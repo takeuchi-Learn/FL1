@@ -150,6 +150,8 @@
     <ClCompile Include="App\Scene\PlayScene.cpp" />
     <ClCompile Include="Engine\Util\YamlLoader.cpp" />
     <ClCompile Include="Engine\Texture\Texture.cpp" />
+    <ClCompile Include="App\Scene\GameClear.cpp" />
+    <ClCompile Include="App\Scene\GameOver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
@@ -197,6 +199,8 @@
     <ClInclude Include="Engine\Util\YamlLoader.h" />
     <ClInclude Include="Engine\Util\Stopwatch.h" />
     <ClInclude Include="Engine\Texture\Texture.h" />
+    <ClInclude Include="App\Scene\GameClear.h" />
+    <ClInclude Include="App\Scene\GameOver.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

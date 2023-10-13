@@ -13,7 +13,8 @@
 #include <algorithm>
 
 #include "TitleScene.h"
-
+#include "GameClear.h"
+#include "GameOver.h"
 using namespace DirectX;
 
 namespace
@@ -159,6 +160,17 @@ void PlayScene::update()
 		SceneManager::ins()->changeScene<TitleScene>();
 		return;
 	}
+	if (Input::ins()->triggerKey(DIK_1))
+	{
+		SceneManager::ins()->changeScene<GameClear>();
+		return;
+	}
+	if (Input::ins()->triggerKey(DIK_2))
+	{
+		SceneManager::ins()->changeScene<GameOver>();
+		return;
+	}
+
 
 	if (Input::ins()->triggerKey(DIK_P))
 	{
