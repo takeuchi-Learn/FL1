@@ -14,8 +14,6 @@
 
 #include "TitleScene.h"
 
-#include"../GameCamera.h"
-
 using namespace DirectX;
 
 namespace
@@ -26,7 +24,7 @@ namespace
 	}
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
-	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -250);
+	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
 	constexpr XMFLOAT3 lightPosDef = XMFLOAT3(0, 0, -cameraPosDef.z * 2.f);
 
 	XMFLOAT3 defAtt{};
