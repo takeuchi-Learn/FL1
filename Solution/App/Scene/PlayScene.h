@@ -12,6 +12,7 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
+class Player;
 
 class PlayScene :
 	public GameScene
@@ -28,11 +29,10 @@ private:
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<Sprite> sprite;
 
-	std::unique_ptr<ObjModel> model;
-	std::unique_ptr<Object3d> object;
-	size_t pbrPP{};
-
 	std::unique_ptr<ParticleMgr> particle;
+
+	std::unique_ptr<ObjModel> playerModel;
+	std::unique_ptr<Player> player;
 
 public:
 	PlayScene();
