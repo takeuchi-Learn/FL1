@@ -330,10 +330,19 @@ void PlayScene::update()
 	{
 		object->scale = { 2,2,2 };
 	}
-	else 
+	else
 	{
-		float s = 250.0f;
-		object->scale = { s,s,s };
+		float s = object->scale.x;
+		if (Input::getInstance()->hitKey(DIK_X))
+		{
+			s -= 1.0f;
+			object->scale = { s,s,s };
+		}
+		if (Input::getInstance()->hitKey(DIK_C))
+		{
+			s += 1.0f;
+			object->scale = { s,s,s };
+		}
 	}
 }
 

@@ -76,6 +76,8 @@ void GameCamera::movePosition()
 
 GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 {
+	// 平行投影の場合、相当カメラ離したほうがいい(-150くらいがベストs)
+
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
 }
