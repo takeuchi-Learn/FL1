@@ -16,7 +16,7 @@ void GameCamera::upRotate()
 {
 	// 傾きの最大値
 	constexpr float maxAngle = 60.0f;
-	// 1フレームの回転量
+	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
 	constexpr float frameAngle = 3.0f;
 
 	// 入力確認してカメラを傾ける
@@ -35,47 +35,11 @@ void GameCamera::upRotate()
 	if (angle >= maxAngle)angle = maxAngle;
 	else if (angle <= -maxAngle)angle = -maxAngle;
 
-	// 上ベクトルをセット
+	// angleを上ベクトルに変換してセット
 	DirectX::XMFLOAT2 upXY;
 	angleToUp(angle, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
-
-#ifdef _DEBUG
-
-void GameCamera::movePosition()
-{
-	DirectX::XMFLOAT3 xyPos(0, 0, 0);
-	constexpr float frameMove = 0.4f;
-	if (Input::getInstance()->hitKey(DIK_W))
-	{
-		xyPos.y += frameMove;
-	}
-	if (Input::getInstance()->hitKey(DIK_S))
-	{
-		xyPos.y -= frameMove;
-	}
-	if (Input::getInstance()->hitKey(DIK_A))
-	{
-		xyPos.x -= frameMove;
-	}
-	if (Input::getInstance()->hitKey(DIK_D))
-	{
-		xyPos.x += frameMove;
-	}
-	if (Input::getInstance()->hitKey(DIK_Q))
-	{
-		xyPos.z -= frameMove;
-	}
-	if (Input::getInstance()->hitKey(DIK_E))
-	{
-		xyPos.z += frameMove;
-	}
-	moveCamera(xyPos);
-
-
-}
-#endif // _DEBUG
 
 GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 {
@@ -87,19 +51,6 @@ GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 
 void GameCamera::gameCameraUpdate()
 {
+	// 回転
 	upRotate();
-
-#ifdef _DEBUG
-
-	// デバッグ用
-	// カメラ移動
-	movePosition();
-
-	// 透視投影と平行投影の切り替え
-	if (Input::getInstance()->triggerKey(DIK_Z))
-	{
-		setPerspectiveProjFlag(!getPerspectiveProjFlag());
-	}
-#endif // _DEBUG
-
 }

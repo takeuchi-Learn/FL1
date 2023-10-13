@@ -20,11 +20,6 @@ private:
 	/// @brief 上ベクトルの回転(カメラ回転)
 	void upRotate();
 
-#ifdef _DEBUG
-
-	/// @brief カメラ平行移動
-	void movePosition();
-#endif // _DEBUG
 public:
 
 	/// @brief コンストラクタ
