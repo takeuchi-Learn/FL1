@@ -7,6 +7,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 	// 0.0fで上を向くように90.0fを加算
 	angle += 90.0f;
 
+	// 変換
 	constexpr float pi = 3.141592f;
 	upXY.x = std::cos(angle * pi / 180.0f);
 	upXY.y = std::sin(angle * pi / 180.0f);
@@ -20,7 +21,6 @@ void GameCamera::upRotate()
 	constexpr float frameAngle = 3.0f;
 
 	// 入力確認してカメラを傾ける
-	// 上ベクトル変更する仕様っぽい
 	if(Input::getInstance()->hitKey(DIK_LEFT) && angle >= -maxAngle)
 	{
 		angle -= frameAngle;
@@ -43,7 +43,7 @@ void GameCamera::upRotate()
 
 GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 {
-	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだと-250くらいがベスト)
+	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-250くらいがベスト)
 
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
