@@ -17,18 +17,21 @@ private:
 	/// @param float2 上ベクトルを格納するXMFLOAT2
 	void angleToUp(float angle,DirectX::XMFLOAT2& float2);
 	
-	/// @brief 入力確認と処理
+	/// @brief 上ベクトルの回転(カメラ回転)
 	void upRotate();
 
-	// デバッグ用
+#ifdef _DEBUG
+
+	/// @brief カメラ平行移動
 	void movePosition();
+#endif // _DEBUG
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(AbstractGameObj* obj = nullptr);
 
-	/// @brief 更新
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
 	void gameCameraUpdate();
 
 };

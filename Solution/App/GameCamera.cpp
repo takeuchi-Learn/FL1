@@ -41,9 +41,11 @@ void GameCamera::upRotate()
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 
+#ifdef _DEBUG
+
 void GameCamera::movePosition()
 {
-	DirectX::XMFLOAT3 xyPos( 0,0,0 );
+	DirectX::XMFLOAT3 xyPos(0, 0, 0);
 	constexpr float frameMove = 0.4f;
 	if (Input::getInstance()->hitKey(DIK_W))
 	{
@@ -73,10 +75,11 @@ void GameCamera::movePosition()
 
 
 }
+#endif // _DEBUG
 
 GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 {
-	// 平行投影の場合、相当カメラ離したほうがいい(-150くらいがベストs)
+	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだと-250くらいがベスト)
 
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
