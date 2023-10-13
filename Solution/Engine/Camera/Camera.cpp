@@ -113,12 +113,15 @@ void Camera::updateViewMatrix()
 
 void Camera::updateProjectionMatrix()
 {
-	// 透視投影による射影行列の生成
-	matProjection = XMMatrixPerspectiveFovLH(
-		fogAngleYRad,
-		aspectRatio,
-		nearZ, farZ
-	);
+	if (perspectiveProjFlag)
+	{
+		// 透視投影による射影行列の生成
+		matProjection = XMMatrixPerspectiveFovLH(fogAngleYRad, aspectRatio, nearZ, farZ);
+	} else
+	{
+		// 平行投影
+		matProjection = XMMatrixOrthographicLH(WinAPI::window_width, WinAPI::window_height, nearZ, farZ);
+	}
 }
 
 void Camera::updateMatrix()
@@ -211,7 +214,7 @@ Camera::Camera(const float window_width, const float window_height) :
 	aspectRatio(window_width / window_height),
 	fogAngleYRad(XM_PIDIV3),
 	nearZ(1.f),
-	farZ(256.f)
+	farZ(10000.f)
 {
 	//ビュー行列の計算
 	updateViewMatrix();
