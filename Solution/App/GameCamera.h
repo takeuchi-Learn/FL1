@@ -7,12 +7,22 @@ class GameCamera :
     public CameraObj
 {
 private:
+	
 	// 角度Z
 	float angle = 0.0f;
 
 private:
+	/// @brief 角度を上ベクトルに変換
+	/// @param angle 角度
+	/// @param float2 上ベクトルを格納するXMFLOAT2
 	void angleToUp(float angle,DirectX::XMFLOAT2& float2);
-	void checkInput();
+	
+	/// @brief 入力確認と処理
+	void upRotate();
+
+	// デバッグ用
+	void movePosition();
+
 
 public:
 

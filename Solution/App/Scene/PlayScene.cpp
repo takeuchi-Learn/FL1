@@ -325,6 +325,16 @@ void PlayScene::update()
 	camera->update();
 	camera->gameCameraUpdate();
 	light->update();
+
+	if (camera->getPerspectiveProjFlag())
+	{
+		object->scale = { 2,2,2 };
+	}
+	else 
+	{
+		float s = 250.0f;
+		object->scale = { s,s,s };
+	}
 }
 
 void PlayScene::drawObj3d()
