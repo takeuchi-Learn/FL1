@@ -51,6 +51,7 @@ public:
 	inline ID3D12Resource* getConstBuff() { return constBuff.Get(); }
 
 	void loadTexture(const std::string& directoryPath, UINT texNum, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle);
+	void loadMonoColorTexture(UINT texNum, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle);
 
 	void update();
 
