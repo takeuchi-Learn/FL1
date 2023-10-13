@@ -51,6 +51,9 @@ private:
 	float farZ;
 	float fogAngleYRad;
 
+	// 透視投影かどうか
+	bool perspectiveProjFlag = true;
+
 	// --------------------
 	// メンバ関数
 	// --------------------
@@ -68,6 +71,8 @@ private:
 	virtual void postUpdate() {};
 
 public:
+	inline bool getPerspectiveProjFlag() const { return perspectiveProjFlag; }
+
 	/// @brief 視線ベクトル（奥方向）を取得
 	inline const XMVECTOR& getEyeVec() const { return cameraAxisZ; }
 
@@ -105,6 +110,9 @@ public:
 
 	// 注視点座標の取得
 	inline const XMFLOAT3& getTarget() const { return target; }
+
+	/// @brief 透視投影かどうかを設定
+	inline void setPerspectiveProjFlag(bool perspectiveProjFlag) { this->perspectiveProjFlag = perspectiveProjFlag; projectionDirty = true; };
 
 	// 注視点座標の設定
 	inline void setTarget(const XMFLOAT3& target) { this->target = target; viewDirty = true; }
