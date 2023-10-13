@@ -5,7 +5,6 @@
 #include <Util/Timer.h>
 #include <fstream>
 #include <Util/YamlLoader.h>
-#include <GameObject/BaseGameObjectHavingHp.h>
 #include <3D/Light/Light.h>
 using namespace DirectX;
 
@@ -14,15 +13,21 @@ bool Player::loadYamlFile()
 	constexpr const char filePath[] = "Resources/DataFile/player.yml";
 
 	Yaml::Node root{};
-
 	YamlLoader::LoadYamlFile(root, filePath);
+
+	auto* obj = gameObj->getObj();
+
+	auto& startPos = obj->position;
+	LoadYamlDataToFloat3(root, startPos);
 
 	return false;
 }
 
 Player::Player(Camera* camera, ObjModel* model) :
 	gameObj(std::make_unique<BaseGameObjectHavingHp>(camera, model))
-{}
+{
+	loadYamlFile();
+}
 
 void Player::update()
 {

@@ -8,8 +8,8 @@
 #include <DirectXMath.h>
 #include <functional>
 #include <memory>
+#include <GameObject/BaseGameObjectHavingHp.h>
 
-class BaseGameObjectHavingHp;
 class Camera;
 class ObjModel;
 class Light;
