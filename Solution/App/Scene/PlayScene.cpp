@@ -26,7 +26,7 @@ namespace
 	}
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
-	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -5);
+	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -250);
 	constexpr XMFLOAT3 lightPosDef = XMFLOAT3(0, 0, -cameraPosDef.z * 2.f);
 
 	XMFLOAT3 defAtt{};
@@ -138,6 +138,7 @@ PlayScene::PlayScene() :
 	endModel = std::make_unique<ObjModel>("Resources/sayuu", "sayuu2", 0u, true, true);
 	object = std::make_unique<Object3d>(camera.get(), model.get());
 	object->position = objectPosDef;
+	object->scale = { 110.0f,110.0f,110.0f };
 	object->color = XMFLOAT4(0.25f, 0.25f, 1, 1);
 
 	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
@@ -326,24 +327,6 @@ void PlayScene::update()
 	camera->gameCameraUpdate();
 	light->update();
 
-	if (camera->getPerspectiveProjFlag())
-	{
-		object->scale = { 2,2,2 };
-	}
-	else
-	{
-		float s = object->scale.x;
-		if (Input::getInstance()->hitKey(DIK_X))
-		{
-			s -= 1.0f;
-			object->scale = { s,s,s };
-		}
-		if (Input::getInstance()->hitKey(DIK_C))
-		{
-			s += 1.0f;
-			object->scale = { s,s,s };
-		}
-	}
 }
 
 void PlayScene::drawObj3d()

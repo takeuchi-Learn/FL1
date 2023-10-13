@@ -22,8 +22,6 @@ private:
 
 	// デバッグ用
 	void movePosition();
-
-
 public:
 
 	/// @brief コンストラクタ
