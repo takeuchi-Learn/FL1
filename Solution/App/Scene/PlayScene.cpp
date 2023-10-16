@@ -111,6 +111,8 @@ PlayScene::PlayScene() :
 
 	camera->setEye(cameraPosDef);
 	camera->setTarget(objectPosDef);
+	// プレイヤーとカメラの距離を700に設定
+	camera->setEye2TargetLen(700.f);
 	pointLightPolarPos = cameraPosDef;
 
 	constexpr float lightAmbient = 0.f;
