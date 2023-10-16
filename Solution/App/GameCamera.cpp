@@ -53,8 +53,7 @@ GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
 
-
-	// プレイヤーとカメラの距離を700に設定
+	// プレイヤー(注視点)とカメラの距離を設定
 	setEye2TargetLen(700.f);
 	// 横からの視点にしたいので勝手に角度変わらないようにする
 	setRelativeRotaDeg(DirectX::XMFLOAT3(0, 0, 0));

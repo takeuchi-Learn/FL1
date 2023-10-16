@@ -136,7 +136,7 @@ PlayScene::PlayScene() :
 	endModel = std::make_unique<ObjModel>("Resources/sayuu", "sayuu2", 0u, true, true);
 	object = std::make_unique<Object3d>(camera.get(), model.get());
 	object->position = objectPosDef;
-	object->scale = { 110.0f,110.0f,110.0f };
+	object->scale = { 100.f,100.f,100.f };
 	object->color = XMFLOAT4(0.25f, 0.25f, 1, 1);
 
 	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
