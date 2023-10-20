@@ -12,7 +12,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 	upXY.x = std::cos(angle * pi / 180.0f);
 	upXY.y = std::sin(angle * pi / 180.0f);
 }
- 
+
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
@@ -25,15 +25,14 @@ void GameCamera::upRotate()
 
 	// 入力確認してカメラを傾ける
 	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if(Input::getInstance()->hitKey(DIK_LEFT) && angle >= -maxAngle)
+	if (Input::getInstance()->hitKey(DIK_LEFT) && angle >= -maxAngle)
 	{
 		angle -= frameAngle;
-	}
-	else
-	if (Input::getInstance()->hitKey(DIK_RIGHT) && angle <= maxAngle)
-	{
-		angle += frameAngle;
-	}
+	} else
+		if (Input::getInstance()->hitKey(DIK_RIGHT) && angle <= maxAngle)
+		{
+			angle += frameAngle;
+		}
 #pragma endregion
 
 	// 制限
@@ -44,23 +43,41 @@ void GameCamera::upRotate()
 	DirectX::XMFLOAT2 upXY;
 	angleToUp(angle, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
+
 }
 
-GameCamera::GameCamera(AbstractGameObj* obj) : CameraObj(obj)
+void GameCamera::followObject()
+{
+	if (!obj)return;
+
+	// 追従
+	// Targetをobjの座標に
+	DirectX::XMFLOAT3 objPos = obj->getPosition();
+	setTarget(objPos);
+
+	// eyeをXYだけobjの座標に
+	DirectX::XMFLOAT3 eye = objPos;
+	eye.z = getEye().z;
+	setEye(eye);
+}
+
+GameCamera::GameCamera(AbstractGameObj* obj)
+	:Camera(WinAPI::window_width,
+			WinAPI::window_height)
+	, obj(obj)
 {
 	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-500くらいがベスト)
 
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
-
-	// プレイヤー(注視点)とカメラの距離を設定
-	setEye2TargetLen(700.f);
-	// 横からの視点にしたいので勝手に角度変わらないようにする
-	setRelativeRotaDeg(DirectX::XMFLOAT3(0, 0, 0));
 }
 
 void GameCamera::gameCameraUpdate()
 {
 	// 回転
 	upRotate();
+
+	// 追従
+	followObject();
+
 }
