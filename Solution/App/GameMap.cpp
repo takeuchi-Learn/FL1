@@ -44,6 +44,12 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				return true;
 			}
 
+			// 道なら何も表示しない
+			if (n == MAPCHIP_ROAD)
+			{
+				continue;
+			}
+
 			// ここで "billboard[MAP_CHIP_DATA(n)];" 要素を追加する
 			// todo YAML内の画像ファイルパスを反映させる
 			const auto addRet = billboard.try_emplace(MAP_CHIP_DATA(n), std::make_unique<Billboard>(L"Resources/judgeRange.png", camera));
