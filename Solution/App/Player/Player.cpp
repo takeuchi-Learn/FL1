@@ -33,7 +33,7 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
 	// 追従させるためにポインタを渡す
-	gameCamera->setParentObj(gameObj.get());
+	//gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
@@ -66,6 +66,7 @@ void Player::jump()
 	if (isJump)
 	{
 		// 重力加速度
+		// 大きくすればするほど落下が早くなる
 		constexpr float gAcc = 0.35f;
 
 		fallTime++;
@@ -86,12 +87,15 @@ void Player::jump()
 
 void Player::checkJumpEnd()
 {
-	const float posY = gameObj->getPosition().y;
+
+	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
-	if (posY <= 0.f)
+	if (pos.y < 0.f)
 	{
 		isJump = false;
 		fallTime = 0;
+		pos.y = 0.f;
+		gameObj->setPosition(pos);
 	}
 
 }

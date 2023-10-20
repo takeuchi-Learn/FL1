@@ -10,12 +10,60 @@ class GameCamera :
 	public Camera
 {
 private:
+
+
 	// 追従Obj
 	AbstractGameObj* obj = nullptr;
-	// 角度Z
-	float angle = 0.f;
+	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
+	float angle = 50.f;
+
+	/// @brief カメラの状態列挙
+	enum class CameraState
+	{
+		START,// 開始
+		INPUT,// 入力受付
+		OTHER, //その他(何も更新しないとき)
+	};
+
+	// カメラの状態
+	CameraState cameraState = CameraState::START;
+
+#pragma region START
+	// スタートするまでの時間
+	unsigned short startTimer = 0;
+	// 上記関数の起動フラグ
+	bool addStartTimer = false;
+
+	// 1フレームの傾き(スタート時)。動的に変えるため、変数にしている
+	float startFrameAngle = 1.5f;
+
+#pragma endregion
 
 private:
+#pragma region START
+
+	/// @brief CameraState::STARTのupdate
+	void updateStart();
+
+	/// @brief Start時の移動
+	void startAutoRot();
+
+	/// @brief 変数 startTimer の加算処理
+	void updateStartTimer();
+
+	/// @brief 現在の状態に応じて状態を切り替える
+	void changeCameraState();
+#pragma endregion
+
+#pragma region INPUT
+
+	/// @brief CameraState::INPUTの時のupdate
+	void updateInput();
+
+	/// @brief 入力確認とそれに応じた角度の加算減算
+	void checkInput();
+#pragma endregion
+
 	/// @brief 角度を上ベクトルに変換
 	/// @param angle 角度
 	/// @param float2 上ベクトルを格納するXMFLOAT2
