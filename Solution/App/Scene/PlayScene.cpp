@@ -52,10 +52,11 @@ void PlayScene::update()
 	}
 
 	// 更新
-	billboards->update();
 	camera->gameCameraUpdate();
 	camera->update();
 	light->update();
+
+	billboards->update();
 }
 
 void PlayScene::drawObj3d()
