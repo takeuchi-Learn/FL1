@@ -27,6 +27,8 @@ Player::Player(Camera* camera, ObjModel* model) :
 	gameObj(std::make_unique<BaseGameObjectHavingHp>(camera, model))
 {
 	loadYamlFile();
+
+	gameObj->setScale(XMFLOAT3(100.f,100.f,100.f));
 }
 
 void Player::update()
