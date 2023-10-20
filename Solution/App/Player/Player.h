@@ -32,6 +32,8 @@ class Player
 	//ジャンプしているかどうか
 	bool isJump = false;
 
+	// センサーの値
+	float sensorValue = 0.0f;
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
@@ -72,8 +74,10 @@ public:
 	// 描画
 	void draw();
 
-
-
 	inline void setLight(Light* light) { this->light = light; }
+
+	/// @brief センサーの値格納用
+	/// @param value センサーの値
+	void setSensorValue(const float value) { sensorValue = value; }
 };
 
