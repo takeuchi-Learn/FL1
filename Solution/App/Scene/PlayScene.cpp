@@ -19,8 +19,7 @@ using namespace DirectX;
 
 PlayScene::PlayScene() :
 	light(std::make_unique<Light>()),
-	camera(std::make_unique<Camera>((float)WinAPI::window_width,
-									(float)WinAPI::window_height)),
+	camera(std::make_unique<GameCamera>()),
 	stopwatch(std::make_unique<Stopwatch>()),
 	stopwatchPlayTime(Timer::timeType(0u))
 {
@@ -102,7 +101,9 @@ void PlayScene::update()
 
 	// ライトとカメラの更新
 	camera->update();
+	camera->gameCameraUpdate();
 	light->update();
+
 }
 
 void PlayScene::drawObj3d()

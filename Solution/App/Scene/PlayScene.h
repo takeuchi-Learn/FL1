@@ -4,6 +4,8 @@
 #include <Util/Stopwatch.h>
 #include <memory>
 
+#include"../GameCamera.h"
+
 class Camera;
 class Light;
 class ObjModel;
@@ -24,7 +26,8 @@ private:
 	std::weak_ptr<SoundData> bgm;
 
 	std::unique_ptr<Light> light;
-	std::unique_ptr<Camera> camera;
+	//std::unique_ptr<Camera> camera;
+	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<Sprite> sprite;
@@ -34,6 +37,8 @@ private:
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
 
+private:
+
 public:
 	PlayScene();
 	~PlayScene();
@@ -41,4 +46,6 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
+
+
 };

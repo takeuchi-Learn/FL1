@@ -151,6 +151,7 @@
     <ClCompile Include="Engine\Util\YamlLoader.cpp" />
     <ClCompile Include="Engine\Texture\Texture.cpp" />
     <ClCompile Include="App\Player\Player.cpp" />
+    <ClCompile Include="App\GameCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Engine\Util\Stopwatch.h" />
     <ClInclude Include="Engine\Texture\Texture.h" />
     <ClInclude Include="App\Player\Player.h" />
+    <ClInclude Include="App\GameCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
