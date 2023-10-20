@@ -12,6 +12,7 @@
 #include <3D/ParticleMgr.h>
 #include <algorithm>
 #include <Player/Player.h>
+#include <3D/Billboard/Billboard.h>
 
 #include "TitleScene.h"
 
@@ -44,6 +45,13 @@ PlayScene::PlayScene() :
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
 	player->setLight(light.get());
+
+	billboard = std::make_unique<Billboard>(L"Resources/judgeRange.png", camera.get());
+
+	constexpr auto bbPos = XMFLOAT3(0, 0, 0);
+	constexpr auto bbScale = 1.f;
+	constexpr auto bbColor = XMFLOAT3(1, 0.5f, 1);
+	billboard->add(bbPos, bbScale, 0.f, bbColor);
 
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
@@ -99,6 +107,7 @@ void PlayScene::update()
 	}
 
 	player->update();
+	billboard->update();
 
 	// ライトとカメラの更新
 	camera->update();
@@ -107,7 +116,8 @@ void PlayScene::update()
 
 void PlayScene::drawObj3d()
 {
-	player->draw();
+	//player->draw();
+	billboard->draw();
 	particle->drawWithUpdate();
 }
 

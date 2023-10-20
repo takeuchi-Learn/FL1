@@ -113,6 +113,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
     <ClCompile Include="Engine\GameObject\AbstractGameObj.cpp" />
     <ClCompile Include="Engine\CollisionMgr.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="App\Player\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />
     <ClInclude Include="Engine\CollisionMgr.h" />

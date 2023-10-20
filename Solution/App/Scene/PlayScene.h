@@ -13,6 +13,7 @@ class SpriteBase;
 class SoundData;
 class ParticleMgr;
 class Player;
+class Billboard;
 
 class PlayScene :
 	public GameScene
@@ -33,6 +34,8 @@ private:
 
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
+
+	std::unique_ptr<Billboard> billboard;
 
 public:
 	PlayScene();
