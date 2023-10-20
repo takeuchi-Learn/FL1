@@ -11,17 +11,93 @@
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
 #include <algorithm>
-#include <Player/Player.h>
-#include <3D/Billboard/Billboard.h>
 
 #include "TitleScene.h"
 
 using namespace DirectX;
 
+namespace
+{
+	inline auto toImVec2(const XMFLOAT2& f)
+	{
+		return ImVec2(f.x, f.y);
+	}
+
+	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
+	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
+	constexpr XMFLOAT3 lightPosDef = XMFLOAT3(0, 0, -cameraPosDef.z * 2.f);
+
+	XMFLOAT3 defAtt{};
+
+	bool isPlayAnim{};
+
+	constexpr uint16_t frameMax = 120ui16;
+	uint16_t frame{};
+
+	std::unique_ptr<ObjModel> startModel, endModel;
+
+	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
+	{
+		return XMFLOAT2(
+			std::lerp(s.x, e.x, t),
+			std::lerp(s.y, e.y, t)
+		);
+	}
+	constexpr XMFLOAT3 lerp(const XMFLOAT3& s, const XMFLOAT3& e, float t)
+	{
+		return XMFLOAT3(
+			std::lerp(s.x, e.x, t),
+			std::lerp(s.y, e.y, t),
+			std::lerp(s.z, e.z, t)
+		);
+	}
+
+	constexpr float easeInOutCubic(float x)
+	{
+		if (x < 0.5f)
+		{
+			return 4.f * x * x * x;
+		}
+		const float n = (-2.f * x + 2.f) / 2.f;
+		return 1.f - n * n * n;
+	}
+
+	struct Polar
+	{
+		float r;
+		float thetaRad;
+		float phiRad;
+
+		Polar(float r, float thetaRad, float phiRad) :
+			r(r), thetaRad(thetaRad), phiRad(phiRad)
+		{}
+
+		inline Polar() : Polar(1.f, 0.f, 0.f) {}
+
+		Polar(const XMFLOAT3& f) :
+			r(std::sqrt(f.x* f.x + f.y * f.y + f.z * f.z)),
+			phiRad(std::atan(f.z / (f.x != 0.f ? f.x : 1.E38f)))
+		{
+			thetaRad = std::acos(f.y / r);
+		}
+
+		static inline XMFLOAT3 transF3(const Polar& p)
+		{
+			const float rSinT = p.r * std::sin(p.thetaRad);
+			return XMFLOAT3(rSinT * std::cos(p.phiRad),
+							p.r * std::cos(p.thetaRad),
+							rSinT * std::sin(p.phiRad));
+		}
+
+		inline XMFLOAT3 toXMFLOAT3() const { return transF3(*this); }
+	};
+
+	Polar pointLightPolarPos{}, pLightPolarPos{};
+}
+
 PlayScene::PlayScene() :
 	light(std::make_unique<Light>()),
-	camera(std::make_unique<Camera>((float)WinAPI::window_width,
-									(float)WinAPI::window_height)),
+	camera(std::make_unique<GameCamera>()),
 	stopwatch(std::make_unique<Stopwatch>()),
 	stopwatchPlayTime(Timer::timeType(0u))
 {
@@ -33,25 +109,32 @@ PlayScene::PlayScene() :
 									  XMFLOAT2(0.5f, 0.5f));
 	sprite->color.w = 0.5f;
 
-	camera->setEye(XMFLOAT3(0, 0, -5));
-	camera->setTarget(XMFLOAT3(0, 0, 0));
+	camera->setEye(cameraPosDef);
+	camera->setTarget(objectPosDef);
+	pointLightPolarPos = cameraPosDef;
+
+	constexpr float lightAmbient = 0.f;
+	light->setAmbientColor(XMFLOAT3(lightAmbient, lightAmbient, lightAmbient));
 
 	light->setDirLightActive(0u, true);
 	light->setDirLightDir(0u, XMVectorSet(1, 0, 0, 0));
 	light->setPointLightPos(0u, camera->getEye());
 
+	isPlayAnim = false;
+	frame = 0ui16;
+
+	pbrPP = Object3d::createGraphicsPipeline(BaseObj::BLEND_MODE::ALPHA,
+											 L"Resources/Shaders/PbrObjVS.hlsl",
+											 L"Resources/Shaders/PbrObjPS.hlsl");
+	model = std::make_unique<ObjModel>("Resources/sayuu", "sayuu", 0u, true, true);
+	startModel = std::make_unique<ObjModel>("Resources/sayuu", "sayuu", 0u, true, true);
+	endModel = std::make_unique<ObjModel>("Resources/sayuu", "sayuu2", 0u, true, true);
+	object = std::make_unique<Object3d>(camera.get(), model.get());
+	object->position = objectPosDef;
+	object->scale = { 100.f,100.f,100.f };
+	object->color = XMFLOAT4(0.25f, 0.25f, 1, 1);
+
 	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
-
-	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setLight(light.get());
-
-	billboard = std::make_unique<Billboard>(L"Resources/judgeRange.png", camera.get());
-
-	constexpr auto bbPos = XMFLOAT3(0, 0, 0);
-	constexpr auto bbScale = 1.f;
-	constexpr auto bbColor = XMFLOAT3(1, 0.5f, 1);
-	billboard->add(bbPos, bbScale, 0.f, bbColor);
 
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
@@ -75,7 +158,7 @@ void PlayScene::update()
 	if (Input::ins()->triggerKey(DIK_P))
 	{
 		constexpr float particleVel = 0.1f;
-		particle->createParticle({ 0,0,0 },
+		particle->createParticle(object->position,
 								 10u,
 								 1.f,
 								 particleVel);
@@ -106,18 +189,16 @@ void PlayScene::update()
 		stopwatchPlayTime = stopwatch->getNowTime();
 	}
 
-	player->update();
-	billboard->update();
-
 	// ライトとカメラの更新
 	camera->update();
+	camera->gameCameraUpdate();
 	light->update();
+
 }
 
 void PlayScene::drawObj3d()
 {
-	//player->draw();
-	billboard->draw();
+	object->drawWithUpdate(light.get(), pbrPP);
 	particle->drawWithUpdate();
 }
 
