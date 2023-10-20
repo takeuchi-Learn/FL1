@@ -42,6 +42,7 @@ public:
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
+		float angleRad = 0.f;
 	};
 
 	// パーティクル1粒

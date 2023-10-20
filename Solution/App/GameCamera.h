@@ -36,6 +36,8 @@ public:
 	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
 	void gameCameraUpdate();
 
+	inline float getAngle() const { return angle; }
+
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }
 

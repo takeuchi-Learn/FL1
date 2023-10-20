@@ -81,7 +81,7 @@ void PlayScene::update()
 	camera->update();
 	light->update();
 
-	billboards->update();
+	billboards->update(XMConvertToRadians(-camera->getAngle()));
 }
 
 void PlayScene::drawObj3d()

@@ -215,6 +215,7 @@ void ParticleMgr::update()
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
+	constMap->angleRad = 0.f;
 	constBuff->Unmap(0, nullptr);
 }
 

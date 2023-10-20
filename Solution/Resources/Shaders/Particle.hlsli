@@ -2,6 +2,7 @@ cbuffer cbuff0 : register(b0)
 {
 	matrix mat; // ビュープロジェクション行列
 	matrix matBillboard; // ビルボード行列
+	float angleRad;
 };
 
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体

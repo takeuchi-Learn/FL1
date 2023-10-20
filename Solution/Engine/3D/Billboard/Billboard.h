@@ -63,6 +63,7 @@ public:
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
+		float angleRad = 0.f;
 	};
 
 	// 定数
@@ -109,7 +110,7 @@ public:
 	// 指定の画像で初期化
 	Billboard(const wchar_t* texFilePath, Camera* camera);
 
-	void update();
+	void update(float angleRad = 0.f);
 	void draw();
 
 	inline void setCamera(Camera* camera) { this->camera = camera; }

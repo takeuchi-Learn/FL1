@@ -12,6 +12,9 @@ static const float4 offset_array[vnum] =
 	float4(+0.5f, +0.5f, 0, 0), //右上
 };
 
+// 回転済みオフセットを入れるところ
+static float4 offsetRota[vnum];
+
 //左上が0,0 右下が,1
 static const float2 uv_array[vnum] =
 {
@@ -20,6 +23,9 @@ static const float2 uv_array[vnum] =
 	float2(1, 1), //右下
 	float2(1, 0), //右上
 };
+
+// ループ用
+static uint i;
 
 //点の入力から、四角形を出力
 [maxvertexcount(vnum)]
@@ -30,12 +36,20 @@ void main(
 	//     出力ストリーム型(出力する形状)
 )
 {
+	// 頂点のオフセットを回転する
+	for (i = 0; i < vnum; i++)
+	{
+		offsetRota[i].x = offset_array[i].x * cos(angleRad) - offset_array[i].y * sin(angleRad);
+		offsetRota[i].y = offset_array[i].y * cos(angleRad) + offset_array[i].x * sin(angleRad);
+		offsetRota[i].zw = offset_array[i].zw;
+	}
+	
 	GSOutput element;
 	//4点分回す
-	for (uint i = 0; i < vnum; i++)
+	for (i = 0; i < vnum; i++)
 	{
 		//中心からのオフセットをスケーリング
-		float4 offset = offset_array[i] * input[0].scale;
+		float4 offset = offsetRota[i] * input[0].scale;
 		//中心からのオフセットをビルボード回転(モデル座標)
 		offset = mul(matBillboard, offset);
 		//オフセット分ずらす(ワールド座標)

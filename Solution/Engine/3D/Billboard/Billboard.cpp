@@ -39,7 +39,7 @@ Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
 	assert(SUCCEEDED(result));
 }
 
-void Billboard::update()
+void Billboard::update(float angleRad)
 {
 	// 寿命が尽きたものを全削除
 	billboards.remove_if([&](const std::shared_ptr<BillboardData>& x) { if (x->deleteFlag) { --drawNum; return true; } return false; });
@@ -74,6 +74,7 @@ void Billboard::update()
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
+	constMap->angleRad = angleRad;
 	constBuff->Unmap(0, nullptr);
 }
 
