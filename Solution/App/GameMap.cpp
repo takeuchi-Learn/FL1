@@ -75,7 +75,7 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			}
 
 			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
-			// todo YAML内の画像ファイルパスを反映させる
+			// YAML内の画像ファイルパスを反映させる
 			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
 
 			auto& data = addRet.first->second;
