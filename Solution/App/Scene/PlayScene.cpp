@@ -38,7 +38,8 @@ PlayScene::PlayScene() :
 	camera->setPerspectiveProjFlag(false);
 
 	gameMap = std::make_unique<GameMap>(camera.get());
-	gameMap->loadDataFile(mapYamlPath);
+	const bool ret = gameMap->loadDataFile(mapYamlPath);
+	assert(false == ret);
 }
 
 PlayScene::~PlayScene() {}

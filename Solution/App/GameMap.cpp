@@ -55,12 +55,13 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				continue;
 			}
 
-			const std::string texPath = texFolderPath + texFileNameNode[cellStr].As<std::string>();
 			std::wstring wTexPath{};
 
 			// パスをstringからwstringに変換
 			try
 			{
+				// string型のパス
+				const std::string texPath = texFolderPath + texFileNameNode[cellStr].As<std::string>();
 				// 長さを取得
 				const auto len = MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, (wchar_t*)NULL, 0);
 				std::vector<wchar_t> buf(len);
@@ -81,11 +82,7 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			auto& data = addRet.first->second;
 			data->setCamera(camera);
 
-			// 新たに挿入されたら
-			if (addRet.second)
-			{
-
-			}
+			// 新たに挿入されたら addRet.second == true
 
 			constexpr auto scale = float(WinAPI::window_height) / 10.f;
 
