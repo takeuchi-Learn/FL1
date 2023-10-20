@@ -26,6 +26,16 @@ namespace
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
 	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
+
+	constexpr size_t mapX = 5;
+	constexpr size_t mapY = 5;
+	constexpr uint8_t map[mapY][mapX] = {
+		{1,1,1,1,1},
+		{1,0,1,1,1},
+		{1,0,1,1,1},
+		{1,0,0,0,1},
+		{1,1,1,1,1},
+	};
 }
 
 PlayScene::PlayScene() :
@@ -37,8 +47,22 @@ PlayScene::PlayScene() :
 	camera->setPerspectiveProjFlag(false);
 
 	billboards = std::make_unique<Billboard>(billboardGraphPath, camera.get());
-	billboards->add(objectPosDef, 100.f, 0.f, XMFLOAT4(0, 1, 1, 0.5f));
-	billboards->add(XMFLOAT3(0, 50, 0), 100.f, 0.f, XMFLOAT4(1, 1, 1, 0.5f));
+	for (size_t y = 0; y < mapY; y++)
+	{
+		for (size_t x = 0; x < mapX; x++)
+		{
+			if (0 == map[y][x]) { continue; }
+
+			constexpr float scale = 100.f;
+
+			const auto pos = XMFLOAT3(float(x) * scale - (scale * 2.f), -float(y) * scale + scale, 0);
+
+			// todo アルファが0.5以下だと表示されない
+			const auto color = XMFLOAT4(float(x) / mapX, float(y) / mapY, 1, 1);
+
+			billboards->add(pos, scale, 0.f, color);
+		}
+	}
 }
 
 PlayScene::~PlayScene() {}
