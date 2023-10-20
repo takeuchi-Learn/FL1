@@ -19,7 +19,10 @@ bool GameMap::loadDataFile(const std::string& filePath)
 	{
 		return true;
 	}
-	auto& csv = root["CSV"].As<std::string>("NONE");
+	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
+	auto& texFileNameNode = root["texFileName"];
+
+	auto& csv = root["csv"].As<std::string>("NONE");
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
@@ -27,10 +30,12 @@ bool GameMap::loadDataFile(const std::string& filePath)
 	{
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
+			const auto& cellStr = csvData[y][x];
+
 			constexpr int base = 10;
 			uint8_t n = MAPCHIP_UNDEF;
-			const auto ret = std::from_chars(std::to_address(csvData[y][x].begin()),
-											 std::to_address(csvData[y][x].end()),
+			const auto ret = std::from_chars(std::to_address(cellStr.begin()),
+											 std::to_address(cellStr.end()),
 											 n,
 											 base);
 
@@ -50,10 +55,28 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				continue;
 			}
 
-			// ここで "billboard[MAP_CHIP_DATA(n)];" 要素を追加する
-			// todo YAML内の画像ファイルパスを反映させる
-			const auto addRet = billboard.try_emplace(MAP_CHIP_DATA(n), std::make_unique<Billboard>(L"Resources/judgeRange.png", camera));
+			const std::string texPath = texFolderPath + texFileNameNode[cellStr].As<std::string>();
+			std::wstring wTexPath{};
 
+			// パスをstringからwstringに変換
+			try
+			{
+				// 長さを取得
+				const auto len = MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, (wchar_t*)NULL, 0);
+				std::vector<wchar_t> buf(len);
+
+				//string -> wstring
+				MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, buf.data(), len);
+				wTexPath = std::wstring(buf.data(), buf.data() + len - 1);
+			} catch (...)
+			{
+				assert(0);
+				return true;
+			}
+
+			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
+			// todo YAML内の画像ファイルパスを反映させる
+			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
 
 			auto& data = addRet.first->second;
 			data->setCamera(camera);

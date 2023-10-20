@@ -10,7 +10,7 @@ class GameCamera;
 class GameMap
 {
 private:
-	enum MAP_CHIP_DATA : uint8_t
+	enum MAPCHIP_DATA : uint8_t
 	{
 		/// @brief 未定義
 		MAPCHIP_UNDEF = 0U,
@@ -26,7 +26,7 @@ private:
 	};
 
 private:
-	std::unordered_map<MAP_CHIP_DATA, std::unique_ptr<Billboard>> billboard;
+	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 
 	GameCamera* camera = nullptr;
 
