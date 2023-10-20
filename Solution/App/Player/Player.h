@@ -41,5 +41,7 @@ public:
 	void move();
 
 	inline void setLight(Light* light) { this->light = light; }
+
+	inline const auto& getObj() { return gameObj; }
 };
 
