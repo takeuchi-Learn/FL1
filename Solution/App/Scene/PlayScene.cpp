@@ -24,7 +24,7 @@ namespace
 	}
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
-	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -5);
+	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
 	constexpr XMFLOAT3 lightPosDef = XMFLOAT3(0, 0, -cameraPosDef.z * 2.f);
 
 	XMFLOAT3 defAtt{};
@@ -97,8 +97,7 @@ namespace
 
 PlayScene::PlayScene() :
 	light(std::make_unique<Light>()),
-	camera(std::make_unique<Camera>((float)WinAPI::window_width,
-									(float)WinAPI::window_height)),
+	camera(std::make_unique<GameCamera>()),
 	stopwatch(std::make_unique<Stopwatch>()),
 	stopwatchPlayTime(Timer::timeType(0u))
 {
@@ -137,6 +136,7 @@ PlayScene::PlayScene() :
 	endModel = std::make_unique<ObjModel>("Resources/sayuu", "sayuu2", 0u, true, true);
 	object = std::make_unique<Object3d>(camera.get(), model.get());
 	object->position = objectPosDef;
+	object->scale = { 100.f,100.f,100.f };
 	object->color = XMFLOAT4(0.25f, 0.25f, 1, 1);
 
 	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
@@ -322,7 +322,9 @@ void PlayScene::update()
 
 	// ライトとカメラの更新
 	camera->update();
+	camera->gameCameraUpdate();
 	light->update();
+
 }
 
 void PlayScene::drawObj3d()
