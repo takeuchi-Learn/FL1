@@ -43,6 +43,7 @@ public:
 	// 移動
 	void move();
 
+
 	inline void setLight(Light* light) { this->light = light; }
 };
 

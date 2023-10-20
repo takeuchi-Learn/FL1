@@ -29,7 +29,8 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 {
 	loadYamlFile();
 
-	gameObj->setScale(XMFLOAT3(100.f,100.f,100.f));
+	constexpr float scale = 50.0f;
+	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
 	// 追従させるためにポインタを渡す
 	//gameCamera->setParentObj(gameObj.get());
@@ -62,13 +63,17 @@ void Player::move()
 	XMFLOAT3 position = gameObj->getPosition();
 
 	// 角度に応じて移動
-	// 仮に動かす座標を設定
-	const float addPos = angle * 0.001f;
+	// 一旦加速は考慮せずに実装
+	// ここ変更すると速度が変わる
+	constexpr float speedMag = 0.35f;
+
+	const float addPos = angle * speedMag;
 	position.x += addPos;
 
 	// 計算後セット
 	gameObj->setPosition(position);
 
-
-	
+	// 回転
+	float cameraAngle = gameCamera->getAngle();
+	gameObj->setRotationZ(-cameraAngle * 0.5f + gameObj->getRotation().z);
 }

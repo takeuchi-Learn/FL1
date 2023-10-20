@@ -50,5 +50,6 @@ public:
 	/// @brief 角度の取得
 	/// @return 角度
 	float getAngle()const { return angle; }
+
 };
 
