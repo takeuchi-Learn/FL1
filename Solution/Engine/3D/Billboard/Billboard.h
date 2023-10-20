@@ -7,6 +7,23 @@
 #include <forward_list>
 #include "Camera/Camera.h"
 
+// ビルボード一枚
+class BillboardData
+{
+public:
+	// 座標
+	DirectX::XMFLOAT3 position = {};
+	// 色
+	DirectX::XMFLOAT3 color = { 1, 1, 1 };
+	// スケール
+	float scale = 1.f;
+	// 回転
+	float rotation = 0.f;
+
+	// 要素を削除するかどうか
+	bool deleteFlag = false;
+};
+
 class Billboard
 {
 public:
@@ -46,23 +63,6 @@ public:
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
-	};
-
-	// パーティクル1粒
-	class BillboardData
-	{
-	public:
-		// 座標
-		DirectX::XMFLOAT3 position = {};
-		// 色
-		DirectX::XMFLOAT3 color = {};
-		// スケール
-		float scale = 1.f;
-		// 回転
-		float rotation = 0.f;
-
-		// 要素を削除するかどうか
-		bool deleteFlag = false;
 	};
 
 	// 定数
@@ -114,11 +114,10 @@ public:
 
 	inline void setCamera(Camera* camera) { this->camera = camera; }
 
-
 	std::weak_ptr<BillboardData> add(const XMFLOAT3& position,
 									 float scale,
-									 float rotation,
-									 const XMFLOAT3& color);
+									 float rotation = 0.f,
+									 const XMFLOAT3& color = XMFLOAT3(1.f, 1.f, 1.f));
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();

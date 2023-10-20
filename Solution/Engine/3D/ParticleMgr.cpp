@@ -16,42 +16,63 @@ DX12Base* ParticleMgr::dxBase = DX12Base::getInstance();
 
 namespace
 {
-	XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	constexpr XMFLOAT4 operator+(const XMFLOAT4& lhs, const XMFLOAT4& rhs)
+	{
+		return XMFLOAT4(lhs.x + rhs.x,
+						lhs.y + rhs.y,
+						lhs.z + rhs.z,
+						lhs.w + rhs.w);
+	}
+
+	constexpr XMFLOAT4 operator-(const XMFLOAT4& lhs, const XMFLOAT4& rhs)
+	{
+		return XMFLOAT4(lhs.x - rhs.x,
+						lhs.y - rhs.y,
+						lhs.z - rhs.z,
+						lhs.w - rhs.w);
+	}
+
+	constexpr XMFLOAT4 operator/(const XMFLOAT4& v, float s)
+	{
+		return XMFLOAT4(v.x / s, v.y / s, v.z / s, v.w / s);
+	}
+
+	constexpr XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		return XMFLOAT3(lhs.x + rhs.x,
 						lhs.y + rhs.y,
 						lhs.z + rhs.z);
 	}
 
-	void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	constexpr void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
 		lhs.z += rhs.z;
 	}
 
-	XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	constexpr XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		return XMFLOAT3(lhs.x - rhs.x,
 						lhs.y - rhs.y,
 						lhs.z - rhs.z);
 	}
 
-	XMFLOAT3 operator/(const XMFLOAT3& lhs, const float rhs)
+	constexpr XMFLOAT3 operator/(const XMFLOAT3& lhs, const float rhs)
 	{
 		return XMFLOAT3(lhs.x / rhs,
 						lhs.y / rhs,
 						lhs.z / rhs);
 	}
 
-	XMFLOAT3 operator*(const XMFLOAT3& lhs, const float rhs)
+	constexpr XMFLOAT3 operator*(const XMFLOAT3& lhs, const float rhs)
 	{
 		return XMFLOAT3(lhs.x * rhs,
 						lhs.y * rhs,
 						lhs.z * rhs);
 	}
 
-	XMFLOAT3 operator*(float lhs, const XMFLOAT3& rhs)
+	constexpr XMFLOAT3 operator*(float lhs, const XMFLOAT3& rhs)
 	{
 		return XMFLOAT3(lhs * rhs.x,
 						lhs * rhs.y,
@@ -177,6 +198,7 @@ void ParticleMgr::update()
 			vertMap->pos = it->position;
 			// スケール
 			vertMap->scale = it->scale;
+			// 色
 			vertMap->color = it->color;
 			// 次の頂点へ
 			vertMap++;

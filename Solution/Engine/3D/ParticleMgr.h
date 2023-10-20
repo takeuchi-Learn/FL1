@@ -65,7 +65,7 @@ public:
 		// 加速度
 		XMFLOAT3 accel = {};
 		// 色
-		XMFLOAT3 color = {};
+		XMFLOAT3 color = { 1, 1, 1 };
 		// スケール
 		float scale = 1.0f;
 		// 回転

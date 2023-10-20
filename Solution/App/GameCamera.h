@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "../Engine/Camera/Camera.h"
-#include "../Engine/GameObject/AbstractGameObj.h"
+#include <Camera/Camera.h>
+#include <GameObject/AbstractGameObj.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも

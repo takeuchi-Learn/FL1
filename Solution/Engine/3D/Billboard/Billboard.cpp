@@ -11,8 +11,7 @@ using namespace Microsoft::WRL;
 
 DX12Base* Billboard::dxBase = DX12Base::getInstance();
 
-Billboard::Billboard() : Billboard(L"Resources/white.png", nullptr)
-{}
+Billboard::Billboard() : Billboard(L"Resources/white.png", nullptr) {}
 
 Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
 	camera(camera)
@@ -51,7 +50,7 @@ void Billboard::update()
 	if (SUCCEEDED(result))
 	{
 		uint32_t vertCount = 0;
-		// パーティクルの情報を1つずつ反映
+		// 各要素の情報を1つずつ反映
 		for (auto& it : billboards)
 		{
 			// 座標
@@ -114,10 +113,10 @@ void Billboard::draw()
 	dxBase->getCmdList()->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-std::weak_ptr<Billboard::BillboardData> Billboard::add(const XMFLOAT3& position,
-					float scale,
-					float rotation,
-					const XMFLOAT3& color)
+std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
+											float scale,
+											float rotation,
+											const XMFLOAT3& color)
 {
 	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
 	++drawNum;
