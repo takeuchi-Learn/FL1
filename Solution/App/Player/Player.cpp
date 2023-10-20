@@ -33,7 +33,7 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
 	// 追従させるためにポインタを渡す
-	//gameCamera->setParentObj(gameObj.get());
+	gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
@@ -51,6 +51,9 @@ void Player::draw()
 
 void Player::jump()
 {
+	// ジャンプ時のカメラの追従をどうするか聞く
+	// 完全に追従するかそうじゃないか
+
 	if (Input::getInstance()->triggerKey(DIK_Z))
 	{
 		isJump = true;
