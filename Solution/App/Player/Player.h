@@ -59,7 +59,7 @@ private:
 		return startVel + -gravAcc * static_cast<float>(t);
 	}
 
-	/// @brief ジャンプ中の座標更新処理鵜
+	/// @brief ジャンプ中の座標更新処理
 	void updateJumpPos();
 	// ジャンプ
 	void jump();
