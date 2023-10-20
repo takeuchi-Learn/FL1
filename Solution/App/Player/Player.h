@@ -29,8 +29,13 @@ class Player
 	float fallStartSpeed = 0.0f;
 	//現在の落下速度
 	float currentFallVelovity = 0.0f;
+	// 重力加速度(一旦プレイヤー内に宣言)
+	const float gAcc = 0.35f;
+
 	//ジャンプしているかどうか
 	bool isJump = false;
+	// バウンドしているかどうか
+	bool isBound = false;
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -54,10 +59,16 @@ private:
 		return startVel + -gravAcc * static_cast<float>(t);
 	}
 
+	/// @brief ジャンプ中の座標更新処理鵜
+	void updateJumpPos();
 	// ジャンプ
 	void jump();
 	// ジャンプ終了確認
 	void checkJumpEnd();
+	// バウンド
+	void bound();
+	// バウンド終了確認
+	void checkBoundEnd();
 
 	// 移動
 	void move();
