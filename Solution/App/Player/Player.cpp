@@ -51,6 +51,45 @@ void Player::draw()
 
 void Player::jump()
 {
+	if (Input::getInstance()->triggerKey(DIK_Z))
+	{
+		isJump = true;
+
+		// 初速度などを設定
+		// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
+		fallStartSpeed = 18.f;
+	}
+
+	if (isJump)
+	{
+		// 重力加速度
+		constexpr float gAcc = 0.35f;
+
+		fallTime++;
+
+		const float PRE_VEL_Y = currentFallVelovity;
+		currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
+		const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
+
+
+		//毎フレーム速度を加算
+		XMFLOAT3 position = gameObj->getPosition();
+		position.y += currentFallVelovity;
+		gameObj->setPosition(position);
+	}
+
+	checkJumpEnd();
+}
+
+void Player::checkJumpEnd()
+{
+	const float posY = gameObj->getPosition().y;
+	// 仮に0.f以下になったらジャンプ終了
+	if (posY <= 0.f)
+	{
+		isJump = false;
+		fallTime = 0;
+	}
 
 }
 
