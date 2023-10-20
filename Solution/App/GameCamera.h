@@ -16,6 +16,8 @@ private:
 	float angle = 0.f;
 
 private:
+	void preUpdate() override;
+
 	/// @brief 角度を上ベクトルに変換
 	/// @param angle 角度
 	/// @param float2 上ベクトルを格納するXMFLOAT2
@@ -27,16 +29,16 @@ private:
 	/// @brief 追従
 	void followObject();
 
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
+	void gameCameraUpdate();
+
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(AbstractGameObj* obj = nullptr);
 
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
-
-	inline float getAngle() const { return angle; }
+	inline float getAngleDeg() const { return angle; }
 
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }

@@ -2,6 +2,11 @@
 
 #include"../Engine/Input/Input.h"
 
+void GameCamera::preUpdate()
+{
+	gameCameraUpdate();
+}
+
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算

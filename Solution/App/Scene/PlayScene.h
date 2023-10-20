@@ -3,19 +3,15 @@
 #include <System/GameScene.h>
 #include <memory>
 
-class Light;
 class GameCamera;
-class Billboard;
-class BillboardData;
+class GameMap;
 
 class PlayScene :
 	public GameScene
 {
 private:
-	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
-
-	std::unique_ptr<Billboard> billboards;
+	std::unique_ptr<GameMap> gameMap;
 
 public:
 	PlayScene();

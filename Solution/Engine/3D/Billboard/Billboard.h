@@ -92,7 +92,6 @@ private:
 	D3D12_VERTEX_BUFFER_VIEW vbView;
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuff;
-	// パーティクル配列
 	std::forward_list<std::shared_ptr<BillboardData>> billboards;
 	Camera* camera = nullptr;
 
