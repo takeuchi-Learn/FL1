@@ -59,6 +59,9 @@ private:
 
 	// 移動
 	void move();
+
+	// 回転
+	void rot();
 public:
 
 	// コンストラクタ仮

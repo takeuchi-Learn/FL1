@@ -17,7 +17,10 @@ void GameCamera::updateStart()
 
 void GameCamera::startAutoRot()
 {
+
 	// 開始時にプレイヤーのアングルが0の方が見た目いいかもしれない
+	// 実装した
+	// 最後にガクってなるのはカメラの傾きをやめたせい
 
 	// 角度0になったら固定してタイマー加算開始
 	if(angle <= 0)
@@ -27,23 +30,47 @@ void GameCamera::startAutoRot()
 	}
 	else
 	{
-		// 傾きの最低値
-		constexpr float startFrameAngleMin = 0.1f;
-		// 最低値を下回ったら固定
-		if(startFrameAngle <= startFrameAngleMin)
+		if (!startLerp)
 		{
-			startFrameAngle = startFrameAngleMin;
+
+			// 傾きの最低値
+			constexpr float startFrameAngleMin = 0.1f;
+			// 最低値を下回ったら固定
+			if (startFrameAngle <= startFrameAngleMin)
+			{
+				startFrameAngle = startFrameAngleMin;
+			} else
+			{
+				// 1フレームに減算する量
+				constexpr float subStartFrameAngle = 0.25f;
+				// 段々遅くするために少しずつ減らす
+				startFrameAngle -= subStartFrameAngle;
+			}
+
+			// 少しずつ平行にしていく
+			angle -= startFrameAngle;
 		}
-		else
+		
+		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
+		// プレイヤーの角度を取得
+		const float objAngleZ = obj->getRotation().z;
+		
+		// angleの最低値
+		constexpr float angleMin = 1.0f;
+		if(angle <= angleMin && !startLerp)
 		{
-			// 1フレームに減算する量
-			constexpr float subStartFrameAngle = 0.2f;
-			// 段々遅くするために少しずつ減らす
-			startFrameAngle -= subStartFrameAngle;
+			angle = angleMin;
+			startLerp = true;
+			
 		}
 
-		// 少しずつ平行にしていく
-		angle -= startFrameAngle;
+		if (startLerp && objAngleZ > -angleMin)
+		{
+			angle = 0.f;
+			//obj->setRotationZ(0.f);
+		}
+
+
 	}
 }
 

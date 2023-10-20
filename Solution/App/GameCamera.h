@@ -15,7 +15,7 @@ private:
 	// 追従Obj
 	AbstractGameObj* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
-	float angle = 50.f;
+	float angle = 20.f;
 
 	/// @brief カメラの状態列挙
 	enum class CameraState
@@ -36,7 +36,8 @@ private:
 
 	// 1フレームの傾き(スタート時)。動的に変えるため、変数にしている
 	float startFrameAngle = 1.5f;
-
+	// スタート演出の補間処理
+	bool startLerp = false;
 #pragma endregion
 
 private:

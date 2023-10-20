@@ -33,7 +33,7 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
 	// 追従させるためにポインタを渡す
-	//gameCamera->setParentObj(gameObj.get());
+	gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
@@ -87,7 +87,6 @@ void Player::jump()
 
 void Player::checkJumpEnd()
 {
-
 	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
 	if (pos.y < 0.f)
@@ -120,6 +119,24 @@ void Player::move()
 	gameObj->setPosition(position);
 
 	// 回転
-	float cameraAngle = gameCamera->getAngle();
-	gameObj->setRotationZ(-cameraAngle * 0.5f + gameObj->getRotation().z);
+	rot();
+}
+
+void Player::rot()
+{
+	// 角度取得
+	const float angleZ = gameObj->getRotation().z;
+	const float cameraAngle = gameCamera->getAngle();
+	// 角度計算
+	float setAngle = -cameraAngle * 0.5f + angleZ;
+
+	// オーバーフロー対策
+	if (angleZ <= -360.f)
+	{
+		// 360足す
+		setAngle += 360.f;
+	}
+
+	// セット
+	gameObj->setRotationZ(setAngle);
 }
