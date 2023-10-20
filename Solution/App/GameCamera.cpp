@@ -79,5 +79,9 @@ void GameCamera::gameCameraUpdate()
 
 	// 追従
 	followObject();
-
+	if (Input::getInstance()->hitKey(DIK_A))
+	{
+		DirectX::XMFLOAT3 eye = getEye();
+		int fh3ifr = 0;
+	}
 }

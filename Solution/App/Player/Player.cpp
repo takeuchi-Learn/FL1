@@ -23,17 +23,24 @@ bool Player::loadYamlFile()
 	return false;
 }
 
-Player::Player(Camera* camera, ObjModel* model) :
+Player::Player(GameCamera* camera, ObjModel* model) :
 	gameObj(std::make_unique<BaseGameObjectHavingHp>(camera, model))
+	, gameCamera(camera)
 {
 	loadYamlFile();
 
 	gameObj->setScale(XMFLOAT3(100.f,100.f,100.f));
+	
+	// 追従させるためにポインタを渡す
+	//gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
 {
 	gameObj->update();
+
+	move();
+	jump();
 }
 
 void Player::draw()
@@ -48,5 +55,20 @@ void Player::jump()
 
 void Player::move()
 {
+	// 角度を取得
+	const float angle = gameCamera->getAngle();
 
+	// 座標を取得
+	XMFLOAT3 position = gameObj->getPosition();
+
+	// 角度に応じて移動
+	// 仮に動かす座標を設定
+	const float addPos = angle * 0.001f;
+	position.x += addPos;
+
+	// 計算後セット
+	gameObj->setPosition(position);
+
+
+	
 }

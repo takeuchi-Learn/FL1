@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 #include <GameObject/BaseGameObjectHavingHp.h>
+#include"../GameCamera.h"
 
 class Camera;
 class ObjModel;
@@ -19,6 +20,8 @@ class Player
 	std::unique_ptr<BaseGameObjectHavingHp> gameObj;
 	Light* light = nullptr;
 
+	GameCamera* gameCamera = nullptr;
+
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
@@ -27,7 +30,7 @@ private:
 public:
 
 	// コンストラクタ仮
-	Player(Camera* camera, ObjModel* model);
+	Player(GameCamera* camera, ObjModel* model);
 
 	// 更新
 	void update();

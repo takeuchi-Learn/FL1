@@ -46,5 +46,9 @@ public:
 	/// @brief Z座標
 	/// @param z 
 	void setEyeZ(float z) { setEye(DirectX::XMFLOAT3(0, 0, z)); }
+
+	/// @brief 角度の取得
+	/// @return 角度
+	float getAngle()const { return angle; }
 };
 
