@@ -116,7 +116,7 @@ void Billboard::draw()
 std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
 											float scale,
 											float rotation,
-											const XMFLOAT3& color)
+											const XMFLOAT4& color)
 {
 	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
 	++drawNum;
@@ -248,7 +248,7 @@ void Billboard::InitializeGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // 色
-			"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

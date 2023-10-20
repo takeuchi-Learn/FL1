@@ -14,7 +14,7 @@ public:
 	// 座標
 	DirectX::XMFLOAT3 position = {};
 	// 色
-	DirectX::XMFLOAT3 color = { 1, 1, 1 };
+	DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 	// スケール
 	float scale = 1.f;
 	// 回転
@@ -55,7 +55,7 @@ public:
 	{
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
-		XMFLOAT3 color;
+		XMFLOAT4 color;
 	};
 
 	// 定数バッファ用データ構造体
@@ -117,7 +117,7 @@ public:
 	std::weak_ptr<BillboardData> add(const XMFLOAT3& position,
 									 float scale,
 									 float rotation = 0.f,
-									 const XMFLOAT3& color = XMFLOAT3(1.f, 1.f, 1.f));
+									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();

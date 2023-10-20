@@ -9,14 +9,14 @@ struct VSOutput
 {
 	float4 pos : POSITION; // 頂点座標
 	float scale : TEXCOORD; // スケール
-	float3 color : COLOR;
+	float4 color : COLOR;
 };
 
 struct GSOutput
 {
 	float4 svpos : SV_POSITION; // システム用頂点座標
 	float2 uv : TEXCOORD; // uv値
-	float3 color : COLOR;
+	float4 color : COLOR;
 };
 
 // レンダーターゲットの数は2つ

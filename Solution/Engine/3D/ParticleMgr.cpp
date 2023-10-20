@@ -109,8 +109,8 @@ void ParticleMgr::createParticle(const XMFLOAT3& pos,
 								 const uint16_t particleNum,
 								 const float startScale,
 								 const float vel,
-								 const XMFLOAT3& startCol,
-								 const XMFLOAT3& endCol)
+								 const XMFLOAT4& startCol,
+								 const XMFLOAT4& endCol)
 {
 	for (uint16_t i = 0U; i < particleNum; ++i)
 	{
@@ -264,7 +264,7 @@ void ParticleMgr::add(Timer::timeType life,
 					  const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
 					  float start_scale, float end_scale,
 					  float start_rotation, float end_rotation,
-					  const  XMFLOAT3& start_color, const  XMFLOAT3& end_color)
+					  const  XMFLOAT4& start_color, const  XMFLOAT4& end_color)
 {
 	// リストに要素を追加
 	// C++17からは追加した要素の参照が返ってくる
@@ -404,7 +404,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // 色
-			"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

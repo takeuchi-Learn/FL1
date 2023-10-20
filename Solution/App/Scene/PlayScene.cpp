@@ -34,10 +34,11 @@ PlayScene::PlayScene() :
 {
 	camera->setEye(cameraPosDef);
 	camera->setTarget(objectPosDef);
+	camera->setPerspectiveProjFlag(false);
 
 	billboards = std::make_unique<Billboard>(billboardGraphPath, camera.get());
-	billboards->add(objectPosDef, 100.f, 0.f, XMFLOAT3(0, 1, 1));
-	billboards->add(XMFLOAT3(0, 50, 0), 100.f, 0.f, XMFLOAT3(1, 1, 1));
+	billboards->add(objectPosDef, 100.f, 0.f, XMFLOAT4(0, 1, 1, 0.5f));
+	billboards->add(XMFLOAT3(0, 50, 0), 100.f, 0.f, XMFLOAT4(1, 1, 1, 0.5f));
 }
 
 PlayScene::~PlayScene() {}

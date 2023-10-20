@@ -34,7 +34,7 @@ public:
 	{
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
-		XMFLOAT3 color;
+		XMFLOAT4 color;
 	};
 
 	// 定数バッファ用データ構造体
@@ -65,17 +65,17 @@ public:
 		// 加速度
 		XMFLOAT3 accel = {};
 		// 色
-		XMFLOAT3 color = { 1, 1, 1 };
+		XMFLOAT4 color = { 1, 1, 1, 1 };
 		// スケール
 		float scale = 1.0f;
 		// 回転
 		float rotation = 0.0f;
 		// 初期値
-		XMFLOAT3 s_color = {};
+		XMFLOAT4 s_color = {};
 		float s_scale = 1.0f;
 		float s_rotation = 0.0f;
 		// 最終値
-		XMFLOAT3 e_color = {};
+		XMFLOAT4 e_color = {};
 		float e_scale = 0.0f;
 		float e_rotation = 0.0f;
 		// 現在の時間
@@ -99,8 +99,8 @@ public:
 						const uint16_t particleNum = 10U,
 						const float startScale = 1.f,
 						const float vel = 5.f,
-						const XMFLOAT3& startCol = { 1.f, 1.f, 0.25f },
-						const XMFLOAT3& endCol = { 1.f, 0.f, 1.f });
+						const XMFLOAT4& startCol = { 1.f, 1.f, 0.25f, 1.f },
+						const XMFLOAT4& endCol = { 1.f, 0.f, 1.f, 1.f });
 
 	// メンバ変数
 private:
@@ -170,7 +170,7 @@ public:
 			 const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
 			 float start_scale, float end_scale,
 			 float start_rotation, float end_rotation,
-			 const XMFLOAT3& start_color, const XMFLOAT3& end_color);
+			 const XMFLOAT4& start_color, const XMFLOAT4& end_color);
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();
