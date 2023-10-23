@@ -70,6 +70,9 @@ void Player::updateJumpPos()
 
 void Player::jump()
 {
+	// センサーの値によってジャンプ量細かく変更するか聞く
+
+	// ジャンプパワー
 	constexpr float jumpPower = 18.f;
 	constexpr float bigJumpPower = 25.f;
 
@@ -78,24 +81,28 @@ void Player::jump()
 
 	calcDropVec();
 
-	// ジャンプ時のカメラの追従をどうするか聞く
-	// 完全に追従するかそうじゃないか
+	// ジャンプするのに必要なジャイロの値
+	constexpr float jumpSensorValue = 1.f;
+	constexpr float bigSensorJyroValue = 2.f;
 
-	// ここジャイロ実装したら書き換える
-	if (Input::getInstance()->triggerKey(DIK_Z))
+	if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 	{
 		isJump = true;
 
-		// 初速度などを設定
-		// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-		fallStartSpeed = jumpPower;
+		// 大ジャンプ
+		if (Input::getInstance()->hitKey(DIK_X) || bigSensorJyroValue >= sensorValue)
+		{
+			fallStartSpeed = bigJumpPower;
+		}
+		else// 通常ジャンプ
+		{
+			// 初速度を設定
+			// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
+			fallStartSpeed = jumpPower;
+		}
 	}
 
-	// 仮大ジャンプ
-	if(Input::getInstance()->hitKey(DIK_X))
-	{
-		fallStartSpeed = bigJumpPower;
-	}
+	
 
 	if (!isJump)return;
 
