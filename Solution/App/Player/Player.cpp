@@ -67,6 +67,9 @@ void Player::updateJumpPos()
 
 void Player::jump()
 {
+	constexpr float jumpPower = 18.f;
+	constexpr float bigJumpPower = 25.f;
+
 	// 一旦バウンド中はジャンプ禁止
 	if (isBound)return;
 
@@ -81,7 +84,13 @@ void Player::jump()
 
 		// 初速度などを設定
 		// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-		fallStartSpeed = 18.f;
+		fallStartSpeed = jumpPower;
+	}
+
+	// 仮大ジャンプ
+	if(Input::getInstance()->hitKey(DIK_X))
+	{
+		fallStartSpeed = bigJumpPower;
 	}
 
 	if (!isJump)return;
