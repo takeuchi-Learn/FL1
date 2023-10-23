@@ -40,6 +40,9 @@ void Player::update()
 {
 	gameObj->update();
 
+	// 落下ベクトル計測
+	preFramePosY = currentPosY;
+	currentPosY = gameObj->getPosition().y;
 	move();
 	jump();
 	bound();
@@ -73,6 +76,7 @@ void Player::jump()
 	// 一旦バウンド中はジャンプ禁止
 	if (isBound)return;
 
+	calcDropVec();
 
 	// ジャンプ時のカメラの追従をどうするか聞く
 	// 完全に追従するかそうじゃないか
@@ -116,15 +120,32 @@ void Player::checkJumpEnd()
 		pos.y = 0.f;
 		gameObj->setPosition(pos);
 
-		// バウンド開始処理
-		isBound = true;
-		fallStartSpeed = 5.f;
+		isDrop = false;
+
+		startBound();
 	}
 
 }
 
+void Player::calcDropVec()
+{
+	preFramePosY = currentPosY;
+	currentPosY = gameObj->getPosition().y;
+
+	// preの方が大きい(落下開始)し始めたら代入
+	if(preFramePosY > currentPosY && !isDrop)
+	{
+		dropStartY = currentPosY;
+		isDrop = true;
+	}
+}
+
 void Player::bound()
 {
+	// 高所からの落下、バウンド中に更に落下した時用
+	// 一定以上高さがあったら再バウンドするからこっちが良いかも
+	// 高さというか加速度とかを見て決めたほうがバウンド中落下に対応できる
+
 	if (!isBound)return;
 
 	// 更新
@@ -134,16 +155,35 @@ void Player::bound()
 	checkBoundEnd();
 }
 
+void Player::startBound()
+{
+	// バウンド開始処理
+	isBound = true;
+
+	constexpr float fallVelMag = 0.4f;
+	// 落下した高さに合わせてバウンド量を変える
+	fallStartSpeed = -currentFallVelovity * fallVelMag;
+}
+
 void Player::checkBoundEnd()
 {
 	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
 	if (pos.y < 0.f)
 	{
-		isBound = false;
 		fallTime = 0;
 		pos.y = 0.f;
 		gameObj->setPosition(pos);
+		constexpr float boundEndVel = 3.f;
+		if (-currentFallVelovity <= boundEndVel)
+		{
+			isBound = false;
+			isDrop = false;
+		}
+		else
+		{
+			startBound();
+		}
 	}
 }
 

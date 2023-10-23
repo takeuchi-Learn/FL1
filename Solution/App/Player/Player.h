@@ -22,7 +22,6 @@ class Player
 
 	GameCamera* gameCamera = nullptr;
 
-
 	//落下時間
 	int fallTime = 0;
 	//落下初速
@@ -32,10 +31,18 @@ class Player
 	// 重力加速度(一旦プレイヤー内に宣言)
 	const float gAcc = 0.35f;
 
+	// 落下中かどうか(バウンド用)
+	bool isDrop = false;
 	//ジャンプしているかどうか
 	bool isJump = false;
 	// バウンドしているかどうか
 	bool isBound = false;
+	// 座標Y (バウンド用。関数ばらけてややこしくなるから変数用意。)
+	float currentPosY = 0.f;
+	// 前フレームの高さ(バウンド用)
+	float preFramePosY = 0.f;
+	// 落下開始した時の高さ(バウンド用)
+	float dropStartY = 0.f;
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -65,8 +72,13 @@ private:
 	void jump();
 	// ジャンプ終了確認
 	void checkJumpEnd();
+
+	// 落下ベクトル計測
+	void calcDropVec();
 	// バウンド
 	void bound();
+	// バウンド開始
+	void startBound();
 	// バウンド終了確認
 	void checkBoundEnd();
 
