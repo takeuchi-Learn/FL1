@@ -33,7 +33,7 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
 	// 追従させるためにポインタを渡す
-	gameCamera->setParentObj(gameObj.get());
+	//gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
@@ -42,6 +42,7 @@ void Player::update()
 
 	move();
 	jump();
+	bound();
 }
 
 void Player::draw()

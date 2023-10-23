@@ -11,7 +11,6 @@ class GameCamera :
 {
 private:
 
-
 	// 追従Obj
 	AbstractGameObj* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
@@ -26,7 +25,7 @@ private:
 	};
 
 	// カメラの状態
-	CameraState cameraState = CameraState::START;
+	CameraState cameraState = CameraState::INPUT;
 
 #pragma region START
 	// スタートするまでの時間
