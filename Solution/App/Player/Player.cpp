@@ -40,12 +40,14 @@ void Player::update()
 {
 	gameObj->update();
 
-	// 落下ベクトル計測
-	preFramePosY = currentPosY;
-	currentPosY = gameObj->getPosition().y;
+	// ベクトル計測用
+	preFramePos = currentFramePos;
+	XMFLOAT3 objPos = gameObj->getPosition();
+	currentFramePos = XMFLOAT2(objPos.x, objPos.y);
+
 	move();
 	jump();
-	bound();
+	rebound();
 }
 
 void Player::draw()
@@ -61,7 +63,6 @@ void Player::updateJumpPos()
 	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
-
 	//毎フレーム速度を加算
 	XMFLOAT3 position = gameObj->getPosition();
 	position.y += currentFallVelovity;
@@ -76,8 +77,8 @@ void Player::jump()
 	constexpr float jumpPower = 18.f;
 	constexpr float bigJumpPower = 25.f;
 
-	// 一旦バウンド中はジャンプ禁止
-	if (isBound)return;
+	// 一旦跳ね返り中はジャンプ禁止
+	if (isRebound)return;
 
 	calcDropVec();
 
@@ -90,7 +91,7 @@ void Player::jump()
 		isJump = true;
 
 		// 大ジャンプ
-		if (Input::getInstance()->hitKey(DIK_X) || bigSensorJyroValue >= sensorValue)
+		if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
 		{
 			fallStartSpeed = bigJumpPower;
 		}
@@ -115,7 +116,7 @@ void Player::jump()
 
 void Player::checkJumpEnd()
 {
-	if (isBound)return;
+	if (isRebound)return;
 
 	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
@@ -129,50 +130,50 @@ void Player::checkJumpEnd()
 
 		isDrop = false;
 
-		startBound();
+		startRebound();
 	}
 
 }
 
 void Player::calcDropVec()
 {
-	preFramePosY = currentPosY;
-	currentPosY = gameObj->getPosition().y;
+	preFramePos.y = currentFramePos.y;
+	currentFramePos.y = gameObj->getPosition().y;
 
 	// preの方が大きい(落下開始)し始めたら代入
-	if(preFramePosY > currentPosY && !isDrop)
+	if(currentFramePos.y > preFramePos.y && !isDrop)
 	{
-		dropStartY = currentPosY;
+		dropStartY = currentFramePos.y;
 		isDrop = true;
 	}
 }
 
-void Player::bound()
+void Player::rebound()
 {
-	// 高所からの落下、バウンド中に更に落下した時用
-	// 一定以上高さがあったら再バウンドするからこっちが良いかも
-	// 高さというか加速度とかを見て決めたほうがバウンド中落下に対応できる
-
-	if (!isBound)return;
+	if (!isRebound)return;
 
 	// 更新
 	updateJumpPos();
 
 	// 終了確認
-	checkBoundEnd();
+	checkreBoundEnd();
+
+
+	// 横のバウンド
+
 }
 
-void Player::startBound()
+void Player::startRebound()
 {
-	// バウンド開始処理
-	isBound = true;
+	// 跳ね返り開始処理
+	isRebound = true;
 
 	constexpr float fallVelMag = 0.4f;
-	// 落下した高さに合わせてバウンド量を変える
+	// 落下した高さに合わせて跳ね返り量を変える
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
 }
 
-void Player::checkBoundEnd()
+void Player::checkreBoundEnd()
 {
 	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
@@ -184,15 +185,19 @@ void Player::checkBoundEnd()
 		constexpr float boundEndVel = 3.f;
 		if (-currentFallVelovity <= boundEndVel)
 		{
-			isBound = false;
+			isRebound = false;
 			isDrop = false;
 		}
 		else
 		{
-			startBound();
+			startRebound();
 		}
 	}
 }
+
+void Player::sideRebound()
+{}
+
 
 void Player::move()
 {

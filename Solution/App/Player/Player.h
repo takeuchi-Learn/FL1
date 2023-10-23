@@ -31,18 +31,20 @@ class Player
 	// 重力加速度(一旦プレイヤー内に宣言)
 	const float gAcc = 0.35f;
 
-	// 落下中かどうか(バウンド用)
+	// 落下中かどうか(跳ね返り用)
 	bool isDrop = false;
 	//ジャンプしているかどうか
 	bool isJump = false;
-	// バウンドしているかどうか
-	bool isBound = false;
-	// 座標Y (バウンド用。関数ばらけてややこしくなるから変数用意。)
-	float currentPosY = 0.f;
-	// 前フレームの高さ(バウンド用)
-	float preFramePosY = 0.f;
-	// 落下開始した時の高さ(バウンド用)
+	// 跳ね返りしているかどうか
+	bool isRebound = false;
+	// 落下開始した時の高さ(跳ね返り用)
 	float dropStartY = 0.f;
+
+	// 前フレームの座標(跳ね返り用)
+	DirectX::XMFLOAT2 preFramePos = { 0.f,0.f };
+	// 現フレームの座標(跳ね返り用)
+	DirectX::XMFLOAT2 currentFramePos = { 0.f,0.f };
+
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -51,7 +53,7 @@ private:
 	/// @return エラーがあったかどうか（エラーでtrue）
 	bool loadYamlFile();
 
-	/// @brief 自由落下の速度を計算します。
+	/// @brief 自由落下(投げ上げ)の速度を計算します。
 	/// @param startVel 初速度
 	/// @param gravAcc 加速度
 	/// @param t 時間
@@ -75,12 +77,14 @@ private:
 
 	// 落下ベクトル計測
 	void calcDropVec();
-	// バウンド
-	void bound();
-	// バウンド開始
-	void startBound();
-	// バウンド終了確認
-	void checkBoundEnd();
+	// 跳ね返り
+	void rebound();
+	// 跳ね返り開始
+	void startRebound();
+	// 跳ね返り終了確認
+	void checkreBoundEnd();
+	/// @brief 横跳ね返り
+	void sideRebound();
 
 	// 移動
 	void move();
