@@ -144,11 +144,14 @@ PlayScene::PlayScene() :
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
 						   0.2f);
+
+	sensor = Sensor::create();
 }
 
 PlayScene::~PlayScene()
 {
 	Sound::ins()->stopWave(bgm);
+	sensor->~Sensor();
 }
 
 void PlayScene::update()
@@ -324,7 +327,7 @@ void PlayScene::update()
 	camera->update();
 	camera->gameCameraUpdate();
 	light->update();
-
+	sensor->update();
 }
 
 void PlayScene::drawObj3d()
@@ -366,6 +369,14 @@ void PlayScene::drawFrontSprite()
 		light->getPointLightPos(0u).x,
 		light->getPointLightPos(0u).y,
 		light->getPointLightPos(0u).z);
+	Text("Accel [x:%.1f, y:%.1f, z:%.1f]",
+		sensor->GetAccelX(),
+		sensor->GetAccelY(),
+		sensor->GetAccelZ());
+	Text("Gyro  [x:%.1f, y:%.1f, z:%.1f]",
+		sensor->GetGyroX(),
+		sensor->GetGyroY(),
+		sensor->GetGyroZ());
 	if (RadioButton("アニメーション再生", isPlayAnim))
 	{
 		isPlayAnim = !isPlayAnim;

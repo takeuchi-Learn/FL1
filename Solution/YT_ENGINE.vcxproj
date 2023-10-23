@@ -122,6 +122,9 @@
     <ClCompile Include="Engine\Collision\Collision.cpp" />
     <ClCompile Include="Engine\Collision\CollisionShape.cpp" />
     <ClCompile Include="Engine\2D\DebugText.cpp" />
+    <ClCompile Include="Engine\Imu\Ini.cpp" />
+    <ClCompile Include="Engine\Imu\Sensor.cpp" />
+    <ClCompile Include="Engine\Imu\Serial.cpp" />
     <ClCompile Include="Engine\System\DX12Base.cpp" />
     <ClCompile Include="Engine\GameObject\BaseGameObjectHavingHp.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
@@ -166,6 +169,9 @@
     <ClInclude Include="Engine\Collision\Collision.h" />
     <ClInclude Include="Engine\Collision\CollisionShape.h" />
     <ClInclude Include="Engine\2D\DebugText.h" />
+    <ClInclude Include="Engine\Imu\Ini.h" />
+    <ClInclude Include="Engine\Imu\Sensor.h" />
+    <ClInclude Include="Engine\Imu\Serial.h" />
     <ClInclude Include="Engine\System\DX12Base.h" />
     <ClInclude Include="Engine\GameObject\BaseGameObjectHavingHp.h" />
     <ClInclude Include="Engine\System\GameScene.h" />

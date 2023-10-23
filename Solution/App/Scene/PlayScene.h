@@ -5,6 +5,7 @@
 #include <memory>
 
 #include"../GameCamera.h"
+#include <Imu/Sensor.h>
 
 class Camera;
 class Light;
@@ -36,6 +37,8 @@ private:
 	size_t pbrPP{};
 
 	std::unique_ptr<ParticleMgr> particle;
+	Sensor* sensor = nullptr;
+
 
 private:
 
