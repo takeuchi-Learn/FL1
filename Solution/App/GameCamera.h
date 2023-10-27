@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../Engine/Camera/Camera.h"
 #include "../Engine/GameObject/AbstractGameObj.h"
+#include <Imu/Sensor.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも
@@ -12,8 +13,11 @@ class GameCamera :
 private:
 	// 追従Obj
 	AbstractGameObj* obj = nullptr;
+	// センサー
+	Sensor* sensor = nullptr;
 	// 角度Z
 	float angle = 0.f;
+	float getGyroX = 0.0f;
 
 private:
 	/// @brief 角度を上ベクトルに変換
@@ -34,7 +38,7 @@ public:
 	GameCamera(AbstractGameObj* obj = nullptr);
 
 	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
+	void gameCameraUpdate(Sensor* sensor);
 
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }

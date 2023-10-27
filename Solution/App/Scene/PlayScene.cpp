@@ -151,7 +151,7 @@ PlayScene::PlayScene() :
 PlayScene::~PlayScene()
 {
 	Sound::ins()->stopWave(bgm);
-	sensor->~Sensor();
+	sensor->erase();
 }
 
 void PlayScene::update()
@@ -325,7 +325,7 @@ void PlayScene::update()
 
 	// ライトとカメラの更新
 	camera->update();
-	camera->gameCameraUpdate();
+	camera->gameCameraUpdate(sensor);
 	light->update();
 	sensor->update();
 }

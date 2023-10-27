@@ -6,10 +6,17 @@
 
 class Sensor
 {
-public:
-	static Sensor* create();
+private:
+	Sensor(const char* serialDevice);
+
 	~Sensor();
+public:
+	// 生成
+	static Sensor* create();
+	// 更新
 	bool update();
+	// 消去
+	void erase();
 
 	// 加速度X(傾き)
 	float GetAccelX()
@@ -43,17 +50,17 @@ public:
 	}
 
 private:
+	int updateSensor();
+
 	static const int accelCount = 3;
 	static const int gyroCount = 3;
 	static const int sensorCount = accelCount + gyroCount;
 
-	Sensor(const char* serialDevice);
-	int updateSensor();
-	const int maxRecordCount = 1920;
+	Serial* serial;
+
+	std::array<float, sensorCount> record;
 	bool isRecording = true;
 	bool isFlashing = false;
-	Serial* serial;
-	std::array<float, sensorCount> record;
 	int fps = 0;
 	int dps = 0;
 };

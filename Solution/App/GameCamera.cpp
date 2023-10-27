@@ -16,23 +16,16 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 60.0f;
+	constexpr float maxAngle = 90.0f;
 
-#pragma region ジャイロ導入で消す部分
+#pragma region ジャイロ
 
-	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
-	constexpr float frameAngle = 3.0f;
+	getGyroX = sensor->GetAccelX();
+	getGyroX = std::clamp(getGyroX, -1.0f, 1.0f);
 
 	// 入力確認してカメラを傾ける
-	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if (Input::getInstance()->hitKey(DIK_LEFT) && angle >= -maxAngle)
-	{
-		angle -= frameAngle;
-	} else
-		if (Input::getInstance()->hitKey(DIK_RIGHT) && angle <= maxAngle)
-		{
-			angle += frameAngle;
-		}
+	angle = maxAngle * getGyroX;
+
 #pragma endregion
 
 	// 制限
@@ -72,8 +65,10 @@ GameCamera::GameCamera(AbstractGameObj* obj)
 	setPerspectiveProjFlag(false);
 }
 
-void GameCamera::gameCameraUpdate()
+void GameCamera::gameCameraUpdate(Sensor* sensor)
 {
+	this->sensor = sensor;
+
 	// 回転
 	upRotate();
 

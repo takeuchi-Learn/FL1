@@ -1,15 +1,15 @@
 ﻿#include <windows.h>
 #include "Sensor.h"
 
-//int WINAPI WinMain(_In_ HINSTANCE , _In_opt_ HINSTANCE , _In_ LPSTR lpCmdLine, _In_ int )
-//{
-//	const char platform[] = "Windows";
-//	Sensor* sensor = Sensor::create(platform);
-//	if (!sensor) return 1;
-//	while (sensor->update());
-//	delete sensor;
-//	return 0;
-//}
+Sensor::Sensor(const char* serialDevice)
+{
+	serial = Serial::create(serialDevice);
+}
+
+Sensor::~Sensor()
+{
+	if (this->serial) delete this->serial;
+}
 
 Sensor* Sensor::create()
 {
@@ -19,20 +19,15 @@ Sensor* Sensor::create()
 	return new Sensor(serialDevice.c_str());
 }
 
-Sensor::Sensor(const char* serialDevice)
-{
-	this->serial = Serial::create(serialDevice);
-}
-
-Sensor::~Sensor()
-{
-	if (this->serial) delete this->serial;
-}
-
 bool Sensor::update()
 {
 	const int dataCount = this->updateSensor();
 	return true;
+}
+
+void Sensor::erase()
+{
+	Sensor::~Sensor();
 }
 
 int Sensor::updateSensor()
@@ -66,18 +61,6 @@ int Sensor::updateSensor()
 			const float gyroSensitivity_2kdps = 16.4f;
 			record[i] = *((const int16_t*)p) / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
 		}
-
-		//// 記録中
-		//if (this->isRecording)
-		//{
-		//	this->records.push_back(record);
-		//	// 表示が最大まで行ったら
-		//	if (this->records.size() > this->maxRecordCount)
-		//	{
-		//		// 古い表示を消す
-		//		this->records.erase(this->records.begin());
-		//	}
-		//}
 	}
 
 	const int tailSize = (int)(buf + contentSize - p);
