@@ -178,16 +178,6 @@ void Player::rebound()
 
 	if (pos.x >= testP)
 	{
-		// ここに衝突したときの座標格納する
-		terrainHitPosX = testP;
-
-		gameObj->setPosition(XMFLOAT3(80.f, pos.y, pos.z));
-
-		const XMFLOAT3 clampPos = gameObj->getPosition();
-		currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
-
-		// デバッグ用
-		const float vec = preFramePos.x - currentFramePos.x;
 
 		// 横のバウンド開始
 		startSideRebound();
@@ -278,6 +268,18 @@ void Player::calcSideRebound()
 
 void Player::startSideRebound()
 {
+	const XMFLOAT3 pos = gameObj->getPosition();
+
+	// ここに衝突したときの座標格納する
+	terrainHitPosX = 80.0f;
+
+	gameObj->setPosition(XMFLOAT3(80.f, pos.y, pos.z));
+
+	// 壁の隣に移動
+	const XMFLOAT3 clampPos = gameObj->getPosition();
+	currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+
+	// 進行方向を求めるためにベクトルを求める
 	const float vec = preFramePos.x - currentFramePos.x;
 
 	// 速度に合わせて代入
