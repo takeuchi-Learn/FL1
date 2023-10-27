@@ -56,7 +56,7 @@ void Player::draw()
 	gameObj->draw();
 }
 
-void Player::updateJumpPos()
+void Player::calcJumpPos()
 {
 	fallTime++;
 
@@ -77,7 +77,7 @@ void Player::jump()
 	constexpr float bigJumpPower = 25.f;
 
 	// 一旦跳ね返り中はジャンプ禁止
-	if (isRebound)return;
+	if (isReboundY)return;
 
 	calcDropVec();
 
@@ -101,12 +101,10 @@ void Player::jump()
 		}
 	}
 
-
-
 	if (!isJump)return;
 
 	// ジャンプの更新処理
-	updateJumpPos();
+	calcJumpPos();
 
 	// 終了確認
 	checkJumpEnd();
@@ -114,7 +112,7 @@ void Player::jump()
 
 void Player::checkJumpEnd()
 {
-	if (isRebound)return;
+	if (isReboundY)return;
 
 	// 仮に0.f以下になったらジャンプ終了
 	if (mapPos.y < 0.f)
@@ -128,7 +126,6 @@ void Player::checkJumpEnd()
 
 		startRebound();
 	}
-
 }
 
 void Player::calcDropVec()
@@ -146,23 +143,46 @@ void Player::calcDropVec()
 
 void Player::rebound()
 {
-	if (!isRebound)return;
+	// 横バウンド時の座標計算
+	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
+	calcSideRebound();
+
+	// ここから関数化1
+
+	// 仮に80に設定
+	constexpr float testP = 80.f;
+	// 本来は衝突時に呼び出す
+	if (mapPos.x >= testP)
+	{
+		// ここに衝突したときの座標格納する
+		terrainHitPosX = testP;
+
+		mapPos.x = testP;
+
+		const auto clampPos = mapPos;
+		currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+
+		// デバッグ用
+		const float vec = preFramePos.x - currentFramePos.x;
+
+		// 横のバウンド開始
+		startSideRebound();
+	}
+
+	// ここまで関数化1
+
+	if (!isReboundY)return;
 
 	// 更新
-	updateJumpPos();
-
+	calcJumpPos();
 	// 終了確認
 	checkreBoundEnd();
-
-
-	// 横のバウンド
-
 }
 
 void Player::startRebound()
 {
 	// 跳ね返り開始処理
-	isRebound = true;
+	isReboundY = true;
 
 	constexpr float fallVelMag = 0.4f;
 	// 落下した高さに合わせて跳ね返り量を変える
@@ -179,7 +199,7 @@ void Player::checkreBoundEnd()
 		constexpr float boundEndVel = 3.f;
 		if (-currentFallVelovity <= boundEndVel)
 		{
-			isRebound = false;
+			isReboundY = false;
 			isDrop = false;
 		} else
 		{
@@ -188,9 +208,51 @@ void Player::checkreBoundEnd()
 	}
 }
 
-void Player::sideRebound()
-{}
+void Player::calcSideRebound()
+{
+	if (!isReboundX)return;
 
+	// 座標に加算
+	mapPos.x += sideAddX;
+
+	// 加算値を加算または減算
+
+	// 変化する値
+	constexpr float changeValue = 1.0f;
+	if (sideAddX > 0)
+	{
+		sideAddX -= changeValue;
+
+		// 負の値になったら演算終了
+		if (sideAddX <= 0)
+		{
+			sideAddX = 0;
+			isReboundX = false;
+		}
+	} else
+	{
+		sideAddX += changeValue;
+
+		if (sideAddX >= 0)
+		{
+			sideAddX = 0;
+			isReboundX = false;
+		}
+	}
+}
+
+void Player::startSideRebound()
+{
+	const float vec = preFramePos.x - currentFramePos.x;
+
+	// 速度に合わせて代入
+	constexpr float mag = 1.f;
+	sideAddX = vec * mag;
+
+	isReboundX = true;
+
+	terrainHitObjPosX = mapPos.x;
+}
 
 void Player::move()
 {
