@@ -9,6 +9,16 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
+namespace
+{
+	constexpr auto operator+(const XMFLOAT3& l, const XMFLOAT3& r)
+	{
+		return XMFLOAT3(l.x + r.x,
+						l.y + r.y,
+						l.z + r.z);
+	}
+}
+
 DX12Base* Billboard::dxBase = DX12Base::getInstance();
 
 Billboard::Billboard() : Billboard(L"Resources/white.png", nullptr) {}

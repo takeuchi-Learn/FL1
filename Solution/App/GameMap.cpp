@@ -86,8 +86,8 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 			constexpr auto scale = float(WinAPI::window_height) / 10.f;
 
-			const auto pos = XMFLOAT3(float(x) * scale - (scale * float(xLen) / 2.f),
-									  -float(y) * scale + (scale * float(yLen) / 2.f),
+			const auto pos = XMFLOAT3(float(x) * scale,
+									  -float(y) * scale,
 									  0);
 
 			data->add(pos, scale);
