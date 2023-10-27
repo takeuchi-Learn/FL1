@@ -12,7 +12,6 @@
 #include"../GameCamera.h"
 
 class Camera;
-class ObjModel;
 class Light;
 
 class Player
@@ -94,7 +93,7 @@ private:
 public:
 
 	// コンストラクタ仮
-	Player(GameCamera* camera, ObjModel* model);
+	Player(GameCamera* camera);
 
 	// 更新
 	void update();

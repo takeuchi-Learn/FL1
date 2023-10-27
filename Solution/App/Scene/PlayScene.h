@@ -5,7 +5,6 @@
 
 class GameCamera;
 class GameMap;
-class ObjModel;
 class Player;
 class Light;
 
@@ -14,11 +13,7 @@ class PlayScene :
 {
 private:
 	std::unique_ptr<GameCamera> camera;
-
-	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
-
-private:
 	std::unique_ptr<GameMap> gameMap;
 
 public:

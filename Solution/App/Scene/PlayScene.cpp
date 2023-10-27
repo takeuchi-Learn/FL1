@@ -39,8 +39,7 @@ PlayScene::PlayScene() :
 	camera->setTarget(objectPosDef);
 	camera->setPerspectiveProjFlag(false);
 
-	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player = std::make_unique<Player>(camera.get());
 
 	camera->setParentObj(player->getObj().lock().get());
 

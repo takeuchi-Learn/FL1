@@ -23,7 +23,7 @@ bool Player::loadYamlFile()
 	return false;
 }
 
-Player::Player(GameCamera* camera, ObjModel* model) :
+Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, gameCamera(camera)
 {
