@@ -55,7 +55,7 @@ void Player::draw()
 	gameObj->draw(light);
 }
 
-void Player::updateJumpPos()
+void Player::calcJumpPos()
 {
 	fallTime++;
 
@@ -78,7 +78,7 @@ void Player::jump()
 	constexpr float bigJumpPower = 25.f;
 
 	// 一旦跳ね返り中はジャンプ禁止
-	if (isRebound)return;
+	if (isReboundY)return;
 
 	calcDropVec();
 
@@ -108,7 +108,7 @@ void Player::jump()
 	if (!isJump)return;
 
 	// ジャンプの更新処理
-	updateJumpPos();
+	calcJumpPos();
 
 	// 終了確認
 	checkJumpEnd();
@@ -116,7 +116,7 @@ void Player::jump()
 
 void Player::checkJumpEnd()
 {
-	if (isRebound)return;
+	if (isReboundY)return;
 
 	XMFLOAT3 pos = gameObj->getPosition();
 	// 仮に0.f以下になったらジャンプ終了
@@ -150,23 +150,41 @@ void Player::calcDropVec()
 
 void Player::rebound()
 {
-	if (!isRebound)return;
+	// 仮に80に設定
+	// 本来は衝突時に呼び出す
+	const XMFLOAT3 pos = gameObj->getPosition();
+	if (pos.x >= 80.0f)
+	{
+		gameObj->setPosition(XMFLOAT3(80.f, pos.y, pos.z));
+
+		const XMFLOAT3 clampPos = gameObj->getPosition();
+		currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+
+		// デバッグ用
+		const float vec = preFramePos.x - currentFramePos.x;
+
+		// 横のバウンド開始
+		startSideRebound();
+	}
+
+
+
+	// 横バウンド時の座標計算
+	calcSideRebound();
+
+
+	if (!isReboundY)return;
 
 	// 更新
-	updateJumpPos();
-
+	calcJumpPos();
 	// 終了確認
 	checkreBoundEnd();
-
-
-	// 横のバウンド
-
 }
 
 void Player::startRebound()
 {
 	// 跳ね返り開始処理
-	isRebound = true;
+	isReboundY = true;
 
 	constexpr float fallVelMag = 0.4f;
 	// 落下した高さに合わせて跳ね返り量を変える
@@ -185,7 +203,7 @@ void Player::checkreBoundEnd()
 		constexpr float boundEndVel = 3.f;
 		if (-currentFallVelovity <= boundEndVel)
 		{
-			isRebound = false;
+			isReboundY = false;
 			isDrop = false;
 		}
 		else
@@ -195,9 +213,54 @@ void Player::checkreBoundEnd()
 	}
 }
 
-void Player::sideRebound()
-{}
+void Player::calcSideRebound()
+{
+	if (!isReboundX)return;
 
+	// 座標に加算
+	XMFLOAT3 pos = gameObj->getPosition();
+	pos.x += sideAddX;
+	gameObj->setPosition(pos);
+
+
+	// 加算値を加算または減算
+	
+	// 変化する値
+	constexpr float changeValue = 1.0f;
+	if (sideAddX > 0 )
+	{
+		sideAddX -= changeValue;
+
+		// 負の値になったら演算終了
+		if(sideAddX <= 0)
+		{
+			sideAddX = 0;
+			isReboundX = false;
+		}
+	}
+	else
+	{
+		sideAddX += changeValue;
+
+		if (sideAddX >= 0)
+		{
+			sideAddX = 0;
+			isReboundX = false;
+		}
+	}
+
+}
+
+void Player::startSideRebound()
+{
+	const float vec = preFramePos.x - currentFramePos.x;
+
+	// 速度に合わせて代入
+	constexpr float mag = 1.f;
+	sideAddX = vec * mag;
+
+	isReboundX = true;
+}
 
 void Player::move()
 {

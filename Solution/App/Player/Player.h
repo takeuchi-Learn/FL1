@@ -35,10 +35,16 @@ class Player
 	bool isDrop = false;
 	//ジャンプしているかどうか
 	bool isJump = false;
-	// 跳ね返りしているかどうか
-	bool isRebound = false;
+
+	// 跳ね返りしているかどうか(上下)
+	bool isReboundY = false;
+	// 横
+	bool isReboundX = false;
 	// 落下開始した時の高さ(跳ね返り用)
 	float dropStartY = 0.f;
+	// 横跳ね返り時に加算する値
+	float sideAddX = 0.0f;
+
 
 	// 前フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 preFramePos = { 0.f,0.f };
@@ -69,7 +75,7 @@ private:
 	}
 
 	/// @brief ジャンプ中の座標更新処理
-	void updateJumpPos();
+	void calcJumpPos();
 	// ジャンプ
 	void jump();
 	// ジャンプ終了確認
@@ -83,8 +89,10 @@ private:
 	void startRebound();
 	// 跳ね返り終了確認
 	void checkreBoundEnd();
-	/// @brief 横跳ね返り
-	void sideRebound();
+	// 横跳ね返り計算
+	void calcSideRebound();
+	/// @brief 横跳ね返り開始
+	void startSideRebound();
 
 	// 移動
 	void move();
