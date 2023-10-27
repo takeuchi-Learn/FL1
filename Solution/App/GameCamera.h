@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <Camera/Camera.h>
-#include <GameObject/AbstractGameObj.h>
+#include <3D/Billboard/Billboard.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも
@@ -12,7 +12,7 @@ class GameCamera :
 private:
 
 	// 追従Obj
-	AbstractGameObj* obj = nullptr;
+	BillboardData* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	float angle = 20.f;
 
@@ -84,7 +84,7 @@ public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
-	GameCamera(AbstractGameObj* obj = nullptr);
+	GameCamera(BillboardData* obj = nullptr);
 
 	inline float getAngleDeg() const { return angle; }
 
@@ -93,7 +93,7 @@ public:
 
 	/// @brief 追従先オブジェクト
 	/// @param obj 
-	void setParentObj(AbstractGameObj* obj) { this->obj = obj; }
+	void setParentObj(BillboardData* obj) { this->obj = obj; }
 
 	/// @brief Z座標
 	/// @param z 

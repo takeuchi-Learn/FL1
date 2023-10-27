@@ -21,9 +21,6 @@ private:
 private:
 	std::unique_ptr<GameMap> gameMap;
 
-	// todo Playerをビルボードにしたら消す
-	std::unique_ptr<Light> light;
-
 public:
 	PlayScene();
 	~PlayScene();

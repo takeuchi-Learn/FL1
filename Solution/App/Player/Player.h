@@ -8,7 +8,7 @@
 #include <DirectXMath.h>
 #include <functional>
 #include <memory>
-#include <GameObject/BaseGameObjectHavingHp.h>
+#include <3D/Billboard/Billboard.h>
 #include"../GameCamera.h"
 
 class Camera;
@@ -17,8 +17,8 @@ class Light;
 
 class Player
 {
-	std::unique_ptr<BaseGameObjectHavingHp> gameObj;
-	Light* light = nullptr;
+	std::unique_ptr<Billboard> gameObj;
+	std::weak_ptr<BillboardData> objData;
 
 	GameCamera* gameCamera = nullptr;
 
@@ -101,11 +101,8 @@ public:
 	// 描画
 	void draw();
 
-	inline void setLight(Light* light) { this->light = light; }
-
 	/// @brief センサーの値格納用
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
-	inline const auto& getObj() { return gameObj; }
+	inline const auto& getObj() { return objData; }
 };
-

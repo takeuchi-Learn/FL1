@@ -35,17 +35,14 @@ namespace
 PlayScene::PlayScene() :
 	camera(std::make_unique<GameCamera>())
 {
-	light = std::make_unique<Light>();
-
 	camera->setEye(cameraPosDef);
 	camera->setTarget(objectPosDef);
 	camera->setPerspectiveProjFlag(false);
 
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setLight(light.get());
 
-	camera->setParentObj(player->getObj().get());
+	camera->setParentObj(player->getObj().lock().get());
 
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);

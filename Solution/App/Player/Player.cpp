@@ -15,7 +15,7 @@ bool Player::loadYamlFile()
 	Yaml::Node root{};
 	YamlLoader::LoadYamlFile(root, filePath);
 
-	auto* obj = gameObj->getObj();
+	auto obj = objData.lock();
 
 	auto& startPos = obj->position;
 	LoadYamlDataToFloat3(root, startPos);
@@ -24,35 +24,34 @@ bool Player::loadYamlFile()
 }
 
 Player::Player(GameCamera* camera, ObjModel* model) :
-	gameObj(std::make_unique<BaseGameObjectHavingHp>(camera, model))
+	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, gameCamera(camera)
 {
-	loadYamlFile();
+	constexpr float scale = 100.0f;
+	objData = gameObj->add(XMFLOAT3(), scale, 0.f);
 
-	constexpr float scale = 50.0f;
-	gameObj->setScale(XMFLOAT3(scale, scale, scale));
-	
-	// 追従させるためにポインタを渡す
-	//gameCamera->setParentObj(gameObj.get());
+	loadYamlFile();
 }
 
 void Player::update()
 {
-	gameObj->update();
+	auto& obj = objData.lock();
 
 	// ベクトル計測用
 	preFramePos = currentFramePos;
-	XMFLOAT3 objPos = gameObj->getPosition();
+	const auto& objPos = obj->position;
 	currentFramePos = XMFLOAT2(objPos.x, objPos.y);
 
 	move();
 	jump();
 	rebound();
+
+	gameObj->update(XMConvertToRadians(obj->rotation));
 }
 
 void Player::draw()
 {
-	gameObj->draw(light);
+	gameObj->draw();
 }
 
 void Player::updateJumpPos()
@@ -64,9 +63,7 @@ void Player::updateJumpPos()
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
-	XMFLOAT3 position = gameObj->getPosition();
-	position.y += currentFallVelovity;
-	gameObj->setPosition(position);
+	objData.lock()->position.y += currentFallVelovity;
 }
 
 void Player::jump()
@@ -94,8 +91,7 @@ void Player::jump()
 		if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
 		{
 			fallStartSpeed = bigJumpPower;
-		}
-		else// 通常ジャンプ
+		} else// 通常ジャンプ
 		{
 			// 初速度を設定
 			// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
@@ -103,7 +99,7 @@ void Player::jump()
 		}
 	}
 
-	
+
 
 	if (!isJump)return;
 
@@ -118,15 +114,15 @@ void Player::checkJumpEnd()
 {
 	if (isRebound)return;
 
-	XMFLOAT3 pos = gameObj->getPosition();
+	auto obj = objData.lock();
+
 	// 仮に0.f以下になったらジャンプ終了
-	if (pos.y < 0.f)
+	if (obj->position.y < 0.f)
 	{
 		// ジャンプ終了処理
 		isJump = false;
 		fallTime = 0;
-		pos.y = 0.f;
-		gameObj->setPosition(pos);
+		obj->position.y = 0.f;
 
 		isDrop = false;
 
@@ -138,10 +134,10 @@ void Player::checkJumpEnd()
 void Player::calcDropVec()
 {
 	preFramePos.y = currentFramePos.y;
-	currentFramePos.y = gameObj->getPosition().y;
+	currentFramePos.y = objData.lock()->position.y;
 
 	// preの方が大きい(落下開始)し始めたら代入
-	if(currentFramePos.y > preFramePos.y && !isDrop)
+	if (currentFramePos.y > preFramePos.y && !isDrop)
 	{
 		dropStartY = currentFramePos.y;
 		isDrop = true;
@@ -175,20 +171,19 @@ void Player::startRebound()
 
 void Player::checkreBoundEnd()
 {
-	XMFLOAT3 pos = gameObj->getPosition();
+	auto obj = objData.lock();
+
 	// 仮に0.f以下になったらジャンプ終了
-	if (pos.y < 0.f)
+	if (obj->position.y < 0.f)
 	{
 		fallTime = 0;
-		pos.y = 0.f;
-		gameObj->setPosition(pos);
+		obj->position.y = 0.f;
 		constexpr float boundEndVel = 3.f;
 		if (-currentFallVelovity <= boundEndVel)
 		{
 			isRebound = false;
 			isDrop = false;
-		}
-		else
+		} else
 		{
 			startRebound();
 		}
@@ -204,19 +199,13 @@ void Player::move()
 	// 角度を取得
 	const float angle = gameCamera->getAngle();
 
-	// 座標を取得
-	XMFLOAT3 position = gameObj->getPosition();
-
 	// 角度に応じて移動
 	// 一旦加速は考慮せずに実装
 	// ここ変更すると速度が変わる
 	constexpr float speedMag = 0.35f;
 
 	const float addPos = angle * speedMag;
-	position.x += addPos;
-
-	// 計算後セット
-	gameObj->setPosition(position);
+	objData.lock()->position.x += addPos;
 
 	// 回転
 	rot();
@@ -224,8 +213,10 @@ void Player::move()
 
 void Player::rot()
 {
+	auto obj = objData.lock();
+
 	// 角度取得
-	const float angleZ = gameObj->getRotation().z;
+	const float angleZ = obj->rotation;
 	const float cameraAngle = gameCamera->getAngle();
 	// 角度計算
 	float setAngle = -cameraAngle * 0.5f + angleZ;
@@ -238,5 +229,5 @@ void Player::rot()
 	}
 
 	// セット
-	gameObj->setRotationZ(setAngle);
+	obj->rotation = setAngle;
 }

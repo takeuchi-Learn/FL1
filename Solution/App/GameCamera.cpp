@@ -2,6 +2,8 @@
 
 #include"../Engine/Input/Input.h"
 
+using namespace DirectX;
+
 #pragma region START
 
 void GameCamera::updateStart()
@@ -49,7 +51,7 @@ void GameCamera::startAutoRot()
 
 		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
 		// プレイヤーの角度を取得
-		const float objAngleZ = obj->getRotation().z;
+		const float objAngleZ = obj->position.z;
 
 		// angleの最低値
 		constexpr float angleMin = 1.0f;
@@ -141,8 +143,8 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 
 	// 変換
 	constexpr float pi = 3.14f;
-	upXY.x = std::cos(angle * pi / 180.0f);
-	upXY.y = std::sin(angle * pi / 180.0f);
+	upXY.x = std::cos(XMConvertToRadians(angle));
+	upXY.y = std::sin(XMConvertToRadians(angle));
 }
 
 void GameCamera::upRotate()
@@ -166,7 +168,7 @@ void GameCamera::followObject()
 
 	// 追従
 	// Targetをobjの座標に
-	DirectX::XMFLOAT3 objPos = obj->getPosition();
+	DirectX::XMFLOAT3 objPos = obj->position;
 	setTarget(objPos);
 
 	// eyeをXYだけobjの座標に
@@ -175,7 +177,7 @@ void GameCamera::followObject()
 	setEye(eye);
 }
 
-GameCamera::GameCamera(AbstractGameObj* obj)
+GameCamera::GameCamera(BillboardData* obj)
 	:Camera(WinAPI::window_width,
 			WinAPI::window_height)
 	, obj(obj)
