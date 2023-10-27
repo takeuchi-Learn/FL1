@@ -12,10 +12,12 @@
 #include <3D/ParticleMgr.h>
 #include <3D/Billboard/Billboard.h>
 #include <algorithm>
+#include <Player/Player.h>
 
 #include"../GameCamera.h"
 #include "../GameMap.h"
 #include "TitleScene.h"
+#include <3D/Light/Light.h>
 
 using namespace DirectX;
 
@@ -33,9 +35,15 @@ namespace
 PlayScene::PlayScene() :
 	camera(std::make_unique<GameCamera>())
 {
+	light = std::make_unique<Light>();
+
 	camera->setEye(cameraPosDef);
 	camera->setTarget(objectPosDef);
 	camera->setPerspectiveProjFlag(false);
+
+	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setLight(light.get());
 
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
@@ -56,11 +64,13 @@ void PlayScene::update()
 	// 更新
 	camera->update();
 	gameMap->update();
+	player->update();
 }
 
 void PlayScene::drawObj3d()
 {
 	gameMap->draw();
+	player->draw();
 }
 
 void PlayScene::drawFrontSprite() {}
