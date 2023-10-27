@@ -44,6 +44,8 @@ class Player
 	float dropStartY = 0.f;
 	// 横跳ね返り時に加算する値
 	float sideAddX = 0.0f;
+	// 加速度
+	float acc = 0.f;
 
 
 	// 前フレームの座標(跳ね返り用)

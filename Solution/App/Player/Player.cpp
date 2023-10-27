@@ -262,6 +262,7 @@ void Player::startSideRebound()
 	isReboundX = true;
 }
 
+
 void Player::move()
 {
 	// 角度を取得
@@ -277,6 +278,14 @@ void Player::move()
 
 	const float addPos = angle * speedMag;
 	position.x += addPos;
+
+	constexpr float accMag = 0.015f;
+	acc += addPos * accMag;
+	position.x += acc;
+
+	// 停止したらリセット
+	// ここジャストじゃなくて一定範囲でもいいかも
+	if (preFramePos.x == currentFramePos.x)acc = 0.f;
 
 	// 計算後セット
 	gameObj->setPosition(position);
