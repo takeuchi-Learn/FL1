@@ -377,6 +377,7 @@ void PlayScene::drawFrontSprite()
 		sensor->GetGyroX(),
 		sensor->GetGyroY(),
 		sensor->GetGyroZ());
+	Text("Angle  [%.1f]", atan2f(sensor->GetAccelX(), sensor->GetAccelZ()) * 58.0f);
 	if (RadioButton("アニメーション再生", isPlayAnim))
 	{
 		isPlayAnim = !isPlayAnim;

@@ -16,8 +16,11 @@ private:
 	// センサー
 	Sensor* sensor = nullptr;
 	// 角度Z
-	float angle = 0.f;
+	float angle = 0.0f;
 	float getGyroX = 0.0f;
+	float getGyroZ = 0.0f;
+	float getAccelX = 0.0f;
+	float getAccelZ = 0.0f;
 
 private:
 	/// @brief 角度を上ベクトルに変換

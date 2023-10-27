@@ -1,7 +1,5 @@
 ﻿#include "GameCamera.h"
 
-#include"../Engine/Input/Input.h"
-
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算
@@ -16,15 +14,18 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 90.0f;
+	constexpr float maxAngle = 180.0f;
 
 #pragma region ジャイロ
 
-	getGyroX = sensor->GetAccelX();
-	getGyroX = std::clamp(getGyroX, -1.0f, 1.0f);
+	getAccelX = sensor->GetAccelX();
+	getAccelZ = sensor->GetAccelZ();
+	getGyroX = sensor->GetGyroX();
+	getGyroZ = sensor->GetGyroZ();
+
 
 	// 入力確認してカメラを傾ける
-	angle = maxAngle * getGyroX;
+	angle = atan2f(getAccelX, getAccelZ) * 58.0f;
 
 #pragma endregion
 

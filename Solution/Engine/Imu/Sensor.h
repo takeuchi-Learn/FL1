@@ -59,8 +59,4 @@ private:
 	Serial* serial;
 
 	std::array<float, sensorCount> record;
-	bool isRecording = true;
-	bool isFlashing = false;
-	int fps = 0;
-	int dps = 0;
 };
