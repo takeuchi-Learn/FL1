@@ -6,6 +6,7 @@
 #include <fstream>
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
+
 using namespace DirectX;
 
 bool Player::loadYamlFile()
@@ -17,8 +18,8 @@ bool Player::loadYamlFile()
 
 	auto obj = objData.lock();
 
-	auto& startPos = obj->position;
-	LoadYamlDataToFloat3(root, startPos);
+	XMFLOAT2& startPos = mapPos;
+	LoadYamlDataToFloat2(root, startPos);
 
 	return false;
 }
@@ -39,12 +40,13 @@ void Player::update()
 
 	// ベクトル計測用
 	preFramePos = currentFramePos;
-	const auto& objPos = obj->position;
-	currentFramePos = XMFLOAT2(objPos.x, objPos.y);
+	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
 
 	move();
 	jump();
 	rebound();
+
+	obj->position = XMFLOAT3(mapPos.x, mapPos.y, obj->position.z);
 
 	gameObj->update(XMConvertToRadians(obj->rotation));
 }
@@ -63,7 +65,7 @@ void Player::updateJumpPos()
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
-	objData.lock()->position.y += currentFallVelovity;
+	mapPos.y += currentFallVelovity;
 }
 
 void Player::jump()
@@ -114,15 +116,13 @@ void Player::checkJumpEnd()
 {
 	if (isRebound)return;
 
-	auto obj = objData.lock();
-
 	// 仮に0.f以下になったらジャンプ終了
-	if (obj->position.y < 0.f)
+	if (mapPos.y < 0.f)
 	{
 		// ジャンプ終了処理
 		isJump = false;
 		fallTime = 0;
-		obj->position.y = 0.f;
+		mapPos.y = 0.f;
 
 		isDrop = false;
 
@@ -134,7 +134,7 @@ void Player::checkJumpEnd()
 void Player::calcDropVec()
 {
 	preFramePos.y = currentFramePos.y;
-	currentFramePos.y = objData.lock()->position.y;
+	currentFramePos.y = mapPos.y;
 
 	// preの方が大きい(落下開始)し始めたら代入
 	if (currentFramePos.y > preFramePos.y && !isDrop)
@@ -171,13 +171,11 @@ void Player::startRebound()
 
 void Player::checkreBoundEnd()
 {
-	auto obj = objData.lock();
-
 	// 仮に0.f以下になったらジャンプ終了
-	if (obj->position.y < 0.f)
+	if (mapPos.y < 0.f)
 	{
 		fallTime = 0;
-		obj->position.y = 0.f;
+		mapPos.y = 0.f;
 		constexpr float boundEndVel = 3.f;
 		if (-currentFallVelovity <= boundEndVel)
 		{
@@ -205,7 +203,7 @@ void Player::move()
 	constexpr float speedMag = 0.35f;
 
 	const float addPos = angle * speedMag;
-	objData.lock()->position.x += addPos;
+	mapPos.x += addPos;
 
 	// 回転
 	rot();
