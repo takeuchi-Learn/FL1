@@ -38,6 +38,14 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 
 void Player::update()
 {
+	//// 絶対座標いじる前に書く
+	//if (terrainHitObjPosX != 0.f)
+	//{
+	//	// 座標戻す
+	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
+
+	//}
+
 	gameObj->update();
 
 	// ベクトル計測用
@@ -48,6 +56,12 @@ void Player::update()
 	move();
 	jump();
 	rebound();
+
+	//// 一旦ここに書いてる
+	//if(terrainHitObjPosX != 0.f)
+	//{
+	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
+	//}
 }
 
 void Player::draw()
@@ -150,11 +164,23 @@ void Player::calcDropVec()
 
 void Player::rebound()
 {
+
+	// 横バウンド時の座標計算
+	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
+	calcSideRebound();
+
+	// ここから関数化1
+
 	// 仮に80に設定
+	constexpr float testP = 80.f;
 	// 本来は衝突時に呼び出す
 	const XMFLOAT3 pos = gameObj->getPosition();
-	if (pos.x >= 80.0f)
+
+	if (pos.x >= testP)
 	{
+		// ここに衝突したときの座標格納する
+		terrainHitPosX = testP;
+
 		gameObj->setPosition(XMFLOAT3(80.f, pos.y, pos.z));
 
 		const XMFLOAT3 clampPos = gameObj->getPosition();
@@ -167,10 +193,9 @@ void Player::rebound()
 		startSideRebound();
 	}
 
+	// ここまで関数化1
 
 
-	// 横バウンド時の座標計算
-	calcSideRebound();
 
 
 	if (!isReboundY)return;
@@ -260,6 +285,8 @@ void Player::startSideRebound()
 	sideAddX = vec * mag;
 
 	isReboundX = true;
+
+	terrainHitObjPosX = gameObj->getPosition().x;
 }
 
 

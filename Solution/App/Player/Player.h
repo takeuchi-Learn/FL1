@@ -44,6 +44,11 @@ class Player
 	float dropStartY = 0.f;
 	// 横跳ね返り時に加算する値
 	float sideAddX = 0.0f;
+	// 地形衝突時の座標
+	float terrainHitObjPosX = 0.f;
+	// 衝突した地形の座標
+	float terrainHitPosX = 0.f;
+
 	// 加速度
 	float acc = 0.f;
 
