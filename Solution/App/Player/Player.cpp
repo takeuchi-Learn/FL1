@@ -154,16 +154,6 @@ void Player::rebound()
 	// 本来は衝突時に呼び出す
 	if (mapPos.x >= testP)
 	{
-		// ここに衝突したときの座標格納する
-		terrainHitPosX = testP;
-
-		mapPos.x = testP;
-
-		const auto clampPos = mapPos;
-		currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
-
-		// デバッグ用
-		const float vec = preFramePos.x - currentFramePos.x;
 
 		// 横のバウンド開始
 		startSideRebound();
@@ -243,6 +233,18 @@ void Player::calcSideRebound()
 
 void Player::startSideRebound()
 {
+	auto obj = objData.lock();
+
+	// ここに衝突したときの座標格納する
+	terrainHitPosX = 80.0f;
+
+	obj->position.x = terrainHitPosX;
+
+	// 壁の隣に移動
+	const XMFLOAT3 clampPos = obj->position;
+	currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+
+	// 進行方向を求めるためにベクトルを求める
 	const float vec = preFramePos.x - currentFramePos.x;
 
 	// 速度に合わせて代入
@@ -279,7 +281,10 @@ void Player::rot()
 	const float angleZ = obj->rotation;
 	const float cameraAngle = gameCamera->getAngle();
 	// 角度計算
-	float setAngle = -cameraAngle * 0.5f + angleZ;
+	//float setAngle = -cameraAngle * 0.5f + angleZ;
+	float setAngle = angleZ;
+	const float vec = currentFramePos.x - preFramePos.x;
+	setAngle += vec * -1.f;
 
 	// オーバーフロー対策
 	if (angleZ <= -360.f)

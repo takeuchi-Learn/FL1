@@ -89,13 +89,14 @@ private:
 	void calcDropVec();
 	// 跳ね返り
 	void rebound();
+
 	// 跳ね返り開始
 	void startRebound();
 	// 跳ね返り終了確認
 	void checkreBoundEnd();
 	// 横跳ね返り計算
 	void calcSideRebound();
-	/// @brief 横跳ね返り開始
+	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。
 	void startSideRebound();
 
 	// 移動
