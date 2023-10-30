@@ -15,7 +15,6 @@ class Player
 {
 	DirectX::XMFLOAT2 mapPos{};
 	std::unique_ptr<Billboard> gameObj;
-	std::weak_ptr<BillboardData> objData;
 
 	GameCamera* gameCamera = nullptr;
 
@@ -117,7 +116,7 @@ public:
 	/// @brief センサーの値格納用
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
-	inline const auto& getObj() { return objData; }
+	inline const auto& getObj() { return gameObj->getFrontData(); }
 
 	inline const auto& getMapPos() const { return mapPos; }
 };

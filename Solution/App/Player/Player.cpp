@@ -16,8 +16,6 @@ bool Player::loadYamlFile()
 	Yaml::Node root{};
 	YamlLoader::LoadYamlFile(root, filePath);
 
-	auto obj = objData.lock();
-
 	XMFLOAT2& startPos = mapPos;
 	LoadYamlDataToFloat2(root, startPos);
 
@@ -29,15 +27,13 @@ Player::Player(GameCamera* camera) :
 	, gameCamera(camera)
 {
 	constexpr float scale = 100.0f;
-	objData = gameObj->add(XMFLOAT3(), scale, 0.f);
+	gameObj->add(XMFLOAT3(), scale, 0.f);
 
 	loadYamlFile();
 }
 
 void Player::update()
 {
-	auto& obj = objData.lock();
-
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
@@ -46,9 +42,9 @@ void Player::update()
 	jump();
 	rebound();
 
-	obj->position = XMFLOAT3(mapPos.x, mapPos.y, obj->position.z);
+	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 
-	gameObj->update(XMConvertToRadians(obj->rotation));
+	gameObj->update(XMConvertToRadians(getObj()->rotation));
 }
 
 void Player::draw()
@@ -233,15 +229,13 @@ void Player::calcSideRebound()
 
 void Player::startSideRebound()
 {
-	auto obj = objData.lock();
-
 	// ここに衝突したときの座標格納する
 	terrainHitPosX = 80.0f;
 
-	obj->position.x = terrainHitPosX;
+	getObj()->position.x = terrainHitPosX;
 
 	// 壁の隣に移動
-	const XMFLOAT3 clampPos = obj->position;
+	const XMFLOAT3 clampPos = getObj()->position;
 	currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
 
 	// 進行方向を求めるためにベクトルを求める
@@ -275,24 +269,14 @@ void Player::move()
 
 void Player::rot()
 {
-	auto obj = objData.lock();
-
 	// 角度取得
-	const float angleZ = obj->rotation;
+	const float objAngle = getObj()->rotation;
 	const float cameraAngle = gameCamera->getAngle();
 	// 角度計算
-	//float setAngle = -cameraAngle * 0.5f + angleZ;
-	float setAngle = angleZ;
+	float angle = objAngle;
 	const float vec = currentFramePos.x - preFramePos.x;
-	setAngle += vec * -1.f;
-
-	// オーバーフロー対策
-	if (angleZ <= -360.f)
-	{
-		// 360足す
-		setAngle += 360.f;
-	}
+	angle += vec * -1.f;
 
 	// セット
-	obj->rotation = setAngle;
+	getObj()->rotation = std::fmod(angle, 360.f);
 }

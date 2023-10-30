@@ -41,7 +41,7 @@ PlayScene::PlayScene() :
 
 	player = std::make_unique<Player>(camera.get());
 
-	camera->setParentObj(player->getObj().lock().get());
+	camera->setParentObj(player->getObj().get());
 
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);

@@ -119,6 +119,8 @@ public:
 									 float rotation = 0.f,
 									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
 
+	inline auto& getFrontData() { return billboards.front(); }
+
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();
 
