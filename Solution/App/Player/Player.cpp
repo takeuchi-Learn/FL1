@@ -329,7 +329,10 @@ void Player::rot()
 	const float angleZ = gameObj->getRotation().z;
 	const float cameraAngle = gameCamera->getAngle();
 	// 角度計算
-	float setAngle = -cameraAngle * 0.5f + angleZ;
+	//float setAngle = -cameraAngle * 0.5f + angleZ;
+	float setAngle = angleZ;
+	const float vec = currentFramePos.x - preFramePos.x;
+	setAngle += vec * -1.f;
 
 	// オーバーフロー対策
 	if (angleZ <= -360.f)
