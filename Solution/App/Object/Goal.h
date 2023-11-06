@@ -27,7 +27,8 @@ private:
 	void trueIsGoal() { isGoal = true; }
 
 public:
-	Goal(ObjModel* model, Light* light,const DirectX::XMFLOAT2 pos);
+	Goal(ObjModel* model, Light* light,const DirectX::XMFLOAT2& pos);
+	
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }
