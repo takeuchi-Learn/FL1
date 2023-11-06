@@ -11,6 +11,8 @@
 #include <GameObject/BaseGameObjectHavingHp.h>
 #include"../GameCamera.h"
 
+#include<Collision/CollisionShape.h>
+
 class Camera;
 class ObjModel;
 class Light;
@@ -21,6 +23,8 @@ class Player
 	Light* light = nullptr;
 
 	GameCamera* gameCamera = nullptr;
+
+	CollisionShape::Sphere sphere;
 
 	//落下時間
 	int fallTime = 0;

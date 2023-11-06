@@ -32,6 +32,9 @@ Player::Player(GameCamera* camera, ObjModel* model) :
 	constexpr float scale = 50.0f;
 	gameObj->setScale(XMFLOAT3(scale, scale, scale));
 	
+	// 判定仮設定
+	sphere.radius = scale / 2;
+
 	// 追従させるためにポインタを渡す
 	//gameCamera->setParentObj(gameObj.get());
 }
@@ -62,6 +65,9 @@ void Player::update()
 	//{
 	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
 	//}
+
+	objPos = gameObj->getPosition();
+	sphere.center = DirectX::XMVECTOR(objPos.x, objPos.y, 0, 0);
 }
 
 void Player::draw()
