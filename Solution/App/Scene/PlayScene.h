@@ -6,7 +6,6 @@
 
 #include"../GameCamera.h"
 #include <Imu/Sensor.h>
-#include <KalmanFilter.h>
 
 class Camera;
 class Light;
@@ -28,7 +27,6 @@ private:
 	std::weak_ptr<SoundData> bgm;
 
 	std::unique_ptr<Light> light;
-	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
@@ -36,8 +34,6 @@ private:
 
 	std::unique_ptr<ParticleMgr> particle;
 	Sensor* sensor = nullptr;
-	KalmanFilter* kalman = new KalmanFilter;
-
 
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
@@ -51,6 +47,4 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
-
-
 };

@@ -17,9 +17,18 @@ private:
 	// センサー
 	Sensor* sensor = nullptr;
 	// 角度Z
-	float angle = 20.0f;
+	float angle = 0.0f;
+	float prevAngle = 0.0f;
+	float degree = 0.0f;
+
 	float getGyroX = 0.0f;
+	float getGyroY = 0.0f;
 	float getGyroZ = 0.0f;
+	float prevGyroX = 0.0f;
+	float prevGyroY = 0.0f;
+	float prevGyroZ = 0.0f;
+
+	float accelAngle = 0.0f;
 	float getAccelX = 0.0f;
 	float getAccelZ = 0.0f;
 

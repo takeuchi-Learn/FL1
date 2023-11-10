@@ -55,7 +55,6 @@ PlayScene::~PlayScene()
 {
 	Sound::ins()->stopWave(bgm);
 	sensor->erase();
-	delete(kalman);
 }
 
 void PlayScene::update()
@@ -108,7 +107,6 @@ void PlayScene::update()
 	camera->gameCameraUpdate(sensor);
 	light->update();
 	sensor->update();
-	kalman->Update();
 }
 
 void PlayScene::drawObj3d()
@@ -125,4 +123,29 @@ void PlayScene::drawFrontSprite()
 
 	spriteBase->drawStart(DX12Base::ins()->getCmdList());
 	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+
+	using namespace ImGui;
+
+	SetNextWindowPos(ImVec2(0.f, 0.f));
+
+	Begin("PlaySceneGUI", nullptr, DX12Base::imGuiWinFlagsDef);
+	Text("タイマー%s: %f",
+		 stopwatch->isPlay() ? "|>" : "□",
+		 float(stopwatchPlayTime) / Timer::oneSecF);
+	Text("スペース: シーン切り替え");
+	Text("x:%.1f, y:%.1f, z:%.1f",
+		camera->getEye().x,
+		camera->getEye().y,
+		camera->getEye().z);
+	Text("Accel : x:%.1f, y:%.1f, z:%.1f",
+		 sensor->GetAccelX(),
+		 sensor->GetAccelY(),
+		 sensor->GetAccelZ());
+	Text("Gyro : x:%.1f, y:%.1f, z:%.1f",
+		 sensor->GetGyroX(),
+		 sensor->GetGyroY(),
+		 sensor->GetGyroZ());
+	Text("Angle : %.1f",
+		 camera->getAngle());
+	End();
 }

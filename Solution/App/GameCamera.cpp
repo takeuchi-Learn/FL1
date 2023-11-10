@@ -69,8 +69,6 @@ void GameCamera::startAutoRot()
 			angle = 0.f;
 			//obj->setRotationZ(0.f);
 		}
-
-
 	}
 }
 
@@ -103,9 +101,6 @@ void GameCamera::changeCameraState()
 		break;
 	}
 }
-
-
-
 #pragma endregion
 
 #pragma region INPUT
@@ -122,18 +117,25 @@ void GameCamera::updateInput()
 
 void GameCamera::checkInput()
 {
-
+	// 加速度取得
 	getAccelX = sensor->GetAccelX();
 	getAccelZ = sensor->GetAccelZ();
+	// 角速度取得
 	getGyroX = sensor->GetGyroX();
+	getGyroY = sensor->GetGyroY();
 	getGyroZ = sensor->GetGyroZ();
 
-
 	// 入力確認してカメラを傾ける
-	angle = atan2f(getAccelX, getAccelZ) * 58.0f;
+	accelAngle = atan2f(getAccelZ, getAccelX);
 
-#pragma endregion
+	float dt = 0.005f;
+	angle += -(prevGyroY + getGyroY) * dt;
+	prevGyroY = getGyroY;
+
+	//angle = 0.95f * (prevAngle + getGyroY * dt) + 0.05f * accelAngle;
+	//prevAngle = angle;
 }
+#pragma endregion
 
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
@@ -148,12 +150,12 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 
 void GameCamera::upRotate()
 {
-	// 傾きの最大値
-	constexpr float maxAngle = 360.0f;
+	//// 傾きの最大値
+	//constexpr float maxAngle = 360.0f;
 
-	// 制限
-	if (angle >= maxAngle)angle = maxAngle;
-	else if (angle <= -maxAngle)angle = -maxAngle;
+	//// 制限
+	//if (angle >= maxAngle)angle = maxAngle;
+	//else if (angle <= -maxAngle)angle = -maxAngle;
 
 	// angleを上ベクトルに変換してセット
 	DirectX::XMFLOAT2 upXY;

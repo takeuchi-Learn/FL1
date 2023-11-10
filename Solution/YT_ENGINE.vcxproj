@@ -156,7 +156,7 @@
     <ClCompile Include="Engine\Texture\Texture.cpp" />
     <ClCompile Include="App\Player\Player.cpp" />
     <ClCompile Include="App\GameCamera.cpp" />
-    <ClCompile Include="App\KalmanFilter.cpp" />
+    <ClCompile Include="Engine\Imu\Kalman.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\Goal.h" />
@@ -210,7 +210,7 @@
     <ClInclude Include="Engine\Texture\Texture.h" />
     <ClInclude Include="App\Player\Player.h" />
     <ClInclude Include="App\GameCamera.h" />
-    <ClInclude Include="App\KalmanFilter.h" />
+    <ClInclude Include="Engine\Imu\Kalman.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
