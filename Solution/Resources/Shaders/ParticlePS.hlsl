@@ -6,8 +6,8 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 PSOutput main(GSOutput input)
 {
 	PSOutput output;
-	output.target0 = tex.Sample(smp, input.uv) * float4(input.color, 1.f);
-	output.target1 = output.target0;
+	output.target1 = tex.Sample(smp, input.uv);
+	output.target0 = output.target1 * input.color;
 
 	return output;
 }
