@@ -27,6 +27,9 @@ class Player
 
 	CollisionShape::Sphere sphere;
 
+	// 現在のフレームでジャンプキー押したかどうか(ジャンプできない不具合防止用)
+	bool pushJumpKeyFrame = false;
+
 	//落下時間
 	int fallTime = 0;
 	//落下初速
@@ -39,7 +42,7 @@ class Player
 	// 落下中かどうか(跳ね返り用)
 	bool isDrop = false;
 	//ジャンプしているかどうか
-	bool isJump = false;
+	bool isJump = true;
 
 	// 跳ね返りしているかどうか(上下)
 	bool isReboundY = false;
@@ -90,7 +93,7 @@ private:
 	// ジャンプ
 	void jump();
 	// ジャンプ終了確認
-	void checkJumpEnd();
+	void jumpEnd();
 
 	// 落下ベクトル計測
 	void calcDropVec();
@@ -100,7 +103,7 @@ private:
 	// 跳ね返り開始
 	void startRebound();
 	// 跳ね返り終了確認
-	void checkreBoundEnd();
+	void reboundEnd();
 	// 横跳ね返り計算
 	void calcSideRebound();
 	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。

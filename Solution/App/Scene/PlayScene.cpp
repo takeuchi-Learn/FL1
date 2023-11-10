@@ -34,6 +34,23 @@ namespace
 
 void PlayScene::checkCollision()
 {
+	const auto& mapAABBs = gameMap->getAABBs();
+	// テストです
+	for(auto y = 0; y < mapAABBs.size();y++)
+	{
+		// テストのため一部マップチップを無視
+		if (y == 0|| y == 1 || y == 2)continue;
+
+		for (auto x = 0; x < mapAABBs[y].size(); x++)
+		{
+
+			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			{
+				player->hit();
+			}
+		}
+	}
+
 	// テストです
 	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
 	if (res)

@@ -26,9 +26,10 @@ Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, gameCamera(camera)
 {
+
 	constexpr float scale = 100.0f;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
-
+	
 	loadYamlFile();
 
 	
@@ -69,7 +70,20 @@ void Player::draw()
 
 void Player::hit()
 {
-	gameCamera->changeStateGoal();
+	// 地面衝突
+	if (!pushJumpKeyFrame)
+	{
+		if (isReboundY)
+		{
+			reboundEnd();
+		} else
+		{
+			jumpEnd();
+		}
+	}
+
+	// ゴール衝突
+	//gameCamera->changeStateGoal();
 }
 
 void Player::calcJumpPos()
@@ -86,6 +100,7 @@ void Player::calcJumpPos()
 
 void Player::jump()
 {
+
 	// センサーの値によってジャンプ量細かく変更するか聞く
 
 	// ジャンプパワー
@@ -101,47 +116,62 @@ void Player::jump()
 	constexpr float jumpSensorValue = 1.f;
 	constexpr float bigSensorJyroValue = 2.f;
 
-	if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
+	pushJumpKeyFrame = false;
+	if (!isJump)
 	{
-		isJump = true;
+		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
+		{
+			pushJumpKeyFrame = true;
+			isJump = true;
+			// 大ジャンプ
+			if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
+			{
+				fallStartSpeed = bigJumpPower;
+			} else// 通常ジャンプ
+			{
+				// 初速度を設定
+				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
+				fallStartSpeed = jumpPower;
+			}
 
-		// 大ジャンプ
-		if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
-		{
-			fallStartSpeed = bigJumpPower;
-		} else// 通常ジャンプ
-		{
-			// 初速度を設定
-			// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-			fallStartSpeed = jumpPower;
 		}
 	}
 
-	if (!isJump)return;
+	if (!isJump)
+	{
+		// 地形無いときに勝手に落ちるようにするために0.fをセット
+		fallStartSpeed = 0.f;
+	}
 
 	// ジャンプの更新処理
 	calcJumpPos();
 
 	// 終了確認
-	checkJumpEnd();
+	//checkJumpEnd();
 }
 
-void Player::checkJumpEnd()
+void Player::jumpEnd()
 {
-	if (isReboundY)return;
+	//// 仮に0.f以下になったらジャンプ終了
+	//if (mapPos.y < 0.f)
+	//{
+	//	// ジャンプ終了処理
+	//	isJump = false;
+	//	fallTime = 0;
+	//	mapPos.y = 0.f;
 
-	// 仮に0.f以下になったらジャンプ終了
-	if (mapPos.y < 0.f)
-	{
-		// ジャンプ終了処理
-		isJump = false;
-		fallTime = 0;
-		mapPos.y = 0.f;
+	//	isDrop = false;
 
-		isDrop = false;
+	//	startRebound();
+	//}
 
-		startRebound();
-	}
+	// ジャンプ終了処理
+	isJump = false;
+	fallTime = 0;
+	// 仮
+	mapPos.y = mapPos.y + 0.3f;
+	isDrop = false;
+	startRebound();
 }
 
 void Player::calcDropVec()
@@ -182,7 +212,7 @@ void Player::rebound()
 	// 更新
 	calcJumpPos();
 	// 終了確認
-	checkreBoundEnd();
+	//reboundEnd();
 }
 
 void Player::startRebound()
@@ -195,10 +225,10 @@ void Player::startRebound()
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
 }
 
-void Player::checkreBoundEnd()
+void Player::reboundEnd()
 {
-	// 仮に0.f以下になったらジャンプ終了
-	if (mapPos.y < 0.f)
+	// 仮に0.f以下になったら跳ね返り終了
+	/*if (mapPos.y < 0.f)
 	{
 		fallTime = 0;
 		mapPos.y = 0.f;
@@ -211,6 +241,19 @@ void Player::checkreBoundEnd()
 		{
 			startRebound();
 		}
+	}*/
+
+	fallTime = 0;
+	// 仮
+	mapPos.y = mapPos.y + 0.3f;
+	constexpr float boundEndVel = 3.f;
+	if (-currentFallVelovity <= boundEndVel)
+	{
+		isReboundY = false;
+		isDrop = false;
+	} else
+	{
+		startRebound();
 	}
 }
 
