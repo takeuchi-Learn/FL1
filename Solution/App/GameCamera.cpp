@@ -133,7 +133,7 @@ void GameCamera::checkInput()
 	angle = atan2f(getAccelX, getAccelZ) * 58.0f;
 
 #pragma endregion
-
+}
 
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
@@ -149,7 +149,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 40.0f;
+	constexpr float maxAngle = 360.0f;
 
 	// 制限
 	if (angle >= maxAngle)angle = maxAngle;
@@ -190,6 +190,7 @@ GameCamera::GameCamera(AbstractGameObj* obj)
 
 void GameCamera::gameCameraUpdate(Sensor* sensor)
 {
+	this->sensor = sensor;
 	
 	switch (cameraState)
 	{
@@ -202,7 +203,6 @@ void GameCamera::gameCameraUpdate(Sensor* sensor)
 	default:
 		break;
 	}
-	this->sensor = sensor;
 
 	// 回転
 	upRotate();
