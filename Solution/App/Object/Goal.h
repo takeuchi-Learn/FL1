@@ -14,6 +14,8 @@ class Camera;
 class Goal
 {
 private:
+	// ここBillboardクラスに直す
+	// というかGameMapクラスに内蔵してもいいかも
 	std::unique_ptr<AbstractGameObj> gameObj;
 	Light* light = nullptr;
 

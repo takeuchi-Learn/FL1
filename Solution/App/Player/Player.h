@@ -17,6 +17,7 @@ class Camera;
 class ObjModel;
 class Light;
 
+
 class Player
 {
 	DirectX::XMFLOAT2 mapPos{};

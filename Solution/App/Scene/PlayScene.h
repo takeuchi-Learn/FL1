@@ -18,6 +18,8 @@ class ParticleMgr;
 class Player;
 class Goal;
 
+class Collision;
+
 class GameMap;
 
 class PlayScene :

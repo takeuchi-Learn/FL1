@@ -4,9 +4,14 @@
 #include <string>
 #include <unordered_map>
 
+#include<Collision/CollisionShape.h>
+
 class Billboard;
 class GameCamera;
+class Collision;
 
+// マップクラス
+// 動かない地形のみ扱う
 class GameMap
 {
 private:
@@ -27,8 +32,19 @@ private:
 
 private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
+	/// @brief 地形のAABB
+	std::vector<std::vector<CollisionShape::AABB>>mapAABBs;
 
 	GameCamera* camera = nullptr;
+
+private:
+	/// @brief AABBのデータをセット
+	/// @param x 配列の添え字
+	/// @param y 配列の添え字
+	/// @param pos 座標
+	/// @param scale サイズ
+	void setAABBData(size_t x,size_t y,const DirectX::XMFLOAT3& pos,float scale);
+
 
 public:
 	GameMap(GameCamera* camera);

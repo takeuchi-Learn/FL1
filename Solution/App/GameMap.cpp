@@ -8,6 +8,20 @@
 
 using namespace DirectX;
 
+void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
+{
+	const float harfScale = scale / 2;
+	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
+	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
+	mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
+	mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+
+	//XMFLOAT2 minPos(pos.x, pos.y );
+	//XMFLOAT2 maxPos(pos.x + scale, pos.y + scale);
+	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
+	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+}
+
 GameMap::GameMap(GameCamera* camera) :
 	camera(camera)
 {}
@@ -26,8 +40,13 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
+	mapAABBs.resize(csvData.size());
+
+
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
 	{
+		mapAABBs[y].resize(csvData[y].size());
+
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
 			const auto& cellStr = csvData[y][x];
@@ -78,21 +97,24 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
 			// YAML内の画像ファイルパスを反映させる
 			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
-
 			auto& data = addRet.first->second;
 			data->setCamera(camera);
-
+			
 			// 新たに挿入されたら addRet.second == true
 
 			constexpr auto scale = float(WinAPI::window_height) / 10.f;
-
 			const auto pos = XMFLOAT3(float(x) * scale,
 									  -float(y) * scale,
 									  0);
 
 			data->add(pos, scale);
+
+			// 判定作成
+			setAABBData(x,y, pos, scale);
 		}
 	}
+
+
 
 	return false;
 }
