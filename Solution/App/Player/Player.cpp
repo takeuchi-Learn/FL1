@@ -304,7 +304,8 @@ void Player::move()
 
 
 	// 計算後セット
-	getObj()->position = position;
+	//getObj()->position = position;
+	mapPos = DirectX::XMFLOAT2(position.x, position.y);
 	
 	// 回転
 	rot();

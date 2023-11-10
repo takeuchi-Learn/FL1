@@ -27,7 +27,7 @@ void PlayScene::checkCollision()
 	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
 	if (res)
 	{
-		player->hit();
+		//player->hit();
 	}
 
 }
