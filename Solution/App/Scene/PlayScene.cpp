@@ -152,6 +152,7 @@ PlayScene::~PlayScene()
 {
 	Sound::ins()->stopWave(bgm);
 	sensor->erase();
+	delete(kalman);
 }
 
 void PlayScene::update()
@@ -328,6 +329,7 @@ void PlayScene::update()
 	camera->gameCameraUpdate(sensor);
 	light->update();
 	sensor->update();
+	kalman->Update();
 }
 
 void PlayScene::drawObj3d()

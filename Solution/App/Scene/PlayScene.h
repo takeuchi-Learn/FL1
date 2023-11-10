@@ -6,6 +6,7 @@
 
 #include"../GameCamera.h"
 #include <Imu/Sensor.h>
+#include <KalmanFilter.h>
 
 class Camera;
 class Light;
@@ -38,6 +39,7 @@ private:
 
 	std::unique_ptr<ParticleMgr> particle;
 	Sensor* sensor = nullptr;
+	KalmanFilter* kalman = new KalmanFilter;
 
 
 private:

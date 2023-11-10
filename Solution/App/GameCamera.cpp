@@ -37,7 +37,6 @@ void GameCamera::upRotate()
 	DirectX::XMFLOAT2 upXY;
 	angleToUp(angle, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
-
 }
 
 void GameCamera::followObject()

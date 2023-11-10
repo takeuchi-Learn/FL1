@@ -154,6 +154,7 @@
     <ClCompile Include="Engine\Util\YamlLoader.cpp" />
     <ClCompile Include="Engine\Texture\Texture.cpp" />
     <ClCompile Include="App\GameCamera.cpp" />
+    <ClCompile Include="App\KalmanFilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
@@ -205,6 +206,7 @@
     <ClInclude Include="Engine\Util\Stopwatch.h" />
     <ClInclude Include="Engine\Texture\Texture.h" />
     <ClInclude Include="App\GameCamera.h" />
+    <ClInclude Include="App\KalmanFilter.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
