@@ -6,18 +6,11 @@
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
 
+// ニアレストネイバー法で描画する場合に定義する
+#define NEAREST_NEIGHBOR
+
 using namespace DirectX;
 using namespace Microsoft::WRL;
-
-namespace
-{
-	constexpr auto operator+(const XMFLOAT3& l, const XMFLOAT3& r)
-	{
-		return XMFLOAT3(l.x + r.x,
-						l.y + r.y,
-						l.z + r.z);
-	}
-}
 
 DX12Base* Billboard::dxBase = DX12Base::getInstance();
 
@@ -350,7 +343,9 @@ void Billboard::InitializeGraphicsPipeline()
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
+#ifdef NEAREST_NEIGHBOR
 	samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT; // ニアレストネイバー法
+#endif // NEAREST_NEIGHBOR
 
 	// ルートシグネチャの設定
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};

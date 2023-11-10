@@ -32,29 +32,6 @@ bool GameMap::loadDataFile(const std::string& filePath)
 		{
 			const auto& cellStr = csvData[y][x];
 
-			constexpr int base = 10;
-			uint8_t n = MAPCHIP_UNDEF;
-			const auto ret = std::from_chars(std::to_address(cellStr.begin()),
-											 std::to_address(cellStr.end()),
-											 n,
-											 base);
-
-			// 未定義の値なら
-			if (ret.ec == std::errc::invalid_argument ||
-				ret.ec == std::errc::result_out_of_range ||
-				n == MAPCHIP_UNDEF ||
-				n >= MAPCHIP_ALLNUM)
-			{
-				assert(0);
-				return true;
-			}
-
-			// 道なら何も表示しない
-			if (n == MAPCHIP_ROAD)
-			{
-				continue;
-			}
-
 			std::wstring wTexPath{};
 
 			// パスをstringからwstringに変換
@@ -77,20 +54,22 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
 			// YAML内の画像ファイルパスを反映させる
-			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
-
+			const auto addRet = billboard.try_emplace(cellStr, nullptr);
 			auto& data = addRet.first->second;
+			// 新たに挿入されたら要素を構築する
+			if (addRet.second)
+			{
+				data = std::make_unique<Billboard>(wTexPath.c_str(), camera);
+			}
 			data->setCamera(camera);
 
 			// 新たに挿入されたら addRet.second == true
 
-			constexpr auto scale = float(WinAPI::window_height) / 10.f;
-
-			const auto pos = XMFLOAT3(float(x) * scale,
-									  -float(y) * scale,
+			const auto pos = XMFLOAT3(float(x) * chipSize,
+									  -float(y) * chipSize,
 									  0);
 
-			data->add(pos, scale);
+			data->add(pos, chipSize + 1.f);
 		}
 	}
 

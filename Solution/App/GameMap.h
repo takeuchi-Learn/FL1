@@ -9,24 +9,11 @@ class GameCamera;
 
 class GameMap
 {
-private:
-	enum MAPCHIP_DATA : uint8_t
-	{
-		/// @brief 未定義
-		MAPCHIP_UNDEF = 0U,
-		/// @brief 壁
-		MAPCHIP_WALL,
-		/// @brief 道
-		MAPCHIP_ROAD,
-		/// @brief ゴール
-		MAPCHIP_GOAL,
-
-		/// @brief 最後の要素
-		MAPCHIP_ALLNUM
-	};
+public:
+	static constexpr float chipSize = 100.f;
 
 private:
-	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
+	std::unordered_map<std::string, std::unique_ptr<Billboard>> billboard;
 
 	GameCamera* camera = nullptr;
 
