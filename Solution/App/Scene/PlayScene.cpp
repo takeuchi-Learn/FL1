@@ -54,8 +54,7 @@ PlayScene::PlayScene() :
 
 	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
 
-	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player = std::make_unique<Player>(camera.get());
 
 	// 仮にプレイヤーモデルを割り当て
 	constexpr DirectX::XMFLOAT2 goalPos(80, 0);
