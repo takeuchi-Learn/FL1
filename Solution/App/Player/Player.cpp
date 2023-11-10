@@ -254,11 +254,11 @@ void Player::startSideRebound()
 	// ここに衝突したときの座標格納する
 	terrainHitPosX = 80.0f;
 
-	getObj()->position.x = terrainHitPosX;
+	mapPos.x = terrainHitPosX;
 
 	// 壁の隣に移動
-	const XMFLOAT3 clampPos = getObj()->position;
-	currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+	const XMFLOAT2 clampPos = mapPos;
+	currentFramePos = clampPos;
 
 	// 進行方向を求めるためにベクトルを求める
 	const float vec = preFramePos.x - currentFramePos.x;
@@ -284,7 +284,7 @@ void Player::move()
 
 	const float addPos = angle * speedMag;
 
-	DirectX::XMFLOAT3 position = getObj()->position;
+	DirectX::XMFLOAT2 position = mapPos;
 	position.x += addPos;
 
 
@@ -305,7 +305,7 @@ void Player::move()
 
 	// 計算後セット
 	//getObj()->position = position;
-	mapPos = DirectX::XMFLOAT2(position.x, position.y);
+	mapPos = position;
 	
 	// 回転
 	rot();
@@ -318,7 +318,7 @@ void Player::rot()
 	const float ensyuu = d * XM_PI;
 
 	constexpr float angleMax = 360.f;
-	const float angleVec = -getObj()->position.x / ensyuu * angleMax;
+	const float angleVec = -mapPos.x / ensyuu * angleMax;
 
 	// 角度計算
 	getObj()->rotation = std::fmod(angleVec, angleMax);
