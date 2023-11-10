@@ -55,7 +55,8 @@ void Player::update()
 	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
 	//}
 
-	objPos = getObj()->position();
+	
+	DirectX::XMFLOAT3 objPos = getObj()->position;
 	sphere.center.m128_f32[0] = objPos.x; 
 	sphere.center.m128_f32[1] = objPos.y;
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
@@ -282,6 +283,8 @@ void Player::move()
 	constexpr float speedMag = 0.35f;
 
 	const float addPos = angle * speedMag;
+
+	DirectX::XMFLOAT3 position = getObj()->position;
 	position.x += addPos;
 
 
@@ -301,7 +304,7 @@ void Player::move()
 
 
 	// 計算後セット
-	gameObj->setPosition(position);
+	getObj()->position = position;
 	
 	// 回転
 	rot();

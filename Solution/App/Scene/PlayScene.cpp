@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <Player/Player.h>
 #include <Object/Goal.h>
+#include<GameMap.h>
 
 #include <Collision/Collision.h>
 
@@ -128,6 +129,7 @@ void PlayScene::drawObj3d()
 {
 	player->draw();
 	goal->draw();
+	//gameMap->draw();
 	particle->drawWithUpdate();
 }
 
