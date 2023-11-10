@@ -62,7 +62,6 @@ class Player
 	// 現フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 currentFramePos = { 0.f,0.f };
 
-
 	// センサーの値
 	float sensorValue = 0.0f;
 private:

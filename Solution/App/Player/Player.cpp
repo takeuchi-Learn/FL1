@@ -67,7 +67,8 @@ void Player::update()
 	//}
 
 	objPos = gameObj->getPosition();
-	//sphere.center = DirectX::XMVECTOR(objPos.x, objPos.y, 0, 0);
+	sphere.center.m128_f32[0] = objPos.x; 
+	sphere.center.m128_f32[1] = objPos.y;
 }
 
 void Player::draw()
@@ -314,17 +315,25 @@ void Player::move()
 	const float addPos = angle * speedMag;
 	position.x += addPos;
 
-	constexpr float accMag = 0.015f;
-	acc += addPos * accMag;
-	position.x += acc;
 
-	// 停止したらリセット
-	// ここジャストじゃなくて一定範囲でもいいかも
-	if (preFramePos.x == currentFramePos.x)acc = 0.f;
+	// 加速度計算と加算
+	// 最大速度
+	constexpr float maxSpeed = 5.f;
+	if (abs(preFramePos.x - position.x) <= maxSpeed)
+	{
+		constexpr float accMag = 0.015f;
+		acc += addPos * accMag;
+		position.x += acc;
+
+		// 停止したらリセット
+		// ここジャストじゃなくて一定範囲でもいいかも
+		if (preFramePos.x == currentFramePos.x)acc = 0.f;
+	}
+
 
 	// 計算後セット
 	gameObj->setPosition(position);
-
+	
 	// 回転
 	rot();
 }
