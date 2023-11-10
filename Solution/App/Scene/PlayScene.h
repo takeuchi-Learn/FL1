@@ -17,6 +17,8 @@ class ParticleMgr;
 class Player;
 class Light;
 
+class GameMap;
+
 class PlayScene :
 	public GameScene
 {
