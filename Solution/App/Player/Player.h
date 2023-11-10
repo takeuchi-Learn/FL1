@@ -8,7 +8,7 @@
 #include <DirectXMath.h>
 #include <functional>
 #include <memory>
-#include <GameObject/BaseGameObjectHavingHp.h>
+#include <3D/Billboard/Billboard.h>
 #include"../GameCamera.h"
 
 #include<Collision/CollisionShape.h>
@@ -19,8 +19,8 @@ class Light;
 
 class Player
 {
-	std::unique_ptr<BaseGameObjectHavingHp> gameObj;
-	Light* light = nullptr;
+	DirectX::XMFLOAT2 mapPos{};
+	std::unique_ptr<Billboard> gameObj;
 
 	GameCamera* gameCamera = nullptr;
 
@@ -113,18 +113,19 @@ private:
 public:
 
 	// コンストラクタ仮
-	Player(GameCamera* camera, ObjModel* model);
+	Player(GameCamera* camera);
 
 	// 更新
 	void update();
 	// 描画
 	void draw();
 
-	inline void setLight(Light* light) { this->light = light; }
-
 	/// @brief センサーの値格納用
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
+	inline const auto& getObj() { return gameObj->getFrontData(); }
+
+	inline const auto& getMapPos() const { return mapPos; }
 
 	/// @brief 衝突(仮)
 	void hit();
@@ -133,4 +134,3 @@ public:
 	/// @return 当たり判定の情報
 	const CollisionShape::Sphere& getShape()const { return sphere; }
 };
-

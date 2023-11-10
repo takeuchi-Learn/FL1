@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "../Engine/Camera/Camera.h"
-#include "../Engine/GameObject/AbstractGameObj.h"
+#include <Camera/Camera.h>
+#include <3D/Billboard/Billboard.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも
@@ -12,7 +12,7 @@ class GameCamera :
 private:
 
 	// 追従Obj
-	AbstractGameObj* obj = nullptr;
+	BillboardData* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	float angle = 20.f;
 
@@ -71,6 +71,8 @@ private:
 #pragma endregion
 
 
+	void preUpdate() override;
+
 	/// @brief 角度を上ベクトルに変換
 	/// @param angle 角度
 	/// @param float2 上ベクトルを格納するXMFLOAT2
@@ -82,21 +84,23 @@ private:
 	/// @brief 追従
 	void followObject();
 
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
+	void gameCameraUpdate();
+
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
-	GameCamera(AbstractGameObj* obj = nullptr);
+	GameCamera(BillboardData* obj = nullptr);
 
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
+	inline float getAngleDeg() const { return angle; }
 
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }
 
 	/// @brief 追従先オブジェクト
 	/// @param obj 
-	void setParentObj(AbstractGameObj* obj) { this->obj = obj; }
+	void setParentObj(BillboardData* obj) { this->obj = obj; }
 
 	/// @brief Z座標
 	/// @param z 
