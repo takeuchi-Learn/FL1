@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
+    <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
     <ClCompile Include="Engine\GameObject\AbstractGameObj.cpp" />
     <ClCompile Include="Engine\CollisionMgr.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="App\GameMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App\Object\Goal.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />

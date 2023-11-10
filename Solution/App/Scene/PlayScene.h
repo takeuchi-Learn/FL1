@@ -1,20 +1,45 @@
 ﻿#pragma once
 
 #include <System/GameScene.h>
+#include <Util/Stopwatch.h>
 #include <memory>
 
-class GameCamera;
-class GameMap;
-class Player;
+#include"../GameCamera.h"
+
+class Camera;
 class Light;
+class ObjModel;
+class Object3d;
+class Sprite;
+class SpriteBase;
+class SoundData;
+class ParticleMgr;
+
+class Player;
+class Goal;
+
+class Collision;
+
+class GameMap;
 
 class PlayScene :
 	public GameScene
 {
 private:
 	std::unique_ptr<GameCamera> camera;
+
+	std::unique_ptr<SpriteBase> spriteBase;
+	std::unique_ptr<Sprite> sprite;
+
 	std::unique_ptr<Player> player;
+
+	std::unique_ptr<Goal> goal;
+
 	std::unique_ptr<GameMap> gameMap;
+
+private:
+	/// @brief 衝突確認関数
+	void checkCollision();
 
 public:
 	PlayScene();

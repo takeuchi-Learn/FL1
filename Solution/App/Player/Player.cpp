@@ -31,6 +31,9 @@ Player::Player(GameCamera* camera) :
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
 	loadYamlFile();
+
+	// 判定仮設定
+	sphere.radius = scale / 2;
 }
 
 void Player::update()
@@ -53,6 +56,24 @@ void Player::update()
 void Player::draw()
 {
 	gameObj->draw();
+}
+
+void Player::hit()
+{
+	// 地面衝突
+	if (!pushJumpKeyFrame)
+	{
+		if (isReboundY)
+		{
+			reboundEnd();
+		} else
+		{
+			jumpEnd();
+		}
+	}
+
+	// ゴール衝突
+	//gameCamera->changeStateGoal();
 }
 
 void Player::calcJumpPos()
@@ -82,47 +103,61 @@ void Player::jump()
 	constexpr float jumpSensorValue = 1.f;
 	constexpr float bigSensorJyroValue = 2.f;
 
-	if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
+	pushJumpKeyFrame = false;
+	if (!isJump)
 	{
-		isJump = true;
-
-		// 大ジャンプ
-		if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
+		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 		{
-			fallStartSpeed = bigJumpPower;
-		} else// 通常ジャンプ
-		{
-			// 初速度を設定
-			// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-			fallStartSpeed = jumpPower;
+			pushJumpKeyFrame = true;
+			isJump = true;
+			// 大ジャンプ
+			if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
+			{
+				fallStartSpeed = bigJumpPower;
+			} else// 通常ジャンプ
+			{
+				// 初速度を設定
+				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
+				fallStartSpeed = jumpPower;
+			}
 		}
 	}
 
-	if (!isJump)return;
+	if (!isJump)
+	{
+		// 地形無いときに勝手に落ちるようにするために0.fをセット
+		fallStartSpeed = 0.f;
+	}
 
 	// ジャンプの更新処理
 	calcJumpPos();
 
 	// 終了確認
-	checkJumpEnd();
+	//checkJumpEnd();
 }
 
-void Player::checkJumpEnd()
+void Player::jumpEnd()
 {
-	if (isReboundY)return;
+	//// 仮に0.f以下になったらジャンプ終了
+	//if (mapPos.y < 0.f)
+	//{
+	//	// ジャンプ終了処理
+	//	isJump = false;
+	//	fallTime = 0;
+	//	mapPos.y = 0.f;
 
-	// 仮に0.f以下になったらジャンプ終了
-	if (mapPos.y < 0.f)
-	{
-		// ジャンプ終了処理
-		isJump = false;
-		fallTime = 0;
-		mapPos.y = 0.f;
+	//	isDrop = false;
 
-		isDrop = false;
+	//	startRebound();
+	//}
 
-		startRebound();
-	}
+	// ジャンプ終了処理
+	isJump = false;
+	fallTime = 0;
+	// 仮
+	mapPos.y = mapPos.y + 0.3f;
+	isDrop = false;
+	startRebound();
 }
 
 void Player::calcDropVec()
@@ -151,7 +186,6 @@ void Player::rebound()
 	// 本来は衝突時に呼び出す
 	if (mapPos.x >= testP)
 	{
-
 		// 横のバウンド開始
 		startSideRebound();
 	}
@@ -163,7 +197,7 @@ void Player::rebound()
 	// 更新
 	calcJumpPos();
 	// 終了確認
-	checkreBoundEnd();
+	//reboundEnd();
 }
 
 void Player::startRebound()
@@ -176,10 +210,10 @@ void Player::startRebound()
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
 }
 
-void Player::checkreBoundEnd()
+void Player::reboundEnd()
 {
-	// 仮に0.f以下になったらジャンプ終了
-	if (mapPos.y < 0.f)
+	// 仮に0.f以下になったら跳ね返り終了
+	/*if (mapPos.y < 0.f)
 	{
 		fallTime = 0;
 		mapPos.y = 0.f;
@@ -192,6 +226,19 @@ void Player::checkreBoundEnd()
 		{
 			startRebound();
 		}
+	}*/
+
+	fallTime = 0;
+	// 仮
+	mapPos.y = mapPos.y + 0.3f;
+	constexpr float boundEndVel = 3.f;
+	if (-currentFallVelovity <= boundEndVel)
+	{
+		isReboundY = false;
+		isDrop = false;
+	} else
+	{
+		startRebound();
 	}
 }
 
@@ -233,11 +280,11 @@ void Player::startSideRebound()
 	// ここに衝突したときの座標格納する
 	terrainHitPosX = 80.0f;
 
-	getObj()->position.x = terrainHitPosX;
+	mapPos.x = terrainHitPosX;
 
 	// 壁の隣に移動
-	const XMFLOAT3 clampPos = getObj()->position;
-	currentFramePos = XMFLOAT2(clampPos.x, clampPos.y);
+	const XMFLOAT2 clampPos = mapPos;
+	currentFramePos = clampPos;
 
 	// 進行方向を求めるためにベクトルを求める
 	const float vec = preFramePos.x - currentFramePos.x;
@@ -262,7 +309,27 @@ void Player::move()
 	constexpr float speedMag = 0.0035f;
 
 	const float addPos = angle * speedMag;
-	mapPos.x += addPos;
+
+	DirectX::XMFLOAT2 position = mapPos;
+	position.x += addPos;
+
+	// 加速度計算と加算
+	// 最大速度
+	constexpr float maxSpeed = 5.f;
+	if (abs(preFramePos.x - position.x) <= maxSpeed)
+	{
+		constexpr float accMag = 0.015f;
+		acc += addPos * accMag;
+		position.x += acc;
+
+		// 停止したらリセット
+		// ここジャストじゃなくて一定範囲でもいいかも
+		if (preFramePos.x == currentFramePos.x)acc = 0.f;
+	}
+
+	// 計算後セット
+	//getObj()->position = position;
+	mapPos = position;
 
 	// 回転
 	rot();
@@ -275,7 +342,7 @@ void Player::rot()
 	const float ensyuu = d * XM_PI;
 
 	constexpr float angleMax = 360.f;
-	const float angleVec = -getObj()->position.x / ensyuu * angleMax;
+	const float angleVec = -mapPos.x / ensyuu * angleMax;
 
 	// 角度計算
 	getObj()->rotation = std::fmod(angleVec, angleMax);

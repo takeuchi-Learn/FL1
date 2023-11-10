@@ -136,6 +136,11 @@ void GameCamera::checkInput()
 
 #pragma endregion
 
+#pragma region CLEAR
+void GameCamera::updateClear()
+{}
+#pragma endregion
+
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算
@@ -197,6 +202,9 @@ void GameCamera::gameCameraUpdate()
 		break;
 	case GameCamera::CameraState::INPUT:
 		updateInput();
+		break;
+	case GameCamera::CameraState::CLEAR:
+		updateClear();
 		break;
 	default:
 		break;

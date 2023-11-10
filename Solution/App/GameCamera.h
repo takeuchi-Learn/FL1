@@ -21,6 +21,7 @@ private:
 	{
 		START,// 開始
 		INPUT,// 入力受付
+		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
 		OTHER, //その他(何も更新しないとき)
 	};
 
@@ -64,6 +65,11 @@ private:
 	void checkInput();
 #pragma endregion
 
+#pragma region CLEAR
+	/// @brief CameraState::CLEARのupdate
+	void updateClear();
+#pragma endregion
+
 	void preUpdate() override;
 
 	/// @brief 角度を上ベクトルに変換
@@ -77,14 +83,13 @@ private:
 	/// @brief 追従
 	void followObject();
 
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
-
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(BillboardData* obj = nullptr);
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
+	void gameCameraUpdate();
 
 	inline float getAngleDeg() const { return angle; }
 
@@ -92,16 +97,24 @@ public:
 	void setGyroValue(float value) { angle = value; }
 
 	/// @brief 追従先オブジェクト
-	/// @param obj 
+	/// @param obj
 	void setParentObj(BillboardData* obj) { this->obj = obj; }
 
 	/// @brief Z座標
-	/// @param z 
+	/// @param z
 	void setEyeZ(float z) { setEye(DirectX::XMFLOAT3(0, 0, z)); }
 
 	/// @brief 角度の取得
 	/// @return 角度
 	float getAngle()const { return angle; }
 
-};
+	// ポーズしてるかどうか
+	void pause(const bool flag)
+	{
+		if (flag)cameraState = CameraState::OTHER;
+		else cameraState = CameraState::INPUT;
+	}
 
+	// クリア状態に変更
+	void changeStateGoal() { cameraState = CameraState::CLEAR; }
+};

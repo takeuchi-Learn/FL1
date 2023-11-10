@@ -11,12 +11,23 @@
 #include <3D/Billboard/Billboard.h>
 #include"../GameCamera.h"
 
+#include<Collision/CollisionShape.h>
+
+class Camera;
+class ObjModel;
+class Light;
+
 class Player
 {
 	DirectX::XMFLOAT2 mapPos{};
 	std::unique_ptr<Billboard> gameObj;
 
 	GameCamera* gameCamera = nullptr;
+
+	CollisionShape::Sphere sphere;
+
+	// 現在のフレームでジャンプキー押したかどうか(ジャンプできない不具合防止用)
+	bool pushJumpKeyFrame = false;
 
 	//落下時間
 	int fallTime = 0;
@@ -30,7 +41,7 @@ class Player
 	// 落下中かどうか(跳ね返り用)
 	bool isDrop = false;
 	//ジャンプしているかどうか
-	bool isJump = false;
+	bool isJump = true;
 
 	// 跳ね返りしているかどうか(上下)
 	bool isReboundY = false;
@@ -48,12 +59,10 @@ class Player
 	// 加速度
 	float acc = 0.f;
 
-
 	// 前フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 preFramePos = { 0.f,0.f };
 	// 現フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 currentFramePos = { 0.f,0.f };
-
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -66,7 +75,7 @@ private:
 	/// @param startVel 初速度
 	/// @param gravAcc 加速度
 	/// @param t 時間
-	/// @return 
+	/// @return
 	float calcFallVelocity
 	(
 		const float startVel,
@@ -82,7 +91,7 @@ private:
 	// ジャンプ
 	void jump();
 	// ジャンプ終了確認
-	void checkJumpEnd();
+	void jumpEnd();
 
 	// 落下ベクトル計測
 	void calcDropVec();
@@ -92,7 +101,7 @@ private:
 	// 跳ね返り開始
 	void startRebound();
 	// 跳ね返り終了確認
-	void checkreBoundEnd();
+	void reboundEnd();
 	// 横跳ね返り計算
 	void calcSideRebound();
 	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。
@@ -119,4 +128,11 @@ public:
 	inline const auto& getObj() { return gameObj->getFrontData(); }
 
 	inline const auto& getMapPos() const { return mapPos; }
+
+	/// @brief 衝突(仮)
+	void hit();
+
+	/// @brief 当たり判定取得
+	/// @return 当たり判定の情報
+	const CollisionShape::Sphere& getShape()const { return sphere; }
 };
