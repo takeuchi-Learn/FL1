@@ -1,9 +1,8 @@
 ﻿#include "Goal.h"
 
 
-Goal::Goal(ObjModel* model, Camera* camera, Light* light, const DirectX::XMFLOAT2& pos)
+Goal::Goal(ObjModel* model, Camera* camera,  const DirectX::XMFLOAT2& pos)
 	:gameObj(std::make_unique<AbstractGameObj>(camera,model))
-	,light(light)
 {
 	gameObj->setPosition(DirectX::XMFLOAT3(pos.x, pos.y, 0));
 

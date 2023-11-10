@@ -35,8 +35,6 @@ Player::Player(GameCamera* camera) :
 	// 判定仮設定
 	sphere.radius = scale / 2;
 
-	// 追従させるためにポインタを渡す
-	//gameCamera->setParentObj(gameObj.get());
 }
 
 void Player::update()
