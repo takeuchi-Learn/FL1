@@ -141,9 +141,9 @@ void GameCamera::checkInput()
 #pragma endregion
 
 #pragma region CLEAR
-
 void GameCamera::updateClear()
-{}
+{
+}
 #pragma endregion
 
 

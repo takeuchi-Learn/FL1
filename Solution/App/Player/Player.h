@@ -125,5 +125,10 @@ public:
 	/// @brief センサーの値格納用
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
+
+
+	/// @brief 当たり判定取得
+	/// @return 当たり判定の情報
+	const CollisionShape::Sphere& getShape()const { return sphere; }
 };
 

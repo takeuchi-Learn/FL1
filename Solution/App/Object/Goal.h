@@ -33,5 +33,9 @@ public:
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }
+
+	/// @brief 当たり判定取得
+	/// @return 当たり判定の情報
+	const CollisionShape::AABB& getShape()const { return aabb; }
 };
 
