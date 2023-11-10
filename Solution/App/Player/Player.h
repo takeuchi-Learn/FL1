@@ -127,6 +127,7 @@ public:
 
 	inline const auto& getMapPos() const { return mapPos; }
 
+
 	/// @brief 衝突(仮)
 	void hit();
 

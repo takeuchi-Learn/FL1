@@ -10,17 +10,13 @@
 #include <Sound/Sound.h>
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
-#include <3D/Billboard/Billboard.h>
 #include <algorithm>
 #include <Player/Player.h>
 #include <Object/Goal.h>
 
 #include <Collision/Collision.h>
 
-#include"../GameCamera.h"
-#include "../GameMap.h"
 #include "TitleScene.h"
-#include <3D/Light/Light.h>
 
 using namespace DirectX;
 
@@ -28,7 +24,7 @@ void PlayScene::checkCollision()
 {
 	// テストです
 	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
-	if(res)
+	if (res)
 	{
 		player->hit();
 	}
@@ -41,43 +37,39 @@ PlayScene::PlayScene() :
 	stopwatch(std::make_unique<Stopwatch>()),
 	stopwatchPlayTime(Timer::timeType(0u))
 {
-	constexpr auto bgmPath = "Resources/BGM.wav";
-	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
-	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
-	constexpr auto mapYamlPath = "Resources/Map/map.yml";
+	bgm = Sound::ins()->loadWave("Resources/BGM.wav");
 
-	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
-	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
-}
+	spriteBase = std::make_unique<SpriteBase>();
+	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
+									  spriteBase.get(),
+									  XMFLOAT2(0.5f, 0.5f));
+	sprite->color.w = 0.5f;
 
-PlayScene::PlayScene() :
-	camera(std::make_unique<GameCamera>())
-{
-	camera->setEye(cameraPosDef);
-	camera->setTarget(objectPosDef);
-	camera->setPerspectiveProjFlag(false);
+	camera->setEye(XMFLOAT3(0, 0, -5));
+	camera->setTarget(XMFLOAT3(0, 0, 0));
 
-	player = std::make_unique<Player>(camera.get());
+	light->setDirLightActive(0u, true);
+	light->setDirLightDir(0u, XMVectorSet(1, 0, 0, 0));
+	light->setPointLightPos(0u, camera->getEye());
 
-	camera->setParentObj(player->getObj().get());
+	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
 
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setLight(light.get());
 
 	// 仮にプレイヤーモデルを割り当て
 	constexpr DirectX::XMFLOAT2 goalPos(80, 0);
-	goal = std::make_unique<Goal>( nullptr, camera.get(), light.get(), goalPos);
+	goal = std::make_unique<Goal>(nullptr, camera.get(), light.get(), goalPos);
 
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
 						   0.2f);
-	gameMap = std::make_unique<GameMap>(camera.get());
-	const bool ret = gameMap->loadDataFile(mapYamlPath);
-	assert(false == ret);
 }
 
-PlayScene::~PlayScene() {}
+PlayScene::~PlayScene()
+{
+	Sound::ins()->stopWave(bgm);
+}
 
 void PlayScene::update()
 {
@@ -88,9 +80,40 @@ void PlayScene::update()
 		return;
 	}
 
-	// 更新
-	camera->update();
-	gameMap->update();
+	if (Input::ins()->triggerKey(DIK_P))
+	{
+		constexpr float particleVel = 0.1f;
+		particle->createParticle({ 0,0,0 },
+								 10u,
+								 1.f,
+								 particleVel);
+	}
+
+	if (Input::ins()->triggerKey(DIK_B))
+	{
+		static bool isPlay = true;
+
+		if (isPlay)
+		{
+			bgm.lock()->stopVoice();
+		} else
+		{
+			bgm.lock()->startVoice();
+		}
+		isPlay = !isPlay;
+	}
+
+	// Tを押したらタイマーを停止/再開
+	if (Input::ins()->triggerKey(DIK_T))
+	{
+		stopwatch->stopOrResume();
+	}
+	// 測定中なら現在時間を更新
+	if (stopwatch->isPlay())
+	{
+		stopwatchPlayTime = stopwatch->getNowTime();
+	}
+
 	player->update();
 
 	// ライトとカメラの更新
@@ -104,10 +127,17 @@ void PlayScene::update()
 
 void PlayScene::drawObj3d()
 {
-	gameMap->draw();
 	player->draw();
 	goal->draw();
 	particle->drawWithUpdate();
 }
 
-void PlayScene::drawFrontSprite() {}
+void PlayScene::drawFrontSprite()
+{
+	const auto mousePos = Input::ins()->calcMousePosFromSystem();
+	sprite->position.x = mousePos.x;
+	sprite->position.y = mousePos.y;
+
+	spriteBase->drawStart(DX12Base::ins()->getCmdList());
+	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+}

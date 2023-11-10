@@ -84,14 +84,14 @@ private:
 	/// @brief 追従
 	void followObject();
 
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
 
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(BillboardData* obj = nullptr);
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
+	void gameCameraUpdate();
 
 	inline float getAngleDeg() const { return angle; }
 

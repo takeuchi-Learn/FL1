@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <System/GameScene.h>
+#include <Util/Stopwatch.h>
 #include <memory>
 
 #include"../GameCamera.h"
@@ -15,7 +16,7 @@ class SoundData;
 class ParticleMgr;
 
 class Player;
-class Light;
+class Goal;
 
 class GameMap;
 
@@ -23,15 +24,29 @@ class PlayScene :
 	public GameScene
 {
 private:
+	std::unique_ptr<Stopwatch> stopwatch{};
+	Timer::timeType stopwatchPlayTime;
+
+	std::weak_ptr<SoundData> bgm;
+
+	std::unique_ptr<Light> light;
+	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<GameCamera> camera;
+
+	std::unique_ptr<SpriteBase> spriteBase;
+	std::unique_ptr<Sprite> sprite;
+
+	std::unique_ptr<ParticleMgr> particle;
+
 	std::unique_ptr<Player> player;
 
 	std::unique_ptr<Goal> goal;
 
+	std::unique_ptr<GameMap> gameMap;
+
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
-	std::unique_ptr<GameMap> gameMap;
 
 public:
 	PlayScene();
@@ -40,4 +55,6 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
+
+
 };

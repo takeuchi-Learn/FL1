@@ -30,8 +30,7 @@ Player::Player(GameCamera* camera) :
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
 	loadYamlFile();
-	constexpr float scale = 50.0f;
-	gameObj->setScale(XMFLOAT3(scale, scale, scale));
+
 	
 	// 判定仮設定
 	sphere.radius = scale / 2;
