@@ -25,7 +25,7 @@ class Player
 	//現在の落下速度
 	float currentFallVelovity = 0.0f;
 	// 重力加速度(一旦プレイヤー内に宣言)
-	const float gAcc = 0.35f;
+	static constexpr float gAcc = 0.0098f;
 
 	// 落下中かどうか(跳ね返り用)
 	bool isDrop = false;

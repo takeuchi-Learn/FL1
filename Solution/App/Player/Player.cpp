@@ -6,6 +6,7 @@
 #include <fstream>
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
+#include <GameMap.h>
 
 using namespace DirectX;
 
@@ -42,7 +43,9 @@ void Player::update()
 	jump();
 	rebound();
 
-	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+	getObj()->position = XMFLOAT3(mapPos.x * GameMap::chipSize,
+								  mapPos.y * GameMap::chipSize,
+								  getObj()->position.z);
 
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
 }
@@ -54,10 +57,8 @@ void Player::draw()
 
 void Player::calcJumpPos()
 {
-	fallTime++;
-
 	const float PRE_VEL_Y = currentFallVelovity;
-	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
+	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, ++fallTime);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
@@ -69,8 +70,8 @@ void Player::jump()
 	// センサーの値によってジャンプ量細かく変更するか聞く
 
 	// ジャンプパワー
-	constexpr float jumpPower = 18.f;
-	constexpr float bigJumpPower = 25.f;
+	constexpr float jumpPower = 0.18f;
+	constexpr float bigJumpPower = 0.25f;
 
 	// 一旦跳ね返り中はジャンプ禁止
 	if (isReboundY)return;
@@ -258,7 +259,7 @@ void Player::move()
 	// 角度に応じて移動
 	// 一旦加速は考慮せずに実装
 	// ここ変更すると速度が変わる
-	constexpr float speedMag = 0.35f;
+	constexpr float speedMag = 0.0035f;
 
 	const float addPos = angle * speedMag;
 	mapPos.x += addPos;
