@@ -269,14 +269,13 @@ void Player::move()
 
 void Player::rot()
 {
-	// 角度取得
-	const float objAngle = getObj()->rotation;
-	const float cameraAngle = gameCamera->getAngle();
-	// 角度計算
-	float angle = objAngle;
-	const float vec = currentFramePos.x - preFramePos.x;
-	angle += vec * -1.f;
+	// 直径
+	const float d = getObj()->scale;
+	const float ensyuu = d * XM_PI;
 
-	// セット
-	getObj()->rotation = std::fmod(angle, 360.f);
+	constexpr float angleMax = 360.f;
+	const float angleVec = -getObj()->position.x / ensyuu * angleMax;
+
+	// 角度計算
+	getObj()->rotation = std::fmod(angleVec, angleMax);
 }
