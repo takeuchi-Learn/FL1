@@ -67,7 +67,7 @@ void Player::update()
 	//}
 
 	objPos = gameObj->getPosition();
-	sphere.center = DirectX::XMVECTOR(objPos.x, objPos.y, 0, 0);
+	//sphere.center = DirectX::XMVECTOR(objPos.x, objPos.y, 0, 0);
 }
 
 void Player::draw()
