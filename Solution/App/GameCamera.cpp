@@ -140,6 +140,13 @@ void GameCamera::checkInput()
 
 #pragma endregion
 
+#pragma region CLEAR
+
+void GameCamera::updateClear()
+{}
+#pragma endregion
+
+
 
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
@@ -204,6 +211,9 @@ void GameCamera::gameCameraUpdate()
 		break;
 	case GameCamera::CameraState::INPUT:
 		updateInput();
+		break;
+	case GameCamera::CameraState::CLEAR:
+		updateClear();
 		break;
 	default:
 		break;

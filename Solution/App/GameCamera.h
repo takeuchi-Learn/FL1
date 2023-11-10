@@ -21,6 +21,7 @@ private:
 	{
 		START,// 開始
 		INPUT,// 入力受付
+		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
 		OTHER, //その他(何も更新しないとき)
 	};
 
@@ -64,6 +65,12 @@ private:
 	void checkInput();
 #pragma endregion
 
+#pragma region CLEAR
+	/// @brief CameraState::CLEARのupdate
+	void updateClear();
+#pragma endregion
+
+
 	/// @brief 角度を上ベクトルに変換
 	/// @param angle 角度
 	/// @param float2 上ベクトルを格納するXMFLOAT2
@@ -98,6 +105,16 @@ public:
 	/// @brief 角度の取得
 	/// @return 角度
 	float getAngle()const { return angle; }
+
+	// ポーズしてるかどうか
+	void pause(const bool flag)
+	{
+		if(flag)cameraState = CameraState::OTHER;
+		else cameraState = CameraState::INPUT;
+	}
+
+	// クリア状態に変更
+	void changeStateGoal() { cameraState = CameraState::CLEAR; }
 
 };
 
