@@ -55,7 +55,7 @@ void Player::update()
 	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
 	//}
 
-	objPos = gameObj->getPosition();
+	objPos = getObj()->position();
 	sphere.center.m128_f32[0] = objPos.x; 
 	sphere.center.m128_f32[1] = objPos.y;
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
