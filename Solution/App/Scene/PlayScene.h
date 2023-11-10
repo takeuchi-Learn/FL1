@@ -14,7 +14,9 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
+
 class Player;
+class Goal;
 
 class PlayScene :
 	public GameScene
@@ -37,7 +39,11 @@ private:
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
 
+	std::unique_ptr<Goal> goal;
+
 private:
+	/// @brief 衝突確認関数
+	void checkCollision();
 
 public:
 	PlayScene();

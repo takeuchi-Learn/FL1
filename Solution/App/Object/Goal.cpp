@@ -3,6 +3,7 @@
 
 Goal::Goal(ObjModel* model, Camera* camera, Light* light, const DirectX::XMFLOAT2& pos)
 	:gameObj(std::make_unique<AbstractGameObj>(camera,model))
+	,light(light)
 {
 	gameObj->setPosition(DirectX::XMFLOAT3(pos.x, pos.y, 0));
 
@@ -11,7 +12,12 @@ Goal::Goal(ObjModel* model, Camera* camera, Light* light, const DirectX::XMFLOAT
 	aabb.minPos.m128_f32[0] = pos.x - size / 2;
 	aabb.minPos.m128_f32[1] = pos.y - size / 2;
 	
-	aabb.minPos.m128_f32[0] = pos.x + size / 2;
-	aabb.minPos.m128_f32[1] = pos.y + size / 2;
+	aabb.maxPos.m128_f32[0] = pos.x + size / 2;
+	aabb.maxPos.m128_f32[1] = pos.y + size / 2;
 
+}
+
+void Goal::draw()
+{
+	gameObj->draw(light);
 }

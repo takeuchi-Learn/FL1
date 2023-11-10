@@ -12,10 +12,24 @@
 #include <3D/ParticleMgr.h>
 #include <algorithm>
 #include <Player/Player.h>
+#include <Object/Goal.h>
+
+#include <Collision/Collision.h>
 
 #include "TitleScene.h"
 
 using namespace DirectX;
+
+void PlayScene::checkCollision()
+{
+	// テストです
+	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
+	if(res)
+	{
+		player->hit();
+	}
+
+}
 
 PlayScene::PlayScene() :
 	light(std::make_unique<Light>()),
@@ -43,6 +57,10 @@ PlayScene::PlayScene() :
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
 	player->setLight(light.get());
+
+	// 仮にプレイヤーモデルを割り当て
+	constexpr DirectX::XMFLOAT2 goalPos(80, 0);
+	goal = std::make_unique<Goal>( nullptr, camera.get(), light.get(), goalPos);
 
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
@@ -104,11 +122,14 @@ void PlayScene::update()
 	camera->gameCameraUpdate();
 	light->update();
 
+	// 衝突判定テスト
+	checkCollision();
 }
 
 void PlayScene::drawObj3d()
 {
 	player->draw();
+	goal->draw();
 	particle->drawWithUpdate();
 }
 

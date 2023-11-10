@@ -76,6 +76,11 @@ void Player::draw()
 	gameObj->draw(light);
 }
 
+void Player::hit()
+{
+	gameCamera->changeStateGoal();
+}
+
 void Player::calcJumpPos()
 {
 	fallTime++;

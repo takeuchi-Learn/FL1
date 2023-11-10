@@ -126,6 +126,8 @@ public:
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
 
+	/// @brief 衝突(仮)
+	void hit();
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報

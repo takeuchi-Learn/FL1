@@ -29,7 +29,7 @@ private:
 
 public:
 	Goal(ObjModel* model, Camera* camera, Light* light,const DirectX::XMFLOAT2& pos);
-	
+	void draw();
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }
