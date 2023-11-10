@@ -123,20 +123,14 @@ void GameCamera::updateInput()
 void GameCamera::checkInput()
 {
 
-	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
-	constexpr float frameAngle = 3.0f;
+	getAccelX = sensor->GetAccelX();
+	getAccelZ = sensor->GetAccelZ();
+	getGyroX = sensor->GetGyroX();
+	getGyroZ = sensor->GetGyroZ();
+
 
 	// 入力確認してカメラを傾ける
-	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if (Input::getInstance()->hitKey(DIK_LEFT))
-	{
-		angle -= frameAngle;
-	} else
-		if (Input::getInstance()->hitKey(DIK_RIGHT))
-		{
-			angle += frameAngle;
-		}
-}
+	angle = atan2f(getAccelX, getAccelZ) * 58.0f;
 
 #pragma endregion
 
@@ -194,7 +188,7 @@ GameCamera::GameCamera(AbstractGameObj* obj)
 	setPerspectiveProjFlag(false);
 }
 
-void GameCamera::gameCameraUpdate()
+void GameCamera::gameCameraUpdate(Sensor* sensor)
 {
 	
 	switch (cameraState)
@@ -208,6 +202,10 @@ void GameCamera::gameCameraUpdate()
 	default:
 		break;
 	}
+	this->sensor = sensor;
+
+	// 回転
+	upRotate();
 
 	// 追従
 	followObject();

@@ -47,11 +47,14 @@ PlayScene::PlayScene() :
 	Sound::ins()->playWave(bgm,
 						   XAUDIO2_LOOP_INFINITE,
 						   0.2f);
+
+	sensor = Sensor::create();
 }
 
 PlayScene::~PlayScene()
 {
 	Sound::ins()->stopWave(bgm);
+	sensor->erase();
 }
 
 void PlayScene::update()
@@ -101,9 +104,9 @@ void PlayScene::update()
 
 	// ライトとカメラの更新
 	camera->update();
-	camera->gameCameraUpdate();
+	camera->gameCameraUpdate(sensor);
 	light->update();
-
+	sensor->update();
 }
 
 void PlayScene::drawObj3d()
