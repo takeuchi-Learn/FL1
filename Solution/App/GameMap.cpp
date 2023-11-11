@@ -99,9 +99,11 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 void GameMap::update()
 {
+	const auto angle = XMConvertToRadians(-camera->getAngleDeg());
 	for (auto& i : billboard)
 	{
-		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
+		i.second->setRotation(angle);
+		i.second->update();
 	}
 }
 

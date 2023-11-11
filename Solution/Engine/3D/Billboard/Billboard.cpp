@@ -42,7 +42,7 @@ Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
 	assert(SUCCEEDED(result));
 }
 
-void Billboard::update(float angleRad)
+void Billboard::update()
 {
 	// 寿命が尽きたものを全削除
 	billboards.remove_if([&](const std::shared_ptr<BillboardData>& x) { if (x->deleteFlag) { --drawNum; return true; } return false; });
@@ -62,6 +62,8 @@ void Billboard::update(float angleRad)
 			vertMap->scale = it->scale;
 			// 色
 			vertMap->color = it->color;
+			// 回転
+			vertMap->rotation = it->rotation;
 			// 次の頂点へ
 			vertMap++;
 			if (++vertCount >= vertexCount)
@@ -77,7 +79,6 @@ void Billboard::update(float angleRad)
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
-	constMap->angleRad = angleRad;
 	constBuff->Unmap(0, nullptr);
 }
 
@@ -253,6 +254,11 @@ void Billboard::InitializeGraphicsPipeline()
 		},
 		{ // 色
 			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ // 回転
+			"ROTATION", 0, DXGI_FORMAT_R32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

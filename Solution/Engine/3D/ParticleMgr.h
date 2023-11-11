@@ -35,6 +35,7 @@ public:
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
 		XMFLOAT4 color;
+		float rotation;
 	};
 
 	// 定数バッファ用データ構造体
@@ -42,7 +43,6 @@ public:
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
-		float angleRad = 0.f;
 	};
 
 	// パーティクル1粒

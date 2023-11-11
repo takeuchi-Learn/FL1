@@ -200,6 +200,8 @@ void ParticleMgr::update()
 			vertMap->scale = it->scale;
 			// 色
 			vertMap->color = it->color;
+			// 回転
+			vertMap->rotation = it->rotation;
 			// 次の頂点へ
 			vertMap++;
 			if (++vertCount >= vertexCount)
@@ -215,7 +217,6 @@ void ParticleMgr::update()
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
-	constMap->angleRad = 0.f;
 	constBuff->Unmap(0, nullptr);
 }
 
@@ -406,6 +407,11 @@ void ParticleMgr::InitializeGraphicsPipeline()
 		},
 		{ // 色
 			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ // 回転
+			"ROTATION", 0, DXGI_FORMAT_R32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

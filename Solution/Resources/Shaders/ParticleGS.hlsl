@@ -39,8 +39,8 @@ void main(
 	// 頂点のオフセットを回転する
 	for (i = 0; i < vnum; i++)
 	{
-		offsetRota[i].x = offset_array[i].x * cos(angleRad) - offset_array[i].y * sin(angleRad);
-		offsetRota[i].y = offset_array[i].y * cos(angleRad) + offset_array[i].x * sin(angleRad);
+		offsetRota[i].x = offset_array[i].x * cos(input[0].rotation) - offset_array[i].y * sin(input[0].rotation);
+		offsetRota[i].y = offset_array[i].y * cos(input[0].rotation) + offset_array[i].x * sin(input[0].rotation);
 		offsetRota[i].zw = offset_array[i].zw;
 	}
 	

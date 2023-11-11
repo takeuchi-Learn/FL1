@@ -56,6 +56,7 @@ public:
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
 		XMFLOAT4 color;
+		float rotation;
 	};
 
 	// 定数バッファ用データ構造体
@@ -63,7 +64,6 @@ public:
 	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
-		float angleRad = 0.f;
 	};
 
 	// 定数
@@ -109,7 +109,7 @@ public:
 	// 指定の画像で初期化
 	Billboard(const wchar_t* texFilePath, Camera* camera);
 
-	void update(float angleRad = 0.f);
+	void update();
 	void draw();
 
 	inline void setCamera(Camera* camera) { this->camera = camera; }
@@ -120,6 +120,14 @@ public:
 									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
 
 	inline auto& getFrontData() { return billboards.front(); }
+
+	inline void setRotation(float angle)
+	{
+		for (auto& i : billboards)
+		{
+			i->rotation = angle;
+		}
+	}
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();

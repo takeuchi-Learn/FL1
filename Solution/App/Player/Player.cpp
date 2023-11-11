@@ -53,7 +53,7 @@ void Player::update()
 								  mapPos.y * GameMap::chipSize,
 								  getObj()->position.z);
 
-	gameObj->update(XMConvertToRadians(getObj()->rotation));
+	gameObj->update();
 
 	// コライダーの座標更新
 	const XMFLOAT2 pos = XMFLOAT2(getObj()->position.x, getObj()->position.y);

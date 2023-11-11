@@ -6,20 +6,12 @@
 
 #include"../GameCamera.h"
 
-class Camera;
-class Light;
-class ObjModel;
-class Object3d;
 class Sprite;
 class SpriteBase;
-class SoundData;
 class ParticleMgr;
-
 class Player;
 class Goal;
-
 class Collision;
-
 class GameMap;
 
 class PlayScene :
