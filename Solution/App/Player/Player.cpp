@@ -27,13 +27,16 @@ Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, gameCamera(camera)
 {
-	constexpr float scale = 100.0f;
-	gameObj->add(XMFLOAT3(), scale, 0.f);
+	constexpr float scale = GameMap::chipSize;
+	gameObj->add(XMFLOAT3(), scale);
 
 	loadYamlFile();
 
 	// 判定仮設定
-	sphere.radius = scale / 2;
+	constexpr float radius = scale / 2.f;
+	sphere.radius = radius;
+	const XMFLOAT2 pos = XMFLOAT2(mapPos.x * GameMap::chipSize, mapPos.y * GameMap::chipSize);
+	sphere.center = XMLoadFloat2(&pos);
 }
 
 void Player::update()
@@ -51,6 +54,10 @@ void Player::update()
 								  getObj()->position.z);
 
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
+
+	// コライダーの座標更新
+	const XMFLOAT2 pos = XMFLOAT2(getObj()->position.x, getObj()->position.y);
+	sphere.center = XMLoadFloat2(&pos);
 }
 
 void Player::draw()

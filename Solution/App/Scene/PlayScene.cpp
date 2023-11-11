@@ -35,19 +35,25 @@ namespace
 void PlayScene::checkCollision()
 {
 	const auto& mapAABBs = gameMap->getAABBs();
-	// テストです
-	for (auto y = 0; y < mapAABBs.size(); y++)
-	{
-		// テストのため一部マップチップを無視
-		if (y == 0 || y == 1 || y == 2)continue;
 
-		for (auto x = 0; x < mapAABBs[y].size(); x++)
+	for (uint32_t yNum = 0u; auto & y : mapAABBs)
+	{
+		for (uint32_t xNum = 0u; auto & x : y)
 		{
-			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			if (yNum <= 2u)
+			{
+				++xNum;
+				continue;
+			}
+			const auto& p = player->getShape();
+			const bool isHit = Collision::CheckHit(p, x);
+			if (isHit)
 			{
 				player->hit();
 			}
+			++xNum;
 		}
+		++yNum;
 	}
 
 	// テストです
