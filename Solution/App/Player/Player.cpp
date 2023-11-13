@@ -56,8 +56,8 @@ void Player::update()
 
 	
 	DirectX::XMFLOAT3 objPos = getObj()->position;
-	sphere.center.m128_f32[0] = objPos.x; 
-	sphere.center.m128_f32[1] = objPos.y;
+	sphere.center.m128_f32[0] = mapPos.x;
+	sphere.center.m128_f32[1] = mapPos.y;
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
@@ -161,15 +161,17 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 	switch (hitArea)
 	{
 	case HIT_AREA::UP:
+
 		// 地面衝突
-		if (!pushJumpKeyFrame)
+		if (!pushJumpKeyFrame || !reboundYFrame)
 		{
+			// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
 			if (isReboundY)
 			{
-				reboundEnd();
+				reboundEnd(hitAABB);
 			} else
 			{
-				jumpEnd();
+				jumpEnd(hitAABB);
 			}
 		}
 		break;
@@ -177,8 +179,12 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 		
 		break;
 	case HIT_AREA::LEFT:
+		// 横のバウンド開始
+		startSideRebound(hitAABB.minPos.m128_f32[0]);
+		break;
 	case HIT_AREA::RIGTH:
-
+		// 横のバウンド開始
+		startSideRebound(hitAABB.maxPos.m128_f32[0]);
 		break;
 	}
 	
@@ -217,6 +223,8 @@ void Player::jump()
 	constexpr float bigSensorJyroValue = 2.f;
 
 	pushJumpKeyFrame = false;
+
+
 	if (!isJump)
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
@@ -250,7 +258,7 @@ void Player::jump()
 	//checkJumpEnd();
 }
 
-void Player::jumpEnd()
+void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 {
 	//// 仮に0.f以下になったらジャンプ終了
 	//if (mapPos.y < 0.f)
@@ -268,8 +276,12 @@ void Player::jumpEnd()
 	// ジャンプ終了処理
 	isJump = false;
 	fallTime = 0;
-	// 仮
-	mapPos.y = mapPos.y + 0.3f;
+
+	// 押し出し後の位置
+	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	//mapPos.y = mapPos.y + hitPosY;
+	mapPos.y = extrusionEndPosY + 0.01f;
+	
 	isDrop = false;
 	startRebound();
 }
@@ -289,21 +301,23 @@ void Player::calcDropVec()
 
 void Player::rebound()
 {
+	reboundYFrame = false;
+
 	// 横バウンド時の座標計算
 	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
 	calcSideRebound();
 
 	// ここから関数化1
 
-	// 仮に80に設定
-	constexpr float testP = 80.f;
-	// 本来は衝突時に呼び出す
-	if (mapPos.x >= testP)
-	{
+	//// 仮に80に設定
+	//constexpr float testP = 80.f;
+	//// 本来は衝突時に呼び出す
+	//if (mapPos.x >= testP)
+	//{
 
-		// 横のバウンド開始
-		startSideRebound();
-	}
+	//	// 横のバウンド開始
+	//	startSideRebound();
+	//}
 
 	// ここまで関数化1
 
@@ -323,9 +337,11 @@ void Player::startRebound()
 	constexpr float fallVelMag = 0.4f;
 	// 落下した高さに合わせて跳ね返り量を変える
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
+
+	reboundYFrame = true;
 }
 
-void Player::reboundEnd()
+void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
 	// 仮に0.f以下になったら跳ね返り終了
 	/*if (mapPos.y < 0.f)
@@ -344,8 +360,13 @@ void Player::reboundEnd()
 	}*/
 
 	fallTime = 0;
-	// 仮
-	mapPos.y = mapPos.y + 0.3f;
+
+
+	// 押し出し後の位置
+	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	//mapPos.y = mapPos.y + hitPosY;
+	mapPos.y = extrusionEndPosY + 0.01f;
+
 	constexpr float boundEndVel = 3.f;
 	if (-currentFallVelovity <= boundEndVel)
 	{
@@ -390,12 +411,12 @@ void Player::calcSideRebound()
 	}
 }
 
-void Player::startSideRebound()
+void Player::startSideRebound(const float wallPosX)
 {
-	// ここに衝突したときの座標格納する
-	terrainHitPosX = 80.0f;
+	//// ここに衝突したときの座標格納する
+	//terrainHitPosX = 80.0f;
 
-	mapPos.x = terrainHitPosX;
+	mapPos.x = wallPosX;
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;
@@ -410,7 +431,7 @@ void Player::startSideRebound()
 
 	isReboundX = true;
 
-	terrainHitObjPosX = mapPos.x;
+	//terrainHitObjPosX = mapPos.x;
 }
 
 void Player::move()

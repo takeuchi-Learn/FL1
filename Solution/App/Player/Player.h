@@ -29,6 +29,7 @@ class Player
 
 	// 現在のフレームでジャンプキー押したかどうか(ジャンプできない不具合防止用)
 	bool pushJumpKeyFrame = false;
+	bool reboundYFrame = false;
 
 	//落下時間
 	int fallTime = 0;
@@ -53,9 +54,9 @@ class Player
 	// 横跳ね返り時に加算する値
 	float sideAddX = 0.0f;
 	// 地形衝突時の座標
-	float terrainHitObjPosX = 0.f;
+	//float terrainHitObjPosX = 0.f;
 	// 衝突した地形の座標
-	float terrainHitPosX = 0.f;
+	//float terrainHitPosX = 0.f;
 
 	// 加速度
 	float acc = 0.f;
@@ -88,12 +89,13 @@ private:
 		return startVel + -gravAcc * static_cast<float>(t);
 	}
 
+
 	/// @brief ジャンプ中の座標更新処理
 	void calcJumpPos();
 	// ジャンプ
 	void jump();
 	// ジャンプ終了確認
-	void jumpEnd();
+	void jumpEnd(const CollisionShape::AABB& hitAABB);
 
 	// 落下ベクトル計測
 	void calcDropVec();
@@ -103,11 +105,11 @@ private:
 	// 跳ね返り開始
 	void startRebound();
 	// 跳ね返り終了確認
-	void reboundEnd();
+	void reboundEnd(const CollisionShape::AABB& hitAABB);
 	// 横跳ね返り計算
 	void calcSideRebound();
 	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。
-	void startSideRebound();
+	void startSideRebound(float wallPosX);
 
 	// 移動
 	void move();
