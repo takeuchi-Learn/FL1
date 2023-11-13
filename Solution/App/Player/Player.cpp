@@ -49,12 +49,6 @@ void Player::update()
 	jump();
 	rebound();
 
-	//// 一旦ここに書いてる
-	//if(terrainHitObjPosX != 0.f)
-	//{
-	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
-	//}
-
 
 	sphere.center.m128_f32[0] = mapPos.x;
 	sphere.center.m128_f32[1] = mapPos.y;
@@ -260,25 +254,10 @@ void Player::jump()
 	// ジャンプの更新処理
 	calcJumpPos();
 
-	// 終了確認
-	//checkJumpEnd();
 }
 
 void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 {
-	//// 仮に0.f以下になったらジャンプ終了
-	//if (mapPos.y < 0.f)
-	//{
-	//	// ジャンプ終了処理
-	//	isJump = false;
-	//	fallTime = 0;
-	//	mapPos.y = 0.f;
-
-	//	isDrop = false;
-
-	//	startRebound();
-	//}
-
 	// ジャンプ終了処理
 	isJump = false;
 	fallTime = 0;
@@ -309,22 +288,6 @@ void Player::rebound()
 {
 	reboundYFrame = false;
 
-
-	// ここから関数化1
-
-	//// 仮に80に設定
-	//constexpr float testP = 80.f;
-	//// 本来は衝突時に呼び出す
-	//if (mapPos.x >= testP)
-	//{
-
-	//	// 横のバウンド開始
-	//	startSideRebound();
-	//}
-
-	// ここまで関数化1
-
-
 	// 横バウンド時の座標計算
 	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
 	calcSideRebound();
@@ -348,21 +311,6 @@ void Player::startRebound()
 
 void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
-	// 仮に0.f以下になったら跳ね返り終了
-	/*if (mapPos.y < 0.f)
-	{
-		fallTime = 0;
-		mapPos.y = 0.f;
-		constexpr float boundEndVel = 3.f;
-		if (-currentFallVelovity <= boundEndVel)
-		{
-			isReboundY = false;
-			isDrop = false;
-		} else
-		{
-			startRebound();
-		}
-	}*/
 
 	fallTime = 0;
 
@@ -419,8 +367,6 @@ void Player::calcSideRebound()
 
 void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
-	//// ここに衝突したときの座標格納する
-	//terrainHitPosX = 80.0f;
 
 	// 当たった向きに応じて押し出す
 	if (hitLeft)
