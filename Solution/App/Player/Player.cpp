@@ -387,7 +387,7 @@ void Player::calcSideRebound()
 	// 加算値を加算または減算
 
 	// 変化する値
-	constexpr float changeValue = 1.0f;
+	constexpr float changeValue = 2.5f;
 	if (sideAddX > 0)
 	{
 		sideAddX -= changeValue;
