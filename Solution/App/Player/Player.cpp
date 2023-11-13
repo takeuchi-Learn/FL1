@@ -303,9 +303,6 @@ void Player::rebound()
 {
 	reboundYFrame = false;
 
-	// 横バウンド時の座標計算
-	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
-	calcSideRebound();
 
 	// ここから関数化1
 
@@ -321,12 +318,14 @@ void Player::rebound()
 
 	// ここまで関数化1
 
-	if (!isReboundY)return;
 
+	// 横バウンド時の座標計算
+	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
+	calcSideRebound();
+
+	if (!isReboundY)return;
 	// 更新
 	calcJumpPos();
-	// 終了確認
-	//reboundEnd();
 }
 
 void Player::startRebound()
@@ -416,7 +415,7 @@ void Player::startSideRebound(const float wallPosX)
 	//// ここに衝突したときの座標格納する
 	//terrainHitPosX = 80.0f;
 
-	mapPos.x = wallPosX;
+	mapPos.x = wallPosX - sphere.radius;
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;
