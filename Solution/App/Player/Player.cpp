@@ -88,8 +88,8 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 
 	HIT_AREA hitArea = HIT_AREA::NONE;
 
-	//1 Xが多い
-	//2 Yが多い
+	//topが1 Xが多い
+	//topが2 Yが多い
 	short top = 0;
 
 
