@@ -40,6 +40,7 @@ Player::Player(GameCamera* camera) :
 
 void Player::update()
 {
+
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
@@ -54,13 +55,14 @@ void Player::update()
 	//	gameObj->setPosition(XMFLOAT3(terrainHitPosX, 0.f, 0.f));
 	//}
 
-	
-	DirectX::XMFLOAT3 objPos = getObj()->position;
+
 	sphere.center.m128_f32[0] = mapPos.x;
 	sphere.center.m128_f32[1] = mapPos.y;
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 
+
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
+
 }
 
 void Player::draw()
@@ -178,6 +180,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 	case HIT_AREA::LEFT:
 		// 横のバウンド開始
 		startSideRebound(hitAABB.minPos.m128_f32[0],true);
+
 		break;
 	case HIT_AREA::RIGTH:
 		// 横のバウンド開始
@@ -190,6 +193,9 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 
 
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+	gameObj->update(XMConvertToRadians(getObj()->rotation));
+
+
 }
 
 void Player::calcJumpPos()
@@ -398,7 +404,8 @@ void Player::calcSideRebound()
 			sideAddX = 0;
 			isReboundX = false;
 		}
-	} else
+	} 
+	else
 	{
 		sideAddX += changeValue;
 
@@ -415,9 +422,11 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	//// ここに衝突したときの座標格納する
 	//terrainHitPosX = 80.0f;
 
+	// 当たった向きに応じて押し出す
 	if (hitLeft)
 	{
 		mapPos.x = wallPosX - sphere.radius;
+
 	}
 	else 
 	{
@@ -436,8 +445,8 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	sideAddX = vec * mag;
 
 	isReboundX = true;
-
-	//terrainHitObjPosX = mapPos.x;
+	// 衝突時の座標を代入
+	terrainHitObjPosX = mapPos.x;
 }
 
 void Player::move()
@@ -472,7 +481,6 @@ void Player::move()
 
 
 	// 計算後セット
-	//getObj()->position = position;
 	mapPos = position;
 	
 	// 回転
