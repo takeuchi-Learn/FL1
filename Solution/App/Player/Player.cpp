@@ -72,9 +72,6 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 {
 	// 仮です
 
-	
-
-
 #pragma region 衝突位置確認
 
 	enum class HIT_AREA
@@ -180,16 +177,19 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 		break;
 	case HIT_AREA::LEFT:
 		// 横のバウンド開始
-		startSideRebound(hitAABB.minPos.m128_f32[0]);
+		startSideRebound(hitAABB.minPos.m128_f32[0],true);
 		break;
 	case HIT_AREA::RIGTH:
 		// 横のバウンド開始
-		startSideRebound(hitAABB.maxPos.m128_f32[0]);
+		startSideRebound(hitAABB.maxPos.m128_f32[0],false);
 		break;
 	}
 	
 	// ゴール衝突
 	//gameCamera->changeStateGoal();
+
+
+	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 }
 
 void Player::calcJumpPos()
@@ -410,12 +410,19 @@ void Player::calcSideRebound()
 	}
 }
 
-void Player::startSideRebound(const float wallPosX)
+void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
 	//// ここに衝突したときの座標格納する
 	//terrainHitPosX = 80.0f;
 
-	mapPos.x = wallPosX - sphere.radius;
+	if (hitLeft)
+	{
+		mapPos.x = wallPosX - sphere.radius;
+	}
+	else 
+	{
+		mapPos.x = wallPosX + sphere.radius;
+	}
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;

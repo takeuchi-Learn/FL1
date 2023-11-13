@@ -109,7 +109,7 @@ private:
 	// 横跳ね返り計算
 	void calcSideRebound();
 	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。
-	void startSideRebound(float wallPosX);
+	void startSideRebound(float wallPosX , bool hitLeft);
 
 	// 移動
 	void move();

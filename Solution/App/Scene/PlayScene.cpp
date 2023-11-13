@@ -44,7 +44,11 @@ void PlayScene::checkCollision()
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
 			// テスト
-			if (y == 2 && x != 4)continue;
+			
+			if (y == 2 && !(x == 4 ||x == 0))
+			{
+				continue;
+			}
 
 			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
