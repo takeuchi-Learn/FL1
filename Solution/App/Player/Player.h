@@ -133,7 +133,7 @@ public:
 
 
 	/// @brief 衝突(仮)
-	void hit();
+	void hit(const CollisionShape::AABB& hitAABB);
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報

@@ -68,20 +68,120 @@ void Player::draw()
 	gameObj->draw();
 }
 
-void Player::hit()
+void Player::hit(const CollisionShape::AABB& hitAABB)
 {
-	// 地面衝突
-	if (!pushJumpKeyFrame)
+	// 仮です
+
+	
+
+
+#pragma region 衝突位置確認
+
+	enum class HIT_AREA
 	{
-		if (isReboundY)
+		NONE,
+		UP,
+		DOWN,
+		LEFT,
+		RIGTH,
+	};
+
+	HIT_AREA hitArea = HIT_AREA::NONE;
+
+	//1 Xが多い
+	//2 Yが多い
+	short top = 0;
+
+
+	XMFLOAT3 boxSize
+	(
+		(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0]),
+		(hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1]),
+		(hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2])
+	);
+	XMFLOAT3 boxPointPos
+	(
+		hitAABB.maxPos.m128_f32[0] - boxSize.x / 2,
+		hitAABB.maxPos.m128_f32[1] - boxSize.y / 2,
+		hitAABB.maxPos.m128_f32[2] - boxSize.z / 2
+	);
+
+
+	XMFLOAT3 spherePos
+	(
+		sphere.center.m128_f32[0],
+		sphere.center.m128_f32[1],
+		sphere.center.m128_f32[2]
+	);
+	XMFLOAT3 sphereToVector
+	(
+		boxPointPos.x - spherePos.x,
+		boxPointPos.y - spherePos.y,
+		boxPointPos.z - spherePos.z
+	);
+
+	if (abs(sphereToVector.x) > abs(sphereToVector.y) &&
+		abs(sphereToVector.x) > boxSize.x / 2)
+	{
+		top = 1;
+		if (abs(sphereToVector.z) > abs(sphereToVector.x) &&
+			abs(sphereToVector.z) > boxSize.z / 2)
+			top = 3;
+	} else
+	{
+		top = 2;
+		if (abs(sphereToVector.z) > abs(sphereToVector.y) &&
+			abs(sphereToVector.z) > boxSize.z / 2)
+			top = 3;
+	}
+
+	if (top == 1)
+	{
+		if (sphereToVector.x >= 0)
 		{
-			reboundEnd();
+			hitArea = HIT_AREA::LEFT;
 		} else
 		{
-			jumpEnd();
+			hitArea = HIT_AREA::RIGTH;
+		}
+	} else if (top == 2)
+	{
+		if (sphereToVector.y >= 0)
+		{
+			hitArea = HIT_AREA::DOWN;
+		} else
+		{
+			hitArea = HIT_AREA::UP;
 		}
 	}
 
+#pragma endregion
+
+
+	switch (hitArea)
+	{
+	case HIT_AREA::UP:
+		// 地面衝突
+		if (!pushJumpKeyFrame)
+		{
+			if (isReboundY)
+			{
+				reboundEnd();
+			} else
+			{
+				jumpEnd();
+			}
+		}
+		break;
+	case HIT_AREA::DOWN:
+		
+		break;
+	case HIT_AREA::LEFT:
+	case HIT_AREA::RIGTH:
+
+		break;
+	}
+	
 	// ゴール衝突
 	//gameCamera->changeStateGoal();
 }

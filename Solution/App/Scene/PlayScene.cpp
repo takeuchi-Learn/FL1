@@ -46,7 +46,7 @@ void PlayScene::checkCollision()
 
 			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
-				player->hit();
+				player->hit(mapAABBs[y][x]);
 			}
 		}
 	}
