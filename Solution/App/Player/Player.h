@@ -72,8 +72,8 @@ class Player
 	bool isDead = false;
 	bool isClear = false;
 
-	// スタート演出終了後の座標(mapPosがこれを下回った場合追従をオフにする)
-	float startPosX = 350.f;
+	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
+	float leftScrollEndPos = 350.f;
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -154,7 +154,7 @@ public:
 	bool getIsDead() const{ return isDead; }
 	bool getIsClear()const { return isClear; }
 
-	float getStartPosX()const { return startPosX; }
+	float getStartPosX()const { return leftScrollEndPos; }
 	
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

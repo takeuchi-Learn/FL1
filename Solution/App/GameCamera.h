@@ -82,7 +82,7 @@ private:
 	void upRotate();
 
 	/// @brief 追従
-	void followObject();
+	void followObject(bool followX);
 
 
 public:

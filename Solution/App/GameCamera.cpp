@@ -155,18 +155,29 @@ void GameCamera::upRotate()
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 
-void GameCamera::followObject()
+void GameCamera::followObject(const bool followX)
 {
 	if (!obj)return;
 
 	// 追従
 	// Targetをobjの座標に
 	DirectX::XMFLOAT3 objPos = obj->position;
+
+	if(!followX)
+	{
+		objPos.x = getEye().x;
+	}
+
 	setTarget(objPos);
 
 	// eyeをXYだけobjの座標に
 	DirectX::XMFLOAT3 eye = objPos;
 	eye.z = getEye().z;
+
+	if (!followX)
+	{
+		objPos.x = getTarget().x;
+	}
 	setEye(eye);
 }
 
@@ -204,6 +215,11 @@ void GameCamera::gameCameraUpdate()
 		cameraState != GameCamera::CameraState::FOLLOW_OFF)
 	{
 		// 追従
-		followObject();
+		followObject(true);
+	}
+	else
+	{
+
+		followObject(false);
 	}
 }

@@ -461,7 +461,7 @@ void Player::checkStageSide()
 	if (isDead)return;
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if(mapPos.x <= startPosX)
+	if(mapPos.x <= leftScrollEndPos)
 	{
 		camera->setFollowFlag(false);
 	}
