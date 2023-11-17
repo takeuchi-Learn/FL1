@@ -26,7 +26,7 @@ BackGround::BackGround(GameCamera* camera, const unsigned int stageNum)
 	constexpr float scale = 8.f;
 	obj->setScaleXY(XMFLOAT2(961.f * scale,180.f * scale));
 
-	obj->setPosition(XMFLOAT3(0, -100.f, 1000.f));
+	obj->setPosition(XMFLOAT3(0, -600.f, 10.f));
 }
 
 void BackGround::update()

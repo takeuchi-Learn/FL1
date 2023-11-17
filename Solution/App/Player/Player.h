@@ -67,6 +67,10 @@ class Player
 	// 現フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 currentFramePos = { 0.f,0.f };
 
+	/// @brief 座標がこの数値を下回ったら落下死
+	float gameoverPos = 0.f;
+	bool isDead = false;
+
 	// センサーの値
 	float sensorValue = 0.0f;
 private:
@@ -113,9 +117,12 @@ private:
 
 	// 移動
 	void move();
-
 	// 回転
 	void rot();
+
+	/// @brief ゲームオーバーの確認
+	void checkGameover();
+
 public:
 
 	// コンストラクタ仮
@@ -126,6 +133,10 @@ public:
 	// 描画
 	void draw();
 
+	/// @brief ゲームオーバー扱いになる座標をセットする関数
+	/// @param posY 
+	void setGameOverPos(const float posY) { gameoverPos = posY; }
+
 	/// @brief センサーの値格納用
 	/// @param value センサーの値
 	void setSensorValue(const float value) { sensorValue = value; }
@@ -133,11 +144,15 @@ public:
 
 	inline const auto& getMapPos() const { return mapPos; }
 
-
-	/// @brief 衝突(仮)
-	void hit(const CollisionShape::AABB& hitAABB);
+	bool getIsDead() const{ return isDead; }
+	
+	/// @brief 衝突時に呼び出す関数
+	/// @param hitAABB 判定
+	/// @param hitObjName 相手のクラス名(typeid.name()で取得する)や識別名("map"など)
+	void hit(const CollisionShape::AABB& hitAABB,const std::string& hitObjName = "");
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報
 	const CollisionShape::Sphere& getShape()const { return sphere; }
+
 };

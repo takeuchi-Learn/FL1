@@ -79,7 +79,7 @@ void GameCamera::updateStartTimer()
 	constexpr unsigned short startTimeMax = static_cast<short>(60.f * 1.5f);
 	if (startTimer >= startTimeMax)
 	{
-		changeCameraState();
+		cameraState = CameraState::INPUT;
 	}
 }
 void GameCamera::preUpdate()
@@ -87,21 +87,6 @@ void GameCamera::preUpdate()
 	gameCameraUpdate();
 }
 
-void GameCamera::changeCameraState()
-{
-	switch (cameraState)
-	{
-	case GameCamera::CameraState::START:
-		cameraState = CameraState::INPUT;
-		break;
-	case GameCamera::CameraState::INPUT:
-		break;
-	case GameCamera::CameraState::OTHER:
-		break;
-	default:
-		break;
-	}
-}
 
 #pragma endregion
 
@@ -213,6 +198,10 @@ void GameCamera::gameCameraUpdate()
 		break;
 	}
 
-	// 追従
-	followObject();
+	// ゲームオーバーでなければカメラ追従
+	if (cameraState != GameCamera::CameraState::GAEOVER)
+	{
+		// 追従
+		followObject();
+	}
 }

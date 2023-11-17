@@ -37,15 +37,13 @@ namespace
 void PlayScene::checkCollision()
 {
 	const auto& mapAABBs = gameMap->getAABBs();
-	// テストです
 	for(auto y = 0; y < mapAABBs.size();y++)
 	{
-
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
 			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
-				player->hit(mapAABBs[y][x]);
+				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
 			}
 		}
 	}
@@ -85,6 +83,10 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
+	
+	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
+	player->setGameOverPos(gameMap->getGameoverPos());
+
 }
 
 PlayScene::~PlayScene()
@@ -108,8 +110,14 @@ void PlayScene::update()
 	camera->update();
 	camera->gameCameraUpdate();
 
-	// 衝突判定テスト
+	// 衝突確認
 	checkCollision();
+
+	// ゲームオーバー確認
+	if(player->getIsDead())
+	{
+		camera->changeStateGameover();
+	}
 }
 
 void PlayScene::drawObj3d()

@@ -139,3 +139,8 @@ void GameMap::draw()
 		i.second->draw();
 	}
 }
+
+float GameMap::getGameoverPos()const
+{
+	return mapAABBs[mapAABBs.size() - 1][0].minPos.m128_f32[1];
+}

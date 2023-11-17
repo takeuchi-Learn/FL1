@@ -63,4 +63,6 @@ public:
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
 	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs()const { return mapAABBs; }
+
+	float getGameoverPos()const;
 };

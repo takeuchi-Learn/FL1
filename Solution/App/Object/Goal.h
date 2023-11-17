@@ -31,7 +31,8 @@ private:
 	void trueIsGoal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera,const DirectX::XMFLOAT2& pos);
+	Goal(GameCamera* camera,const DirectX::XMFLOAT2& pos,float scale);
+	void update();
 	void draw();
 
 	// ゴールフラグがtrueかどうか
