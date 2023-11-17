@@ -8,6 +8,7 @@
 using namespace Microsoft::WRL;
 
 #include <chrono>
+#include <thread>
 
 #include <DirectXMath.h>
 
