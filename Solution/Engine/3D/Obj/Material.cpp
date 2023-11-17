@@ -10,7 +10,8 @@ Material::Material()
 	: ambient({ 0.3f, 0.3f, 0.3f }),
 	diffuse({ 0.f, 0.f, 0.f }),
 	specular({ 0.5f, 0.5f, 0.5f }),
-	alpha(1.f)
+	alpha(1.f),
+	texFileName("<EMPTY>")
 {
 	createConstBuff();
 	texbuff.resize(Material::maxTexNum);
@@ -29,13 +30,24 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 
 	const std::string filepath = directoryPath + texFileName;
 
-	constexpr size_t wfilePathSize = 256;
+	constexpr size_t wfilePathSize = 512u;
 	wchar_t wfilepath[wfilePathSize]{};
 	MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, wfilePathSize);
 
-	Texture::loadTexFile(wfilepath, metadata, scratchImg);
+	if (Texture::loadTexFile(wfilepath, metadata, scratchImg))
+	{
+		Texture::createMonoColorTexBuff(UINT32_MAX, texbuff[texNum], cpuDescHandleSRV);
+	} else
+	{
+		Texture::createTexBuff(metadata, scratchImg, texbuff[texNum], cpuDescHandleSRV);
+	}
+}
 
-	Texture::createTexBuff(metadata, scratchImg, texbuff[texNum], cpuDescHandleSRV);
+void Material::loadMonoColorTexture(UINT texNum, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+{
+	cpuDescHandleSRV = cpuHandle;
+	gpuDescHandleSRV = gpuHandle;
+	Texture::createMonoColorTexBuff(UINT32_MAX, texbuff[texNum], cpuDescHandleSRV);
 }
 
 void Material::update()

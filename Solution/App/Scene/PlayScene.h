@@ -15,17 +15,20 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
+
 class Player;
+class Goal;
+
+class Collision;
+
+class GameMap;
 
 class PlayScene :
 	public GameScene
 {
 private:
-	std::unique_ptr<Stopwatch> stopwatch{};
-	Timer::timeType stopwatchPlayTime;
 
-	std::weak_ptr<SoundData> bgm;
-
+	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
 
@@ -35,10 +38,15 @@ private:
 	std::unique_ptr<ParticleMgr> particle;
 	Sensor* sensor = nullptr;
 
-	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
 
+	std::unique_ptr<Goal> goal;
+
+	std::unique_ptr<GameMap> gameMap;
+
 private:
+	/// @brief 衝突確認関数
+	void checkCollision();
 
 public:
 	PlayScene();

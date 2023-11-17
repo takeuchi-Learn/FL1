@@ -2,8 +2,9 @@
 
 #include"../Engine/Input/Input.h"
 
-#pragma region START
+using namespace DirectX;
 
+#pragma region START
 
 void GameCamera::updateStart()
 {
@@ -25,16 +26,14 @@ void GameCamera::startAutoRot()
 	// 最後にガクってなるのはカメラの傾きをやめたせい
 
 	// 角度0になったら固定してタイマー加算開始
-	if(angle <= 0)
+	if (angle <= 0)
 	{
 		angle = 0.f;
 		addStartTimer = true;
-	}
-	else
+	} else
 	{
 		if (!startLerp)
 		{
-
 			// 傾きの最低値
 			constexpr float startFrameAngleMin = 0.1f;
 			// 最低値を下回ったら固定
@@ -52,18 +51,17 @@ void GameCamera::startAutoRot()
 			// 少しずつ平行にしていく
 			angle -= startFrameAngle;
 		}
-		
+
 		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
 		// プレイヤーの角度を取得
-		const float objAngleZ = obj->getRotation().z;
-		
+		const float objAngleZ = obj->position.z;
+
 		// angleの最低値
 		constexpr float angleMin = 1.0f;
-		if(angle <= angleMin && !startLerp)
+		if (angle <= angleMin && !startLerp)
 		{
 			angle = angleMin;
 			startLerp = true;
-			
 		}
 
 		if (startLerp && objAngleZ > -angleMin)
@@ -78,14 +76,18 @@ void GameCamera::updateStartTimer()
 {
 	if (!addStartTimer)return;
 	startTimer++;
-	
+
 	// タイマーの最大値
 	// 自動傾き終了後にタイマーが起動し、以下の時間を上回ったら入力受付開始となる
 	constexpr unsigned short startTimeMax = static_cast<short>(60.f * 1.5f);
-	if(startTimer >= startTimeMax)
+	if (startTimer >= startTimeMax)
 	{
 		changeCameraState();
 	}
+}
+void GameCamera::preUpdate()
+{
+	gameCameraUpdate();
 }
 
 void GameCamera::changeCameraState()
@@ -129,6 +131,8 @@ void GameCamera::checkInput()
 
 	// 入力確認してカメラを傾ける
 	accelAngle = atan2f(getAccelZ, getAccelX);
+	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
+	constexpr float frameAngle = 3.0f;
 
 	float dt = 0.005f;
 	degree += -(prevGyroY + getGyroY) * dt;
@@ -146,6 +150,14 @@ void GameCamera::checkInput()
 }
 #pragma endregion
 
+#pragma region CLEAR
+void GameCamera::updateClear()
+{
+}
+#pragma endregion
+
+
+
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算
@@ -153,8 +165,8 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 
 	// 変換
 	constexpr float pi = 3.14f;
-	upXY.x = std::cos(angle * pi / 180.0f);
-	upXY.y = std::sin(angle * pi / 180.0f);
+	upXY.x = std::cos(XMConvertToRadians(angle));
+	upXY.y = std::sin(XMConvertToRadians(angle));
 }
 
 void GameCamera::upRotate()
@@ -178,7 +190,7 @@ void GameCamera::followObject()
 
 	// 追従
 	// Targetをobjの座標に
-	DirectX::XMFLOAT3 objPos = obj->getPosition();
+	DirectX::XMFLOAT3 objPos = obj->position;
 	setTarget(objPos);
 
 	// eyeをXYだけobjの座標に
@@ -187,7 +199,7 @@ void GameCamera::followObject()
 	setEye(eye);
 }
 
-GameCamera::GameCamera(AbstractGameObj* obj)
+GameCamera::GameCamera(BillboardData* obj)
 	:Camera(WinAPI::window_width,
 			WinAPI::window_height)
 	, obj(obj)
@@ -209,6 +221,9 @@ void GameCamera::gameCameraUpdate(Sensor* sensor)
 		break;
 	case GameCamera::CameraState::INPUT:
 		updateInput();
+		break;
+	case GameCamera::CameraState::CLEAR:
+		updateClear();
 		break;
 	default:
 		break;

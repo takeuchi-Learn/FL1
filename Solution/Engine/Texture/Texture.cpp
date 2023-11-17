@@ -14,9 +14,9 @@ bool Texture::loadTexFile(const wchar_t* wfilePath,
 									 wicFlags,
 									 &metadata,
 									 image);
+	// 読み込みに失敗したらtrueを返す
 	if (FAILED(result))
 	{
-		assert(0);
 		return true;
 	}
 

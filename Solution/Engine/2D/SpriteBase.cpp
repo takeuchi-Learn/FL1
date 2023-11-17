@@ -170,6 +170,7 @@ SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device* d
 
 	// スタティックサンプラー
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
+	samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT; // ニアレストネイバー法
 
 	// パイプラインとルートシグネチャのセット
 	SpriteBase::PipelineSet pipelineSet{};

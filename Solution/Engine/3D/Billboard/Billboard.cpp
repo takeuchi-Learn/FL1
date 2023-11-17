@@ -1,86 +1,30 @@
-﻿#include "ParticleMgr.h"
+﻿#include "Billboard.h"
 
-#include "System/PostEffect.h"
 #include <Texture/Texture.h>
-#include <Util/RandomNum.h>
+#include <System/PostEffect.h>
 
 #include <d3dcompiler.h>
-#include <DirectXTex.h>
-
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DX12Base* ParticleMgr::dxBase = DX12Base::getInstance();
-
 namespace
 {
-	constexpr XMFLOAT4 operator+(const XMFLOAT4& lhs, const XMFLOAT4& rhs)
+	constexpr auto operator+(const XMFLOAT3& l, const XMFLOAT3& r)
 	{
-		return XMFLOAT4(lhs.x + rhs.x,
-						lhs.y + rhs.y,
-						lhs.z + rhs.z,
-						lhs.w + rhs.w);
-	}
-
-	constexpr XMFLOAT4 operator-(const XMFLOAT4& lhs, const XMFLOAT4& rhs)
-	{
-		return XMFLOAT4(lhs.x - rhs.x,
-						lhs.y - rhs.y,
-						lhs.z - rhs.z,
-						lhs.w - rhs.w);
-	}
-
-	constexpr XMFLOAT4 operator/(const XMFLOAT4& v, float s)
-	{
-		return XMFLOAT4(v.x / s, v.y / s, v.z / s, v.w / s);
-	}
-
-	constexpr XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
-	{
-		return XMFLOAT3(lhs.x + rhs.x,
-						lhs.y + rhs.y,
-						lhs.z + rhs.z);
-	}
-
-	constexpr void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
-	{
-		lhs.x += rhs.x;
-		lhs.y += rhs.y;
-		lhs.z += rhs.z;
-	}
-
-	constexpr XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
-	{
-		return XMFLOAT3(lhs.x - rhs.x,
-						lhs.y - rhs.y,
-						lhs.z - rhs.z);
-	}
-
-	constexpr XMFLOAT3 operator/(const XMFLOAT3& lhs, const float rhs)
-	{
-		return XMFLOAT3(lhs.x / rhs,
-						lhs.y / rhs,
-						lhs.z / rhs);
-	}
-
-	constexpr XMFLOAT3 operator*(const XMFLOAT3& lhs, const float rhs)
-	{
-		return XMFLOAT3(lhs.x * rhs,
-						lhs.y * rhs,
-						lhs.z * rhs);
-	}
-
-	constexpr XMFLOAT3 operator*(float lhs, const XMFLOAT3& rhs)
-	{
-		return XMFLOAT3(lhs * rhs.x,
-						lhs * rhs.y,
-						lhs * rhs.z);
+		return XMFLOAT3(l.x + r.x,
+						l.y + r.y,
+						l.z + r.z);
 	}
 }
 
-void ParticleMgr::init(const wchar_t* texFilePath)
+DX12Base* Billboard::dxBase = DX12Base::getInstance();
+
+Billboard::Billboard() : Billboard(L"Resources/white.png", nullptr) {}
+
+Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
+	camera(camera)
 {
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
@@ -105,94 +49,19 @@ void ParticleMgr::init(const wchar_t* texFilePath)
 	assert(SUCCEEDED(result));
 }
 
-void ParticleMgr::createParticle(const XMFLOAT3& pos,
-								 const uint16_t particleNum,
-								 const float startScale,
-								 const float vel,
-								 const XMFLOAT4& startCol,
-								 const XMFLOAT4& endCol)
+void Billboard::update(float angleRad)
 {
-	for (uint16_t i = 0U; i < particleNum; ++i)
-	{
-		const float theata = RandomNum::getRandf(0.f, XM_PI);
-		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
-		const float r = RandomNum::getRandf(0.f, vel);
-
-		const XMFLOAT3 vel{
-			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
-			r * dxBase->nearCos(theata),
-			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
-		};
-
-		constexpr float accNum = 10.f;
-		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
-									  vel.y / accNum,
-									  vel.z / accNum);
-
-		constexpr Timer::timeType life = Timer::oneSec / Timer::timeType(4);
-		constexpr float endScale = 0.f;
-		constexpr float startRota = 0.f, endRota = 0.f;
-
-		// 追加
-		add(life, pos, vel, acc,
-			startScale, endScale,
-			startRota, endRota,
-			startCol, endCol);
-	}
-}
-
-ParticleMgr::ParticleMgr() :
-	ParticleMgr(L"Resources/white.png", nullptr)
-{}
-
-ParticleMgr::ParticleMgr(const wchar_t* texFilePath,
-						 Camera* camera) :
-	camera(camera)
-{
-	init(texFilePath);
-}
-
-void ParticleMgr::update()
-{
-	// 全パーティクル更新
-	for (auto& it : particles)
-	{
-		// 経過時間を更新
-		it->nowTime = it->timer->getNowTime() - it->startTime;
-		// 進行度を0～1の範囲に換算
-		const float f = (float)it->life / it->nowTime;
-
-		// 速度に加速度を加算
-		it->velocity += it->accel;
-
-		// 速度による移動
-		it->position += it->velocity;
-
-		// カラーの線形補間
-		//it->color = it->s_color + (it->e_color - it->s_color) / f;
-		// 二乗In補間
-		it->color = it->s_color + (it->e_color - it->s_color) / (f * f);
-
-		// スケールの補間(三乗)
-		//it->scale = it->s_scale + (it->e_scale - it->s_scale) / (1 - pow(1 - f, 3));
-		// 線形補間
-		it->scale = it->s_scale + (it->e_scale - it->s_scale) / f;
-
-		// 回転の線形補間
-		it->rotation = it->s_rotation + (it->e_rotation - it->s_rotation) / f;
-	}
-
-	// 寿命が尽きたパーティクルを全削除
-	particles.remove_if([](const std::unique_ptr<Particle>& x) { return x->nowTime >= x->life; });
+	// 寿命が尽きたものを全削除
+	billboards.remove_if([&](const std::shared_ptr<BillboardData>& x) { if (x->deleteFlag) { --drawNum; return true; } return false; });
 
 	// 頂点バッファへデータ転送
 	VertexPos* vertMap = nullptr;
 	HRESULT result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result))
 	{
-		int vertCount = 0;
-		// パーティクルの情報を1つずつ反映
-		for (auto& it : particles)
+		uint32_t vertCount = 0;
+		// 各要素の情報を1つずつ反映
+		for (auto& it : billboards)
 		{
 			// 座標
 			vertMap->pos = it->position;
@@ -215,13 +84,13 @@ void ParticleMgr::update()
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
-	constMap->angleRad = 0.f;
+	constMap->angleRad = angleRad;
 	constBuff->Unmap(0, nullptr);
 }
 
-void ParticleMgr::draw()
+void Billboard::draw()
 {
-	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
+	// 最大数を超えないようにする
 	if (drawNum > vertexCount)
 	{
 		drawNum = vertexCount;
@@ -234,7 +103,7 @@ void ParticleMgr::draw()
 	}
 
 	// パイプラインステートの設定
-	dxBase->getCmdList()->SetPipelineState(pipelinestate[nowBlendMode].Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[(size_t)nowBlendMode].Get());
 	// ルートシグネチャの設定
 	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
@@ -255,58 +124,43 @@ void ParticleMgr::draw()
 	dxBase->getCmdList()->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-void ParticleMgr::drawWithUpdate()
+std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
+											float scale,
+											float rotation,
+											const XMFLOAT4& color)
 {
-	update();
-	draw();
-}
+	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
+	++drawNum;
 
-void ParticleMgr::add(Timer::timeType life,
-					  const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
-					  float start_scale, float end_scale,
-					  float start_rotation, float end_rotation,
-					  const  XMFLOAT4& start_color, const  XMFLOAT4& end_color)
-{
-	// リストに要素を追加
-	// C++17からは追加した要素の参照が返ってくる
-	auto& p = particles.emplace_front(std::make_unique<Particle>());
 	p->position = position;
-	p->velocity = velocity;
-	p->accel = accel;
+	p->rotation = rotation;
+	p->scale = scale;
+	p->color = color;
+	p->deleteFlag = false;
 
-	p->s_scale = start_scale;
-	p->e_scale = end_scale;
-
-	p->life = life;
-	p->timer = std::make_unique<Timer>();
-
-	p->s_rotation = start_rotation;
-	p->e_rotation = end_rotation;
-
-	p->s_color = start_color;
-	p->e_color = end_color;
-
-	p->startTime = p->timer->getNowTime();
+	return p;
 }
 
-void ParticleMgr::InitializeDescriptorHeap()
+void Billboard::InitializeDescriptorHeap()
 {
-	HRESULT result = S_FALSE;
-
 	// デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 	descHeapDesc.NumDescriptors = 1; // シェーダーリソースビュー1つ
-	result = dxBase->getDev()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
+	HRESULT result = dxBase->getDev()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
 	assert(SUCCEEDED(result));
 
 	// デスクリプタサイズを取得
 	descriptorHandleIncrementSize = dxBase->getDev()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-void ParticleMgr::InitializeGraphicsPipeline()
+void Billboard::InitializeGraphicsPipeline()
 {
+	constexpr auto vsPath = L"Resources/Shaders/ParticleVS.hlsl";
+	constexpr auto psPath = L"Resources/Shaders/ParticlePS.hlsl";
+	constexpr auto gsPath = L"Resources/Shaders/ParticleGS.hlsl";
+
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
@@ -322,7 +176,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shaders/ParticleVS.hlsl",	// シェーダファイル名
+		vsPath,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -346,7 +200,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shaders/ParticlePS.hlsl",	// シェーダファイル名
+		psPath,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -370,7 +224,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 
 	// ジオメトリシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shaders/ParticleGS.hlsl",	// シェーダファイル名
+		gsPath,	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "gs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -513,7 +367,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.pRootSignature = rootsignature.Get();
 
 	// グラフィックスパイプラインの生成
-	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[ADD]));
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[(size_t)BLENDMODE::ADD]));
 	assert(SUCCEEDED(result));
 
 #pragma region 減算合成のパイプライン生成
@@ -529,13 +383,31 @@ void ParticleMgr::InitializeGraphicsPipeline()
 		gpipeline.BlendState.RenderTarget[i] = blenddesc;
 	}
 
-	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[SUB]));
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[(size_t)BLENDMODE::SUB]));
 	assert(SUCCEEDED(result));
 
 #pragma endregion 減算合成のパイプライン生成
+
+#pragma region 半透明合成のパイプライン生成
+
+	// 半透明
+	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+	// ブレンドステートの設定
+	for (UINT i = 0u; i < renderTargetNum; ++i)
+	{
+		gpipeline.BlendState.RenderTarget[i] = blenddesc;
+	}
+
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[(size_t)BLENDMODE::ALPHA]));
+	assert(SUCCEEDED(result));
+
+#pragma endregion 半透明合成のパイプライン生成
 }
 
-void ParticleMgr::LoadTexture(const wchar_t* filePath)
+void Billboard::LoadTexture(const wchar_t* filePath)
 {
 	// WICテクスチャのロード
 	TexMetadata metadata{};
@@ -550,7 +422,7 @@ void ParticleMgr::LoadTexture(const wchar_t* filePath)
 	Texture::createTexBuff(metadata, scratchImg, texbuff, cpuDescHandleSRV);
 }
 
-void ParticleMgr::CreateModel()
+void Billboard::CreateModel()
 {
 	// 頂点バッファ生成
 	HRESULT result = dxBase->getDev()->CreateCommittedResource(

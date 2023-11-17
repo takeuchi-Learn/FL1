@@ -1,3 +1,5 @@
+.vs
 Solution/.vs/
 Solution/x64/
 *.pdb
+/Solution/YT_ENGINE.vcxproj.user
