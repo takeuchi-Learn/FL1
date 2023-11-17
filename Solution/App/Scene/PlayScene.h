@@ -17,6 +17,7 @@ class ParticleMgr;
 
 class Player;
 class Goal;
+class BackGround;
 
 class Collision;
 
@@ -38,6 +39,7 @@ private:
 
 	std::unique_ptr<Goal> goal;
 
+	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<GameMap> gameMap;
 
 private:

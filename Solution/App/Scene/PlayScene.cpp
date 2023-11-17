@@ -11,9 +11,11 @@
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
 #include <algorithm>
+
 #include <Player/Player.h>
 #include <Object/Goal.h>
-#include<GameMap.h>
+#include <BackGround.h>
+#include <GameMap.h>
 
 #include <Collision/Collision.h>
 
@@ -87,6 +89,8 @@ PlayScene::PlayScene() :
 	constexpr DirectX::XMFLOAT2 goalPos(80, 0);
 	goal = std::make_unique<Goal>(nullptr, camera.get(),  goalPos);
 
+	backGround = std::make_unique<BackGround>(camera.get());
+
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
@@ -105,6 +109,7 @@ void PlayScene::update()
 		return;
 	}
 
+	backGround->update();
 	gameMap->update();
 	player->update();
 
@@ -118,6 +123,7 @@ void PlayScene::update()
 
 void PlayScene::drawObj3d()
 {
+	backGround->draw();
 	gameMap->draw();
 	player->draw();
 	goal->draw();
