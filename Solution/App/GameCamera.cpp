@@ -17,6 +17,8 @@ void GameCamera::updateStart()
 
 void GameCamera::startAutoRot()
 {
+	// カルマンフィルターを使用する場合は必要
+	kalman->setAngle(0.0f);
 
 	// 開始時にプレイヤーのアングルが0の方が見た目いいかもしれない
 	// 実装した
@@ -129,9 +131,16 @@ void GameCamera::checkInput()
 	accelAngle = atan2f(getAccelZ, getAccelX);
 
 	float dt = 0.005f;
-	angle += -(prevGyroY + getGyroY) * dt;
+	degree += -(prevGyroY + getGyroY) * dt;
 	prevGyroY = getGyroY;
 
+	// 角速度から算出
+	angle = degree;
+
+	// カルマンフィルターを使用
+	//angle = kalman->getAngle(accelAngle, degree, dt);
+
+	// 相補フィルターを使用
 	//angle = 0.95f * (prevAngle + getGyroY * dt) + 0.05f * accelAngle;
 	//prevAngle = angle;
 }
