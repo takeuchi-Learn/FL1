@@ -21,14 +21,12 @@ BackGround::BackGround(GameCamera* camera, const unsigned int stageNum)
 {
 	obj = std::make_unique<AbstractGameObj>(camera, model.get());
 
-	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値600くらいがベスト)
+	// 比率計算のためにテクスチャサイズ取得
+	// 取得できないため一旦直接入力
+	constexpr float scale = 8.f;
+	obj->setScaleXY(XMFLOAT2(961 * scale,180 * scale));
 
-
-	// Xを指定したら自動的にYを計算するようにする
-	constexpr float scaleX = 4000.f;
-	
-	obj->setScaleXY(XMFLOAT2(scaleX,1000.f));
-	obj->setPosition(XMFLOAT3(0, 0, 1000));
+	obj->setPosition(XMFLOAT3(0, -100, 1000));
 }
 
 void BackGround::update()
