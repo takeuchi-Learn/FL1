@@ -109,8 +109,13 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 			data->add(pos, scale);
 
-			// 判定作成
-			setAABBData(x,y, pos, scale);
+			// 道なら判定作成しない
+			if (n != MAPCHIP_ROAD
+				&& n != MAPCHIP_GOAL)
+			{
+				// 判定作成
+				setAABBData(x, y, pos, scale);
+			}
 		}
 	}
 

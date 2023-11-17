@@ -169,7 +169,9 @@ void Player::hit(const CollisionShape::AABB& hitAABB)
 		}
 		break;
 	case HIT_AREA::DOWN:
-		
+		// 下方向に落下
+		fallStartSpeed = -0.2f;
+		fallTime = 0;
 		break;
 	case HIT_AREA::LEFT:
 		// 横のバウンド開始

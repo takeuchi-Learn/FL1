@@ -40,18 +40,9 @@ void PlayScene::checkCollision()
 	// テストです
 	for(auto y = 0; y < mapAABBs.size();y++)
 	{
-		// テストのため一部マップチップを無視
-		if (y == 0|| y == 1)continue;
 
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
-			// テスト
-			
-			if (y == 2 && !(x == 4 ||x == 0))
-			{
-				continue;
-			}
-
 			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
 				player->hit(mapAABBs[y][x]);
