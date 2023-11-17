@@ -4,6 +4,7 @@
 class AbstractGameObj;
 class ObjModel;
 class GameCamera;
+class Light;
 
 // 背景クラス
 class BackGround
@@ -14,9 +15,11 @@ private:
 	GameCamera* camera = nullptr;
 	
 	// 背景
-	std::unique_ptr<AbstractGameObj> backGround;
+	std::unique_ptr<AbstractGameObj> obj;
 	std::unique_ptr<ObjModel> model;
 
+	// ライト(使う必要ないがセットが必須なため)
+	std::unique_ptr<Light>light;
 
 public:
 

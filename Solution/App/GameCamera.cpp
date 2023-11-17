@@ -190,7 +190,6 @@ GameCamera::GameCamera(BillboardData* obj)
 			WinAPI::window_height)
 	, obj(obj)
 {
-	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-500くらいがベスト)
 
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);

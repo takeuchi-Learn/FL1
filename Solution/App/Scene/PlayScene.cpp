@@ -123,10 +123,10 @@ void PlayScene::update()
 
 void PlayScene::drawObj3d()
 {
-	backGround->draw();
 	gameMap->draw();
 	player->draw();
 	goal->draw();
+	backGround->draw();
 }
 
 void PlayScene::drawFrontSprite()
