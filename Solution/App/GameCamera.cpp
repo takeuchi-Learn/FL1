@@ -193,6 +193,7 @@ GameCamera::GameCamera(BillboardData* obj)
 
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
+	//setEye(XMFLOAT3(0,0,-700));
 }
 
 void GameCamera::gameCameraUpdate()
