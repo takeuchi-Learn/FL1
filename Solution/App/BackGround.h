@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include<memory>
 
-class Billboard;
+class AbstractGameObj;
+class ObjModel;
 class GameCamera;
 
 // 背景クラス
@@ -13,7 +14,8 @@ private:
 	GameCamera* camera = nullptr;
 	
 	// 背景
-	std::unique_ptr<Billboard> backGround;
+	std::unique_ptr<AbstractGameObj> backGround;
+	std::unique_ptr<ObjModel> model;
 
 
 public:

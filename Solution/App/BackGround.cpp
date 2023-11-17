@@ -4,25 +4,24 @@
 #include<DirectXMath.h>
 
 #include<GameCamera.h>
-#include<3D/Billboard/Billboard.h>
+#include<3D/Obj/ObjModel.h>
 
 using namespace DirectX;
 
 BackGround::BackGround(GameCamera* camera,const unsigned int stageNum)
 	:camera(camera)
-	, backGround(std::make_unique<Billboard>((L"Resources/backGround/back_" + std::to_wstring(stageNum) + L".png").c_str(), camera))
+	, obj(std::make_unique<Billboard>((L"Resources/backGround/back_" + std::to_wstring(stageNum) + L".png").c_str(), camera))
 {
-	constexpr float scale = 1000.f;
-	backGround->add(XMFLOAT3(), scale, 0.f);
+	model = std::unique_ptr<ObjModel>();
 	
 }
 
 void BackGround::update()
 {
-	backGround->update(XMConvertToRadians(-camera->getAngleDeg()));
+	obj->update(XMConvertToRadians(-camera->getAngleDeg()));
 }
 
 void BackGround::draw()
 {
-	backGround->draw();
+	obj->draw();
 }
