@@ -51,11 +51,11 @@ void PlayScene::checkCollision()
 	}
 
 	// テストです
-	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
-	if (res)
-	{
-		//player->hit();
-	}
+	//bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
+	//if (res)
+	//{
+	//	//player->hit();
+	//}
 
 }
 
@@ -77,8 +77,8 @@ PlayScene::PlayScene() :
 	camera->setParentObj(player->getObj().get());
 
 	// 仮にプレイヤーモデルを割り当て
-	constexpr DirectX::XMFLOAT2 goalPos(80, 0);
-	goal = std::make_unique<Goal>(nullptr, camera.get(),  goalPos);
+	//constexpr DirectX::XMFLOAT2 goalPos(80, 0);
+	//goal = std::make_unique<Goal>(nullptr, camera.get(),  goalPos);
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
@@ -117,7 +117,7 @@ void PlayScene::drawObj3d()
 	backGround->draw();
 	gameMap->draw();
 	player->draw();
-	goal->draw();
+	//goal->draw();
 }
 
 void PlayScene::drawFrontSprite()

@@ -9,15 +9,16 @@
 
 class Light;
 class ObjModel;
-class Camera;
+class GameCamera;
+class Billboard;
 
 class Goal
 {
 private:
 	// ここBillboardクラスに直す
 	// というかGameMapクラスに内蔵してもいいかも
-	std::unique_ptr<AbstractGameObj> gameObj;
-	Light* light = nullptr;
+	std::unique_ptr<Billboard> gameObj;
+	GameCamera* camera = nullptr;
 
 	bool isGoal = false;
 
@@ -30,7 +31,7 @@ private:
 	void trueIsGoal() { isGoal = true; }
 
 public:
-	Goal(ObjModel* model, Camera* camera,const DirectX::XMFLOAT2& pos);
+	Goal(GameCamera* camera,const DirectX::XMFLOAT2& pos);
 	void draw();
 
 	// ゴールフラグがtrueかどうか
