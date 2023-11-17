@@ -53,16 +53,9 @@ void PlayScene::checkCollision()
 			const bool isHit = Collision::CheckHit(p, x.aabb);
 			if (isHit)
 			{
-				player->hit();
+				player->hit(x.aabb);
 			}
 		}
-	}
-
-	// テストです
-	bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
-	if (res)
-	{
-		//player->hit();
 	}
 }
 

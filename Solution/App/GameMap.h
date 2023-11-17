@@ -24,6 +24,20 @@ public:
 	};
 
 private:
+	enum MAPCHIP_DATA : uint8_t
+	{
+		/// @brief ゴール
+		MAPCHIP_GOAL,
+		/// @brief 道
+		MAPCHIP_ROAD,
+		/// @brief 壁
+		MAPCHIP_WALL,
+
+		/// @brief 最後の要素
+		MAPCHIP_ALLNUM
+	};
+
+private:
 	std::unordered_map<std::string, std::unique_ptr<Billboard>> billboard;
 
 	/// @brief 地形のAABB

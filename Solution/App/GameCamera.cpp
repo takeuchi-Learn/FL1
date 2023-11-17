@@ -124,14 +124,13 @@ void GameCamera::checkInput()
 
 	// 入力確認してカメラを傾ける
 	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if (Input::getInstance()->hitKey(DIK_LEFT))
+	if (Input::ins()->hitKey(DIK_LEFT))
 	{
 		angle -= frameAngle;
-	} else
-		if (Input::getInstance()->hitKey(DIK_RIGHT))
-		{
-			angle += frameAngle;
-		}
+	} else if (Input::ins()->hitKey(DIK_RIGHT))
+	{
+		angle += frameAngle;
+	}
 }
 
 #pragma endregion

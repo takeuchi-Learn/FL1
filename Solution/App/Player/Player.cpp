@@ -65,22 +65,133 @@ void Player::draw()
 	gameObj->draw();
 }
 
-void Player::hit()
+void Player::hit(const CollisionShape::AABB& hitAABB)
 {
-	// 地面衝突
-	if (!pushJumpKeyFrame)
+	// 仮です
+
+#pragma region 変数作成
+
+	enum class HIT_AREA
 	{
-		if (isReboundY)
+		NONE,
+		UP,
+		DOWN,
+		LEFT,
+		RIGTH,
+	};
+
+	HIT_AREA hitArea = HIT_AREA::NONE;
+
+	//topが1 Xが多い
+	//topが2 Yが多い
+	short top = 0;
+
+	XMFLOAT3 boxSize
+	(
+		(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0]),
+		(hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1]),
+		(hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2])
+	);
+	XMFLOAT3 boxPointPos
+	(
+		hitAABB.maxPos.m128_f32[0] - boxSize.x / 2,
+		hitAABB.maxPos.m128_f32[1] - boxSize.y / 2,
+		hitAABB.maxPos.m128_f32[2] - boxSize.z / 2
+	);
+
+	XMFLOAT3 spherePos
+	(
+		sphere.center.m128_f32[0],
+		sphere.center.m128_f32[1],
+		sphere.center.m128_f32[2]
+	);
+	XMFLOAT3 sphereToVector
+	(
+		boxPointPos.x - spherePos.x,
+		boxPointPos.y - spherePos.y,
+		boxPointPos.z - spherePos.z
+	);
+
+#pragma endregion 変数作成
+
+#pragma region 衝突位置確認
+
+	if (abs(sphereToVector.x) > abs(sphereToVector.y) &&
+		abs(sphereToVector.x) > boxSize.x / 2)
+	{
+		top = 1;
+		if (abs(sphereToVector.z) > abs(sphereToVector.x) &&
+			abs(sphereToVector.z) > boxSize.z / 2)
+			top = 3;
+	} else
+	{
+		top = 2;
+		if (abs(sphereToVector.z) > abs(sphereToVector.y) &&
+			abs(sphereToVector.z) > boxSize.z / 2)
+			top = 3;
+	}
+
+	if (top == 1)
+	{
+		if (sphereToVector.x >= 0)
 		{
-			reboundEnd();
+			hitArea = HIT_AREA::LEFT;
 		} else
 		{
-			jumpEnd();
+			hitArea = HIT_AREA::RIGTH;
 		}
+	} else if (top == 2)
+	{
+		if (sphereToVector.y >= 0)
+		{
+			hitArea = HIT_AREA::DOWN;
+		} else
+		{
+			hitArea = HIT_AREA::UP;
+		}
+	}
+
+#pragma endregion
+
+	switch (hitArea)
+	{
+	case HIT_AREA::UP:
+
+		// 地面衝突
+		if (!pushJumpKeyFrame || !reboundYFrame)
+		{
+			// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
+			if (isReboundY)
+			{
+				reboundEnd(hitAABB);
+			} else
+			{
+				jumpEnd(hitAABB);
+			}
+		}
+		break;
+
+	case HIT_AREA::DOWN:
+		break;
+
+	case HIT_AREA::LEFT:
+		// 横のバウンド開始
+		startSideRebound(hitAABB.minPos.m128_f32[0], true);
+		break;
+
+	case HIT_AREA::RIGTH:
+		// 横のバウンド開始
+		startSideRebound(hitAABB.maxPos.m128_f32[0], false);
+		break;
 	}
 
 	// ゴール衝突
 	//gameCamera->changeStateGoal();
+
+	getObj()->position = XMFLOAT3(mapPos.x * GameMap::chipSize,
+								  mapPos.y * GameMap::chipSize,
+								  getObj()->position.z);
+	gameObj->update();
 }
 
 void Player::calcJumpPos()
@@ -111,6 +222,7 @@ void Player::jump()
 	constexpr float bigSensorJyroValue = 2.f;
 
 	pushJumpKeyFrame = false;
+
 	if (!isJump)
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
@@ -138,31 +250,19 @@ void Player::jump()
 
 	// ジャンプの更新処理
 	calcJumpPos();
-
-	// 終了確認
-	//checkJumpEnd();
 }
 
-void Player::jumpEnd()
+void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 {
-	//// 仮に0.f以下になったらジャンプ終了
-	//if (mapPos.y < 0.f)
-	//{
-	//	// ジャンプ終了処理
-	//	isJump = false;
-	//	fallTime = 0;
-	//	mapPos.y = 0.f;
-
-	//	isDrop = false;
-
-	//	startRebound();
-	//}
-
 	// ジャンプ終了処理
 	isJump = false;
 	fallTime = 0;
-	// 仮
-	mapPos.y = mapPos.y + 0.3f;
+
+	// 押し出し後の位置
+	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	//mapPos.y = mapPos.y + hitPosY;
+	mapPos.y = extrusionEndPosY + 0.01f;
+
 	isDrop = false;
 	startRebound();
 }
@@ -182,29 +282,15 @@ void Player::calcDropVec()
 
 void Player::rebound()
 {
+	reboundYFrame = false;
+
 	// 横バウンド時の座標計算
 	// 一旦壁と隣接してるフレームを描画するために先に呼び出している
 	calcSideRebound();
 
-	// ここから関数化1
-
-	// 仮に80に設定
-	constexpr float testP = 80.f;
-	// 本来は衝突時に呼び出す
-	if (mapPos.x >= testP)
-	{
-		// 横のバウンド開始
-		startSideRebound();
-	}
-
-	// ここまで関数化1
-
 	if (!isReboundY)return;
-
 	// 更新
 	calcJumpPos();
-	// 終了確認
-	//reboundEnd();
 }
 
 void Player::startRebound()
@@ -215,29 +301,19 @@ void Player::startRebound()
 	constexpr float fallVelMag = 0.4f;
 	// 落下した高さに合わせて跳ね返り量を変える
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
+
+	reboundYFrame = true;
 }
 
-void Player::reboundEnd()
+void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
-	// 仮に0.f以下になったら跳ね返り終了
-	/*if (mapPos.y < 0.f)
-	{
-		fallTime = 0;
-		mapPos.y = 0.f;
-		constexpr float boundEndVel = 3.f;
-		if (-currentFallVelovity <= boundEndVel)
-		{
-			isReboundY = false;
-			isDrop = false;
-		} else
-		{
-			startRebound();
-		}
-	}*/
-
 	fallTime = 0;
-	// 仮
-	mapPos.y = mapPos.y + 0.3f;
+
+	// 押し出し後の位置
+	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	//mapPos.y = mapPos.y + hitPosY;
+	mapPos.y = extrusionEndPosY + 0.01f;
+
 	constexpr float boundEndVel = 3.f;
 	if (-currentFallVelovity <= boundEndVel)
 	{
@@ -259,7 +335,7 @@ void Player::calcSideRebound()
 	// 加算値を加算または減算
 
 	// 変化する値
-	constexpr float changeValue = 1.0f;
+	constexpr float changeValue = 2.5f;
 	if (sideAddX > 0)
 	{
 		sideAddX -= changeValue;
@@ -282,12 +358,16 @@ void Player::calcSideRebound()
 	}
 }
 
-void Player::startSideRebound()
+void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
-	// ここに衝突したときの座標格納する
-	terrainHitPosX = 80.0f;
-
-	mapPos.x = terrainHitPosX;
+	// 当たった向きに応じて押し出す
+	if (hitLeft)
+	{
+		mapPos.x = wallPosX - sphere.radius;
+	} else
+	{
+		mapPos.x = wallPosX + sphere.radius;
+	}
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;
@@ -301,7 +381,7 @@ void Player::startSideRebound()
 	sideAddX = vec * mag;
 
 	isReboundX = true;
-
+	// 衝突時の座標を代入
 	terrainHitObjPosX = mapPos.x;
 }
 
@@ -335,7 +415,6 @@ void Player::move()
 	}
 
 	// 計算後セット
-	//getObj()->position = position;
 	mapPos = position;
 
 	// 回転
