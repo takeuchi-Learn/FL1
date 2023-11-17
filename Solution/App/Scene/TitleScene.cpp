@@ -10,6 +10,7 @@ TitleScene::TitleScene() :
 {
 	debugText = std::make_unique<DebugText>(spriteBase->loadTexture(L"Resources/debugfont.png"),
 											spriteBase.get());
+	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 }
 
 TitleScene::~TitleScene()
@@ -17,11 +18,14 @@ TitleScene::~TitleScene()
 
 void TitleScene::update()
 {
-	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "Title Scene\nHIT SPACE" : "Title Scene",
+	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "Title Scene" : "Title Scene\nHIT SPACE",
 					 0.f, 0.f);
-	if (Input::ins()->triggerKey(DIK_SPACE))
+
+	if (Input::ins()->triggerKey(DIK_SPACE) &&
+		thread->joinable())
 	{
-		SceneManager::ins()->changeScene<PlayScene>();
+		thread->join();
+		SceneManager::ins()->changeSceneFromInstance(nextScene);
 	}
 }
 

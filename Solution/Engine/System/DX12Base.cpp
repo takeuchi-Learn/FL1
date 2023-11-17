@@ -8,13 +8,12 @@
 using namespace Microsoft::WRL;
 
 #include <chrono>
+#include <thread>
 
 #include <DirectXMath.h>
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
-
-#include <DirectXMath.h>
 
 #include <Util/Timer.h>
 #include <ImGuiData/KaisoTai_base85.h>

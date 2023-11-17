@@ -6,6 +6,7 @@
 #pragma once
 #include "System/GameScene.h"
 #include <memory>
+#include <thread>
 
 class Sprite;
 class SpriteBase;
@@ -24,6 +25,9 @@ class TitleScene :
 	// デバッグテキスト
 	// --------------------
 	std::unique_ptr<DebugText> debugText;
+
+	std::unique_ptr<GameScene> nextScene = nullptr;
+	std::unique_ptr<std::jthread> thread{};
 
 public:
 	TitleScene();

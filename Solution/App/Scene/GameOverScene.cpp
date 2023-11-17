@@ -10,6 +10,7 @@ GameOverScene::GameOverScene() :
 {
 	debugText = std::make_unique<DebugText>(spriteBase->loadTexture(L"Resources/debugfont.png"),
 											spriteBase.get());
+	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<TitleScene>(); });
 }
 
 GameOverScene::~GameOverScene()
@@ -17,11 +18,14 @@ GameOverScene::~GameOverScene()
 
 void GameOverScene::update()
 {
-	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "GameOver Scene\nHIT SPACE" : "GameOver Scene",
+	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "GameOver Scene" : "GameOver Scene\nHIT SPACE",
 					 0.f, 0.f);
-	if (Input::ins()->triggerKey(DIK_SPACE))
+
+	if (Input::ins()->triggerKey(DIK_SPACE) &&
+		thread->joinable())
 	{
-		SceneManager::ins()->changeScene<TitleScene>();
+		thread->join();
+		SceneManager::ins()->changeSceneFromInstance(nextScene);
 	}
 }
 
