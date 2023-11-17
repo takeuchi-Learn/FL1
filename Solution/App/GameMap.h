@@ -17,11 +17,17 @@ class GameMap
 public:
 	static constexpr float chipSize = 100.f;
 
+	struct ChipData
+	{
+		CollisionShape::AABB aabb{};
+		std::string cellStr = "UNDEF";
+	};
+
 private:
 	std::unordered_map<std::string, std::unique_ptr<Billboard>> billboard;
 
 	/// @brief 地形のAABB
-	std::vector<std::vector<CollisionShape::AABB>>mapAABBs;
+	std::vector<std::vector<ChipData>> chipData;
 
 	GameCamera* camera = nullptr;
 
@@ -31,7 +37,7 @@ private:
 	/// @param y 配列の添え字
 	/// @param pos 座標
 	/// @param scale サイズ
-	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
+	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale, const std::string& cellStr);
 
 public:
 	GameMap(GameCamera* camera);
@@ -45,7 +51,5 @@ public:
 	void update();
 	void draw();
 
-	/// @brief 当たり判定の取得
-	/// @return 当たり判定配列の参照
-	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs()const { return mapAABBs; }
+	const auto& getChipData()const { return chipData; }
 };

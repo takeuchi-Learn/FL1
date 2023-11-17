@@ -34,26 +34,28 @@ namespace
 
 void PlayScene::checkCollision()
 {
-	const auto& mapAABBs = gameMap->getAABBs();
+	const auto& mapAABBs = gameMap->getChipData();
 
-	for (uint32_t yNum = 0u; auto & y : mapAABBs)
+	for (auto& y : mapAABBs)
 	{
-		for (uint32_t xNum = 0u; auto & x : y)
+		for (auto& x : y)
 		{
-			if (yNum <= 2u)
-			{
-				++xNum;
-				continue;
-			}
+			uint8_t num = 255ui8;
+			std::from_chars(std::to_address(x.cellStr.begin()),
+							std::to_address(x.cellStr.end()),
+							num);
+
+			// todo 仮コード。ゴールの判定は取るべき
+			// 0はゴール、1は道なので判定は取らない
+			if (num < 2) { continue; }
+
 			const auto& p = player->getShape();
-			const bool isHit = Collision::CheckHit(p, x);
+			const bool isHit = Collision::CheckHit(p, x.aabb);
 			if (isHit)
 			{
 				player->hit();
 			}
-			++xNum;
 		}
-		++yNum;
 	}
 
 	// テストです

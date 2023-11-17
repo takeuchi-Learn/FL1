@@ -8,18 +8,18 @@
 
 using namespace DirectX;
 
-void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
+void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale, const std::string& cellStr)
 {
-	const float harfScale = scale / 2;
-	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
-	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-	mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+	auto& data = chipData[y][x];
 
-	//XMFLOAT2 minPos(pos.x, pos.y );
-	//XMFLOAT2 maxPos(pos.x + scale, pos.y + scale);
-	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+	data.cellStr = cellStr;
+
+	const float harfScale = scale / 2.f;
+	const XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
+	const XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
+
+	data.aabb.minPos = XMLoadFloat2(&minPos);
+	data.aabb.maxPos = XMLoadFloat2(&maxPos);
 }
 
 GameMap::GameMap(GameCamera* camera) :
@@ -40,11 +40,11 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
-	mapAABBs.resize(csvData.size());
+	chipData.resize(csvData.size());
 
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
 	{
-		mapAABBs[y].resize(csvData[y].size());
+		chipData[y].resize(csvData[y].size());
 
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
@@ -90,7 +90,7 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			data->add(pos, chipSize + 1.f);
 
 			// 判定作成
-			setAABBData(x, y, pos, chipSize);
+			setAABBData(x, y, pos, chipSize, cellStr);
 		}
 	}
 
