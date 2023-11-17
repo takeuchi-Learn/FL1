@@ -1,8 +1,7 @@
 ﻿#pragma once
-#include "../Engine/Camera/Camera.h"
-#include "../Engine/GameObject/AbstractGameObj.h"
 #include <Imu/Sensor.h>
 #include <Imu/Kalman.h>
+#include <Imu/MadgwickAHRS.h>
 #include <Camera/Camera.h>
 #include <3D/Billboard/Billboard.h>
 
@@ -16,11 +15,13 @@ class GameCamera :
 private:
 
 	// 追従Obj
-	AbstractGameObj* obj = nullptr;
+	//AbstractGameObj* obj = nullptr;
 	// センサー
 	Sensor* sensor = nullptr;
 	// カルマンフィルター
 	Kalman* kalman = new Kalman;
+	//
+	Madgwick* madgwick = new Madgwick;
 	// 角度Z
 	float angle = 0.0f;
 	float prevAngle = 0.0f;
@@ -39,7 +40,7 @@ private:
 	float getAccelZ = 0.0f;
 	BillboardData* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
-	float angle = 20.f;
+	//float angle = 20.f;
 
 	/// @brief カメラの状態列挙
 	enum class CameraState
@@ -67,7 +68,6 @@ private:
 
 private:
 #pragma region START
-
 	/// @brief CameraState::STARTのupdate
 	void updateStart();
 
@@ -95,7 +95,6 @@ private:
 	void updateClear();
 #pragma endregion
 
-
 	void preUpdate() override;
 
 	/// @brief 角度を上ベクトルに変換
@@ -108,15 +107,13 @@ private:
 
 	/// @brief 追従
 	void followObject();
-
-
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(BillboardData* obj = nullptr);
 	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate(Sensor* sensor);
+	void gameCameraUpdate();
 
 	inline float getAngleDeg() const { return angle; }
 
@@ -145,5 +142,9 @@ public:
 	// クリア状態に変更
 	void changeStateGoal() { cameraState = CameraState::CLEAR; }
 
+	// センサーのゲッター
+	Sensor* getSensor() { return sensor; }
+
+	void IMUDelete();
 };
 

@@ -36,7 +36,6 @@ private:
 	std::unique_ptr<Sprite> sprite;
 
 	std::unique_ptr<ParticleMgr> particle;
-	Sensor* sensor = nullptr;
 
 	std::unique_ptr<Player> player;
 

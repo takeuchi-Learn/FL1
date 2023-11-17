@@ -123,7 +123,7 @@ void GameMap::update()
 {
 	for (auto& i : billboard)
 	{
-		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
+		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
 }
 

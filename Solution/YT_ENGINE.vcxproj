@@ -125,6 +125,7 @@
     <ClCompile Include="Engine\Collision\CollisionShape.cpp" />
     <ClCompile Include="Engine\2D\DebugText.cpp" />
     <ClCompile Include="Engine\Imu\Ini.cpp" />
+    <ClCompile Include="Engine\Imu\MadgwickAHRS.cpp" />
     <ClCompile Include="Engine\Imu\Sensor.cpp" />
     <ClCompile Include="Engine\Imu\Serial.cpp" />
     <ClCompile Include="Engine\System\DX12Base.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Engine\Collision\CollisionShape.h" />
     <ClInclude Include="Engine\2D\DebugText.h" />
     <ClInclude Include="Engine\Imu\Ini.h" />
+    <ClInclude Include="Engine\Imu\MadgwickAHRS.h" />
     <ClInclude Include="Engine\Imu\Sensor.h" />
     <ClInclude Include="Engine\Imu\Serial.h" />
     <ClInclude Include="Engine\System\DX12Base.h" />

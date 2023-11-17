@@ -90,17 +90,11 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
-	Sound::ins()->playWave(bgm,
-						   XAUDIO2_LOOP_INFINITE,
-						   0.2f);
-
-	sensor = Sensor::create();
 }
 
 PlayScene::~PlayScene()
 {
-	Sound::ins()->stopWave(bgm);
-	sensor->erase();
+	camera->IMUDelete();
 }
 
 void PlayScene::update()
@@ -112,17 +106,16 @@ void PlayScene::update()
 		return;
 	}
 
-	gameMap->update();
-	player->update();
-
 	// ライトとカメラの更新
 	camera->update();
 
 	// 衝突判定テスト
 	checkCollision();
-	camera->gameCameraUpdate(sensor);
-	light->update();
-	sensor->update();
+	camera->gameCameraUpdate();
+	//light->update();
+
+	gameMap->update();
+	player->update();
 }
 
 void PlayScene::drawObj3d()
@@ -146,22 +139,19 @@ void PlayScene::drawFrontSprite()
 	SetNextWindowPos(ImVec2(0.f, 0.f));
 
 	Begin("PlaySceneGUI", nullptr, DX12Base::imGuiWinFlagsDef);
-	Text("タイマー%s: %f",
-		 stopwatch->isPlay() ? "|>" : "□",
-		 float(stopwatchPlayTime) / Timer::oneSecF);
 	Text("スペース: シーン切り替え");
 	Text("x:%.1f, y:%.1f, z:%.1f",
 		camera->getEye().x,
 		camera->getEye().y,
 		camera->getEye().z);
 	Text("Accel : x:%.1f, y:%.1f, z:%.1f",
-		 sensor->GetAccelX(),
-		 sensor->GetAccelY(),
-		 sensor->GetAccelZ());
+		 camera->getSensor()->GetAccelX(),
+		 camera->getSensor()->GetAccelY(),
+		 camera->getSensor()->GetAccelZ());
 	Text("Gyro : x:%.1f, y:%.1f, z:%.1f",
-		 sensor->GetGyroX(),
-		 sensor->GetGyroY(),
-		 sensor->GetGyroZ());
+		 camera->getSensor()->GetGyroX(),
+		 camera->getSensor()->GetGyroY(),
+		 camera->getSensor()->GetGyroZ());
 	Text("Angle : %.1f",
 		 camera->getAngle());
 	End();
