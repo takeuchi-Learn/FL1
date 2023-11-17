@@ -186,14 +186,16 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 		}
 
-		// ゴール衝突
-		//gameCamera->changeStateGoal();
 
 
 		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 		gameObj->update(XMConvertToRadians(getObj()->rotation));
 	}
-
+    else if (hitObjName == typeid(GameMap).name())// ゴール衝突
+	{
+		gameCamera->changeStateClear();
+		isClear = true;
+	}
 }
 
 void Player::calcJumpPos()

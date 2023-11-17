@@ -198,8 +198,8 @@ void GameCamera::gameCameraUpdate()
 		break;
 	}
 
-	// ゲームオーバーでなければカメラ追従
-	if (cameraState != GameCamera::CameraState::GAEOVER)
+	// OTHERでなければカメラ追従
+	if (cameraState != GameCamera::CameraState::OTHER)
 	{
 		// 追従
 		followObject();

@@ -20,6 +20,8 @@
 #include <Collision/Collision.h>
 
 #include "TitleScene.h"
+#include "ClearScene.h"
+#include "GameOverScene.h"
 
 using namespace DirectX;
 
@@ -117,6 +119,25 @@ void PlayScene::update()
 	if(player->getIsDead())
 	{
 		camera->changeStateGameover();
+		
+		gameOverTimer++;
+
+		// 一定時間後にゲームオーバーシーン切り替え
+		if (gameOverTimer >= GAME_OVER_TIME_MAX)
+		{
+			SceneManager::ins()->changeScene<GameOverScene>();
+		}
+	}
+
+	// クリア確認
+	if(player->getIsClear())
+	{
+		camera->changeStateClear();
+		// クリア演出後シーン切り替え
+		if(1)
+		{
+			SceneManager::ins()->changeScene<ClearScene>();
+		}
 	}
 }
 

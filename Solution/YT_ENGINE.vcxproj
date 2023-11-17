@@ -114,6 +114,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App\BackGround.cpp" />
+    <ClCompile Include="App\Scene\ClearScene.cpp" />
+    <ClCompile Include="App\Scene\GameOverScene.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
@@ -160,6 +162,8 @@
   <ItemGroup>
     <ClInclude Include="App\Object\Goal.h" />
     <ClInclude Include="App\BackGround.h" />
+    <ClInclude Include="App\Scene\ClearScene.h" />
+    <ClInclude Include="App\Scene\GameOverScene.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />

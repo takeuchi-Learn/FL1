@@ -70,6 +70,7 @@ class Player
 	/// @brief 座標がこの数値を下回ったら落下死
 	float gameoverPos = 0.f;
 	bool isDead = false;
+	bool isClear = false;
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -145,6 +146,7 @@ public:
 	inline const auto& getMapPos() const { return mapPos; }
 
 	bool getIsDead() const{ return isDead; }
+	bool getIsClear()const { return isClear; }
 	
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

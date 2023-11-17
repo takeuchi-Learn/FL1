@@ -22,7 +22,6 @@ private:
 		START,// 開始
 		INPUT,// 入力受付
 		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
-		GAEOVER,// ゲームオーバー 追従をオフにする
 		OTHER, //その他(何も更新しないとき)
 	};
 
@@ -117,7 +116,8 @@ public:
 	}
 
 	// クリア状態に変更
-	void changeStateGoal() { cameraState = CameraState::CLEAR; }
-	void changeStateGameover(){ cameraState = CameraState::GAEOVER; }
+	void changeStateClear() { cameraState = CameraState::CLEAR; }
+	void changeStateGameover(){ cameraState = CameraState::OTHER; }
+
 };
 
