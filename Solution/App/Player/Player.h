@@ -23,7 +23,7 @@ class Player
 	DirectX::XMFLOAT2 mapPos{};
 	std::unique_ptr<Billboard> gameObj;
 
-	GameCamera* gameCamera = nullptr;
+	GameCamera* camera = nullptr;
 
 	CollisionShape::Sphere sphere;
 
@@ -71,6 +71,9 @@ class Player
 	float gameoverPos = 0.f;
 	bool isDead = false;
 	bool isClear = false;
+
+	// スタート演出終了後の座標(mapPosがこれを下回った場合追従をオフにする)
+	float startPosX = 350.f;
 
 	// センサーの値
 	float sensorValue = 0.0f;
@@ -120,9 +123,12 @@ private:
 	void move();
 	// 回転
 	void rot();
+	/// @brief ステージの端にいるかの確認(スクロール停止用)
+	void checkStageSide();
 
 	/// @brief ゲームオーバーの確認
-	void checkGameover();
+	void checkGameOver();
+
 
 public:
 
@@ -147,6 +153,8 @@ public:
 
 	bool getIsDead() const{ return isDead; }
 	bool getIsClear()const { return isClear; }
+
+	float getStartPosX()const { return startPosX; }
 	
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

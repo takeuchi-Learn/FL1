@@ -189,6 +189,7 @@ void GameCamera::gameCameraUpdate()
 		updateStart();
 		break;
 	case GameCamera::CameraState::INPUT:
+	case GameCamera::CameraState::FOLLOW_OFF:
 		updateInput();
 		break;
 	case GameCamera::CameraState::CLEAR:
@@ -199,7 +200,8 @@ void GameCamera::gameCameraUpdate()
 	}
 
 	// OTHERでなければカメラ追従
-	if (cameraState != GameCamera::CameraState::OTHER)
+	if (cameraState != GameCamera::CameraState::OTHER &&
+		cameraState != GameCamera::CameraState::FOLLOW_OFF)
 	{
 		// 追従
 		followObject();

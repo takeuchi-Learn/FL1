@@ -21,6 +21,7 @@ private:
 	{
 		START,// 開始
 		INPUT,// 入力受付
+		FOLLOW_OFF,// 入力受付 追従オフ(画面端用)
 		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
 		OTHER, //その他(何も更新しないとき)
 	};
@@ -39,6 +40,7 @@ private:
 	// スタート演出の補間処理
 	bool startLerp = false;
 #pragma endregion
+
 
 private:
 #pragma region START
@@ -118,6 +120,9 @@ public:
 	// クリア状態に変更
 	void changeStateClear() { cameraState = CameraState::CLEAR; }
 	void changeStateGameover(){ cameraState = CameraState::OTHER; }
-
+	
+	/// @brief 追従のオンオフ
+	/// @param flag 
+	void setFollowFlag(const bool flag) { cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF; }
 };
 
