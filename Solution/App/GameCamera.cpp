@@ -121,11 +121,18 @@ void GameCamera::checkInput()
 		angle += frameAngle;
 	}
 
-	// todo ジャイロ仮。フィルター未実装なのでドリフトする
+	// todo ジャイロ仮。加速度センサーのみで姿勢推定している。
 	if (PadImu::ins()->getDevCount() > 0)
 	{
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
-		angle += -state.gyroZ / DX12Base::ins()->getFPS();
+
+		// 補正の強度。値が大きいと誤差が吸収されるが反応が遅くなる
+		constexpr float rate = 0.05f, invRate = 1.f - rate;
+
+		const float roll = std::atan2(state.accelY, state.accelZ);
+		const auto delta = DX12Base::ins()->getFPS() / 1000.f;
+
+		angle = invRate * (angle + -state.accelX / delta) + rate * roll;
 	}
 }
 

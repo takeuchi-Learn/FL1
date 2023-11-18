@@ -65,12 +65,14 @@ private:
 	constexpr static USHORT divLen = divNum - 1;
 	float fps;
 	std::unique_ptr<Timer> fpsTimer;
+	Timer::timeType deltaTime = 0u;
 
 	void flipTimeFPS();
 	void updateFPS();
 
 public:
 	inline float getFPS() const { return fps; }
+	inline auto getDeltaTime() const { return deltaTime; }
 
 #pragma endregion
 

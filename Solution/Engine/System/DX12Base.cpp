@@ -609,11 +609,11 @@ void DX12Base::flipTimeFPS()
 	constexpr auto kMinTime = uint64_t(1'000'000.0f / 70.f);
 
 	// 前回空の経過時間
-	auto elap = fpsTimer->getNowTime();
+	deltaTime = fpsTimer->getNowTime();
 
-	if (kMinTime > elap)
+	if (kMinTime > deltaTime)
 	{
-		std::this_thread::sleep_for(Timer::timeUnit(kMinTime - elap));
+		std::this_thread::sleep_for(Timer::timeUnit(kMinTime - deltaTime));
 	}
 
 	fpsTimer->reset();

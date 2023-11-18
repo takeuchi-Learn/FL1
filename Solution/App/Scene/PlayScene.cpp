@@ -160,7 +160,7 @@ void PlayScene::drawObj3d()
 void PlayScene::drawFrontSprite()
 {
 	// 対応パッドが無ければ何も表示しない
-	if (PadImu::ins()->getDevCount() < 0) { return; }
+	if (PadImu::ins()->getDevCount() <= 0) { return; }
 
 	const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
