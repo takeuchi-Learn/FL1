@@ -21,9 +21,6 @@ class TitleScene :
 	std::function<void()> updateProc{};
 	std::unique_ptr<Timer> transitionTimer;
 
-	std::vector<int> devHandles{};
-	int devCount = -1;
-
 	std::string debugStr{};
 
 	void update_main();

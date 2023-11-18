@@ -7,7 +7,7 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 
-#include<GameMap.h>
+#include <GameMap.h>
 
 using namespace DirectX;
 
@@ -229,8 +229,9 @@ void Player::jump()
 	calcDropVec();
 
 	// ジャンプするのに必要なジャイロの値
-	constexpr float jumpSensorValue = 1.f;
-	constexpr float bigSensorJyroValue = 2.f;
+	// todo 調整項目
+	constexpr float jumpSensorValue = 2.f;
+	constexpr float bigSensorJyroValue = 4.f;
 
 	pushJumpKeyFrame = false;
 

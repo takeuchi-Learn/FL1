@@ -18,6 +18,8 @@
 #include <GameMap.h>
 
 #include <Collision/Collision.h>
+#include <PadImu.h>
+#include <JoyShockLibrary.h>
 
 #include "TitleScene.h"
 #include "ClearScene.h"
@@ -39,11 +41,11 @@ namespace
 void PlayScene::checkCollision()
 {
 	const auto& mapAABBs = gameMap->getAABBs();
-	for(auto y = 0; y < mapAABBs.size();y++)
+	for (auto y = 0; y < mapAABBs.size(); y++)
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
-			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
 				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
 			}
@@ -85,15 +87,14 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
-	
+
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
 
 }
 
 PlayScene::~PlayScene()
-{
-}
+{}
 
 void PlayScene::update()
 {
@@ -102,6 +103,13 @@ void PlayScene::update()
 	{
 		SceneManager::ins()->changeScene<TitleScene>();
 		return;
+	}
+
+	// todo ジャンプのための加速度入力仮
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+		player->setSensorValue(state.accelY);
 	}
 
 	backGround->update();
@@ -116,10 +124,10 @@ void PlayScene::update()
 	checkCollision();
 
 	// ゲームオーバー確認
-	if(player->getIsDead())
+	if (player->getIsDead())
 	{
 		camera->changeStateGameover();
-		
+
 		gameOverTimer++;
 
 		// 一定時間後にゲームオーバーシーン切り替え
@@ -130,11 +138,11 @@ void PlayScene::update()
 	}
 
 	// クリア確認
-	if(player->getIsClear())
+	if (player->getIsClear())
 	{
 		camera->changeStateClear();
 		// クリア演出後シーン切り替え
-		if(1)
+		if (1)
 		{
 			SceneManager::ins()->changeScene<ClearScene>();
 		}
@@ -150,4 +158,14 @@ void PlayScene::drawObj3d()
 }
 
 void PlayScene::drawFrontSprite()
-{}
+{
+	// 対応パッドが無ければ何も表示しない
+	if (PadImu::ins()->getDevCount() < 0) { return; }
+
+	const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+
+	using namespace ImGui;
+	Begin("PlayScene::drawFrontSprite()", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+	Text("accelY: %.1f", state.accelY);
+	End();
+}

@@ -1,6 +1,8 @@
 ﻿#include "GameCamera.h"
+#include <Input/Input.h>
 
-#include"../Engine/Input/Input.h"
+#include <PadImu.h>
+#include <JoyShockLibrary.h>
 
 using namespace DirectX;
 
@@ -117,6 +119,13 @@ void GameCamera::checkInput()
 			   Input::ins()->hitPadButton(XINPUT_GAMEPAD_DPAD_RIGHT))
 	{
 		angle += frameAngle;
+	}
+
+	// todo ジャイロ仮。フィルター未実装なのでドリフトする
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+		angle += -state.gyroZ / DX12Base::ins()->getFPS();
 	}
 }
 

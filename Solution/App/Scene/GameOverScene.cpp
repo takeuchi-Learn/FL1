@@ -3,6 +3,7 @@
 #include <2D/DebugText.h>
 #include <Input/Input.h>
 #include <System/SceneManager.h>
+#include <PadImu.h>
 #include <JoyShockLibrary.h>
 
 #include "TitleScene.h"
@@ -19,14 +20,7 @@ GameOverScene::~GameOverScene()
 {}
 
 void GameOverScene::start()
-{
-	devCount = JslConnectDevices();
-	if (devCount > 0)
-	{
-		devHandles.resize(devCount, -1);
-		JslGetConnectedDeviceHandles(devHandles.data(), devCount);
-	}
-}
+{}
 
 void GameOverScene::update()
 {
@@ -53,9 +47,9 @@ bool GameOverScene::checkInputOfStartTransition()
 		return true;
 	}
 
-	if (devCount > 0)
+	if (PadImu::ins()->getDevCount() > 0)
 	{
-		const auto state = JslGetSimpleState(devHandles[0]);
+		const auto state = JslGetSimpleState(PadImu::ins()->getHandles()[0]);
 		// todo hitkey相当になっているのでトリガーに変更する
 		return static_cast<bool>(state.buttons & (useJSLMask));
 	}

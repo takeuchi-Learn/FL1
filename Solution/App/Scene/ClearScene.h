@@ -30,9 +30,6 @@ class ClearScene :
 	std::unique_ptr<GameScene> nextScene = nullptr;
 	std::unique_ptr<std::jthread> thread{};
 
-	std::vector<int> devHandles{};
-	int devCount = -1;
-
 	bool checkInputOfStartTransition();
 
 public:
