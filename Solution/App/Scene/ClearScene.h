@@ -6,6 +6,8 @@
 #pragma once
 #include "System/GameScene.h"
 #include <memory>
+#include <thread>
+#include <functional>
 
 class Sprite;
 class SpriteBase;
@@ -25,9 +27,18 @@ class ClearScene :
 	// --------------------
 	std::unique_ptr<DebugText> debugText;
 
+	std::unique_ptr<GameScene> nextScene = nullptr;
+	std::unique_ptr<std::jthread> thread{};
+
+	std::vector<int> devHandles{};
+	int devCount = -1;
+
+	bool checkInputOfStartTransition();
+
 public:
 	ClearScene();
 	~ClearScene();
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };

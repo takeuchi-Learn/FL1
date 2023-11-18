@@ -237,12 +237,18 @@ void Player::jump()
 
 	if (!isJump)
 	{
-		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
+		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
+		triggerJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B);
+
+		if (triggerJump || sensorValue >= jumpSensorValue)
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
+
 			// 大ジャンプ
-			if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
+			bool hitBigJump = Input::ins()->hitKey(DIK_X);
+			hitBigJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER);
+			if (hitBigJump || sensorValue >= bigSensorJyroValue)
 			{
 				fallStartSpeed = bigJumpPower;
 			} else// 通常ジャンプ

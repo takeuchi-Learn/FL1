@@ -1,9 +1,11 @@
-﻿#include "TitleScene.h"
+﻿#include "GameOverScene.h"
 #include <2D/Sprite.h>
 #include <2D/DebugText.h>
 #include <Input/Input.h>
 #include <System/SceneManager.h>
-#include "GameOverScene.h"
+#include <JoyShockLibrary.h>
+
+#include "TitleScene.h"
 
 GameOverScene::GameOverScene() :
 	spriteBase(std::make_unique<SpriteBase>())
@@ -16,17 +18,49 @@ GameOverScene::GameOverScene() :
 GameOverScene::~GameOverScene()
 {}
 
+void GameOverScene::start()
+{
+	devCount = JslConnectDevices();
+	if (devCount > 0)
+	{
+		devHandles.resize(devCount, -1);
+		JslGetConnectedDeviceHandles(devHandles.data(), devCount);
+	}
+}
+
 void GameOverScene::update()
 {
-	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "GameOver Scene" : "GameOver Scene\nHIT SPACE",
-					 0.f, 0.f);
+	debugText->Print("GameOver Scene\nHIT SPACE", 0.f, 0.f);
 
-	if (Input::ins()->triggerKey(DIK_SPACE) &&
-		thread->joinable())
+	if (thread->joinable() &&
+		checkInputOfStartTransition())
 	{
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
 	}
+}
+
+bool GameOverScene::checkInputOfStartTransition()
+{
+	constexpr auto useKey = DIK_SPACE;
+	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
+	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
+
+	if (Input::ins()->triggerKey(useKey)) { return true; }
+
+	if (Input::ins()->triggerPadButton(useXInputButton))
+	{
+		return true;
+	}
+
+	if (devCount > 0)
+	{
+		const auto state = JslGetSimpleState(devHandles[0]);
+		// todo hitkey相当になっているのでトリガーに変更する
+		return static_cast<bool>(state.buttons & (useJSLMask));
+	}
+
+	return false;
 }
 
 void GameOverScene::drawFrontSprite()

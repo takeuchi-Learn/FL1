@@ -7,6 +7,7 @@
 #include "System/GameScene.h"
 #include <memory>
 #include <thread>
+#include <functional>
 
 class Sprite;
 class SpriteBase;
@@ -29,9 +30,15 @@ class GameOverScene :
 	std::unique_ptr<GameScene> nextScene = nullptr;
 	std::unique_ptr<std::jthread> thread{};
 
+	std::vector<int> devHandles{};
+	int devCount = -1;
+
+	bool checkInputOfStartTransition();
+
 public:
 	GameOverScene();
 	~GameOverScene();
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };

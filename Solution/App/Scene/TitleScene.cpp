@@ -3,6 +3,7 @@
 #include <System/SceneManager.h>
 #include <Util/Timer.h>
 #include <algorithm>
+#include <JoyShockLibrary.h>
 
 #include "PlayScene.h"
 
@@ -26,9 +27,19 @@ TitleScene::TitleScene() :
 TitleScene::~TitleScene()
 {}
 
+void TitleScene::start()
+{
+	devCount = JslConnectDevices();
+	if (devCount > 0)
+	{
+		devHandles.resize(devCount, -1);
+		JslGetConnectedDeviceHandles(devHandles.data(), devCount);
+	}
+}
+
 void TitleScene::update_main()
 {
-	if (Input::ins()->triggerKey(DIK_SPACE))
+	if (checkInputOfStartTransition())
 	{
 		updateProc = std::bind(&TitleScene::update_end, this);
 		transitionTimer->reset();
@@ -47,6 +58,29 @@ void TitleScene::update_end()
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
 	}
+}
+
+bool TitleScene::checkInputOfStartTransition()
+{
+	constexpr auto useKey = DIK_SPACE;
+	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
+	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
+
+	if (Input::ins()->triggerKey(useKey)) { return true; }
+
+	if (Input::ins()->triggerPadButton(useXInputButton))
+	{
+		return true;
+	}
+
+	if (devCount > 0)
+	{
+		const auto state = JslGetSimpleState(devHandles[0]);
+		// todo hitkey相当になっているのでトリガーに変更する
+		return static_cast<bool>(state.buttons & (useJSLMask));
+	}
+
+	return false;
 }
 
 void TitleScene::update()

@@ -109,22 +109,22 @@ void GameCamera::checkInput()
 
 	// 入力確認してカメラを傾ける
 	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if (Input::getInstance()->hitKey(DIK_LEFT))
+	if (Input::ins()->hitKey(DIK_LEFT) ||
+		Input::ins()->hitPadButton(XINPUT_GAMEPAD_DPAD_LEFT))
 	{
 		angle -= frameAngle;
-	} else
-		if (Input::getInstance()->hitKey(DIK_RIGHT))
-		{
-			angle += frameAngle;
-		}
+	} else if (Input::ins()->hitKey(DIK_RIGHT) ||
+			   Input::ins()->hitPadButton(XINPUT_GAMEPAD_DPAD_RIGHT))
+	{
+		angle += frameAngle;
+	}
 }
 
 #pragma endregion
 
 #pragma region CLEAR
 void GameCamera::updateClear()
-{
-}
+{}
 #pragma endregion
 
 
@@ -163,7 +163,7 @@ void GameCamera::followObject(const bool followX)
 	// Targetをobjの座標に
 	DirectX::XMFLOAT3 objPos = obj->position;
 
-	if(!followX)
+	if (!followX)
 	{
 		objPos.x = getEye().x;
 	}
@@ -216,8 +216,7 @@ void GameCamera::gameCameraUpdate()
 	{
 		// 追従
 		followObject(true);
-	}
-	else
+	} else
 	{
 
 		followObject(false);

@@ -21,14 +21,21 @@ class TitleScene :
 	std::function<void()> updateProc{};
 	std::unique_ptr<Timer> transitionTimer;
 
+	std::vector<int> devHandles{};
+	int devCount = -1;
+
 	std::string debugStr{};
 
 	void update_main();
 	void update_end();
 
+	/// @return シーン遷移開始の入力があったかどうか
+	bool checkInputOfStartTransition();
+
 public:
 	TitleScene();
 	~TitleScene();
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };
