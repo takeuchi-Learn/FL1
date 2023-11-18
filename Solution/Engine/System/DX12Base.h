@@ -56,7 +56,7 @@ public:
 		// 移動不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
 
-	static const ImGuiWindowFlags ImGuiWinFlagsNoTitleBar = DX12Base::imGuiWinFlagsDef | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
+	static const ImGuiWindowFlags imGuiWinFlagsNoTitleBar = DX12Base::imGuiWinFlagsDef | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
 
 #pragma region FPS
 private:
