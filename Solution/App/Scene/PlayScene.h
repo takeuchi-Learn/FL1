@@ -15,14 +15,12 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
-
 class Player;
 class Goal;
 class BackGround;
-
 class Collision;
-
 class GameMap;
+class SoundData;
 
 class PlayScene :
 	public GameScene
@@ -45,6 +43,8 @@ private:
 
 	std::function<void()> updateProc;
 	std::unique_ptr<Stopwatch> timer;
+
+	std::weak_ptr<SoundData> bgm;
 
 #pragma region ゲームオーバー関係
 	int gameOverTimer = 0;

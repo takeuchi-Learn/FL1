@@ -11,6 +11,12 @@
 
 using namespace DirectX;
 
+namespace
+{
+	// todo mapSizeはGameMapのconstexpr定数にする
+	constexpr float mapSize = 100.f;
+}
+
 bool Player::loadYamlFile()
 {
 	constexpr const char filePath[] = "Resources/DataFile/player.yml";
@@ -21,6 +27,15 @@ bool Player::loadYamlFile()
 	XMFLOAT2& startPos = mapPos;
 	LoadYamlDataToFloat2(root, startPos);
 
+	// todo mapPosの扱いを正したら消す
+	constexpr float shiftVal = mapSize * 2.f;
+	mapPos.x *= shiftVal;
+	mapPos.y *= shiftVal;
+
+	getObj()->position = XMFLOAT3(mapPos.x,
+								  mapPos.y,
+								  getObj()->position.z);
+
 	return false;
 }
 
@@ -28,34 +43,32 @@ Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
 {
-
-	constexpr float scale = 100.0f;
+	constexpr float scale = mapSize;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
-	
+
 	loadYamlFile();
 
-	
 	// 判定仮設定
-	sphere.radius = scale / 2;
-
+	sphere.radius = scale / 2.f;
 }
 
 void Player::update()
 {
-
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
 
 	move();
+	rot();
 	jump();
 	rebound();
 
-
-	sphere.center.m128_f32[0] = mapPos.x;
-	sphere.center.m128_f32[1] = mapPos.y;
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-
+	// todo 本来下のようであるべき（mapPosはマップチップでの座標であってワールド座標ではない）
+	/*getObj()->position = XMFLOAT3(mapPos.x * mapSize,
+								  mapPos.y * mapSize,
+								  getObj()->position.z);*/
+	sphere.center = XMLoadFloat3(&getObj()->position);
 
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
 
@@ -63,7 +76,6 @@ void Player::update()
 	checkStageSide();
 	// ゲームオーバー確認
 	checkGameOver();
-
 }
 
 void Player::draw()
@@ -92,7 +104,6 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		//topが2 Yが多い
 		short top = 0;
 
-
 		XMFLOAT3 boxSize
 		(
 			(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0]),
@@ -105,7 +116,6 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			hitAABB.maxPos.m128_f32[1] - boxSize.y / 2,
 			hitAABB.maxPos.m128_f32[2] - boxSize.z / 2
 		);
-
 
 		XMFLOAT3 spherePos
 		(
@@ -189,13 +199,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			startSideRebound(hitAABB.maxPos.m128_f32[0], false);
 			break;
 		}
-
-
-
-		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-		gameObj->update(XMConvertToRadians(getObj()->rotation));
-	}
-    else if (hitObjName == typeid(GameMap).name())// ゴール衝突
+	} else if (hitObjName == typeid(GameMap).name())// ゴール衝突
 	{
 		camera->changeStateClear();
 		isClear = true;
@@ -204,6 +208,8 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 
 void Player::calcJumpPos()
 {
+	if (!isDynamic) { return; }
+
 	fallTime++;
 
 	const float PRE_VEL_Y = currentFallVelovity;
@@ -216,7 +222,6 @@ void Player::calcJumpPos()
 
 void Player::jump()
 {
-
 	// センサーの値によってジャンプ量細かく変更するか聞く
 
 	// ジャンプパワー
@@ -234,7 +239,6 @@ void Player::jump()
 	constexpr float bigSensorJyroValue = 4.f;
 
 	pushJumpKeyFrame = false;
-
 
 	if (!isJump)
 	{
@@ -258,7 +262,6 @@ void Player::jump()
 				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
 				fallStartSpeed = jumpPower;
 			}
-
 		}
 	}
 
@@ -270,7 +273,6 @@ void Player::jump()
 
 	// ジャンプの更新処理
 	calcJumpPos();
-
 }
 
 void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
@@ -283,7 +285,7 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
-	
+
 	isDrop = false;
 	startRebound();
 }
@@ -328,9 +330,7 @@ void Player::startRebound()
 
 void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
-
 	fallTime = 0;
-
 
 	// 押し出し後の位置
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
@@ -369,8 +369,7 @@ void Player::calcSideRebound()
 			sideAddX = 0;
 			isReboundX = false;
 		}
-	} 
-	else
+	} else
 	{
 		sideAddX += changeValue;
 
@@ -384,14 +383,11 @@ void Player::calcSideRebound()
 
 void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
-
 	// 当たった向きに応じて押し出す
 	if (hitLeft)
 	{
 		mapPos.x = wallPosX - sphere.radius;
-
-	}
-	else 
+	} else
 	{
 		mapPos.x = wallPosX + sphere.radius;
 	}
@@ -414,6 +410,8 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 
 void Player::move()
 {
+	if (!isDynamic) { return; }
+
 	// 角度を取得
 	const float angle = camera->getAngle();
 
@@ -426,7 +424,6 @@ void Player::move()
 
 	DirectX::XMFLOAT2 position = mapPos;
 	position.x += addPos;
-
 
 	// 加速度計算と加算
 	// 最大速度
@@ -442,12 +439,8 @@ void Player::move()
 		if (preFramePos.x == currentFramePos.x)acc = 0.f;
 	}
 
-
 	// 計算後セット
 	mapPos = position;
-	
-	// 回転
-	rot();
 }
 
 void Player::rot()
@@ -468,22 +461,19 @@ void Player::checkStageSide()
 	if (isDead)return;
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if(mapPos.x <= leftScrollEndPos)
+	if (mapPos.x <= leftScrollEndPos)
 	{
 		camera->setFollowFlag(false);
-	}
-	else
+	} else
 	{
 		camera->setFollowFlag(true);
 	}
-
 }
 
 void Player::checkGameOver()
 {
-	if(mapPos.y <= gameoverPos)
+	if (mapPos.y <= gameoverPos)
 	{
 		isDead = true;
 	}
 }
-

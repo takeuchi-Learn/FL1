@@ -9,14 +9,13 @@
 #include <functional>
 #include <memory>
 #include <3D/Billboard/Billboard.h>
-#include"../GameCamera.h"
+#include "../GameCamera.h"
 
-#include<Collision/CollisionShape.h>
+#include <Collision/CollisionShape.h>
 
 class Camera;
 class ObjModel;
 class Light;
-
 
 class Player
 {
@@ -61,7 +60,6 @@ class Player
 	// 加速度
 	float acc = 0.f;
 
-
 	// 前フレームの座標(跳ね返り用)
 	DirectX::XMFLOAT2 preFramePos = { 0.f,0.f };
 	// 現フレームの座標(跳ね返り用)
@@ -86,7 +84,7 @@ private:
 	/// @param startVel 初速度
 	/// @param gravAcc 加速度
 	/// @param t 時間
-	/// @return 
+	/// @return
 	float calcFallVelocity
 	(
 		const float startVel,
@@ -96,7 +94,6 @@ private:
 	{
 		return startVel + -gravAcc * static_cast<float>(t);
 	}
-
 
 	/// @brief ジャンプ中の座標更新処理
 	void calcJumpPos();
@@ -117,7 +114,7 @@ private:
 	// 横跳ね返り計算
 	void calcSideRebound();
 	/// @brief 横跳ね返り開始。これを衝突したときに呼び出す。
-	void startSideRebound(float wallPosX , bool hitLeft);
+	void startSideRebound(float wallPosX, bool hitLeft);
 
 	// 移動
 	void move();
@@ -129,8 +126,9 @@ private:
 	/// @brief ゲームオーバーの確認
 	void checkGameOver();
 
-
 public:
+	// 物理挙動をするかどうか
+	bool isDynamic = true;
 
 	// コンストラクタ仮
 	Player(GameCamera* camera);
@@ -141,7 +139,7 @@ public:
 	void draw();
 
 	/// @brief ゲームオーバー扱いになる座標をセットする関数
-	/// @param posY 
+	/// @param posY
 	void setGameOverPos(const float posY) { gameoverPos = posY; }
 
 	/// @brief センサーの値格納用
@@ -151,18 +149,17 @@ public:
 
 	inline const auto& getMapPos() const { return mapPos; }
 
-	bool getIsDead() const{ return isDead; }
+	bool getIsDead() const { return isDead; }
 	bool getIsClear()const { return isClear; }
 
 	float getStartPosX()const { return leftScrollEndPos; }
-	
+
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定
 	/// @param hitObjName 相手のクラス名(typeid.name()で取得する)や識別名("map"など)
-	void hit(const CollisionShape::AABB& hitAABB,const std::string& hitObjName = "");
+	void hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName = "");
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報
 	const CollisionShape::Sphere& getShape()const { return sphere; }
-
 };

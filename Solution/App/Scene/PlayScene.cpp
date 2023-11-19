@@ -18,6 +18,8 @@
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
+#include <Sound/Sound.h>
+
 #include <PadImu.h>
 #include <JoyShockLibrary.h>
 
@@ -66,6 +68,8 @@ PlayScene::PlayScene() :
 {
 	updateProc = std::bind(&PlayScene::update_start, this);
 
+	bgm = Sound::ins()->loadWave("Resources/A-Sense-of-Loss.wav");
+
 	spriteBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
 									  spriteBase.get(),
@@ -88,10 +92,15 @@ PlayScene::PlayScene() :
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
+
+	// 開始時は物理挙動をしない
+	player->isDynamic = false;
 }
 
 PlayScene::~PlayScene()
-{}
+{
+	Sound::stopWave(bgm);
+}
 
 void PlayScene::start()
 {
@@ -102,6 +111,9 @@ void PlayScene::update()
 {
 	updateProc();
 
+	// 衝突確認
+	checkCollision();
+
 	backGround->update();
 	gameMap->update();
 	player->update();
@@ -109,23 +121,22 @@ void PlayScene::update()
 	// ライトとカメラの更新
 	camera->update();
 	camera->gameCameraUpdate();
-
-	// 衝突確認
-	checkCollision();
 }
 
 void PlayScene::update_start()
 {
 	if (timer->getNowTime() > transitionTime)
 	{
+		player->isDynamic = true;
 		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+		PostEffect::ins()->setAlpha(1.f);
+		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
 		updateProc = std::bind(&PlayScene::update_main, this);
 		timer->reset();
 	} else
 	{
 		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
-		//raito = 1.f - std::clamp(raito, 0.f, 1.f);
-
+		//PostEffect::ins()->setAlpha(raito);
 		//raito *= raito * raito * raito * raito;
 		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * float(WinAPI::window_width),
 												 raito * float(WinAPI::window_height)));
