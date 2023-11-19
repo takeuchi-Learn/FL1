@@ -16,7 +16,7 @@
 #include <Object/Goal.h>
 #include <BackGround.h>
 #include <GameMap.h>
-
+#include <System/PostEffect.h>
 #include <Collision/Collision.h>
 #include <PadImu.h>
 #include <JoyShockLibrary.h>
@@ -36,6 +36,13 @@ namespace
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
 	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
+
+	constexpr Timer::timeType transitionTime = Timer::oneSec;
+
+	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
+	{
+		return XMFLOAT2(std::lerp(s.x, e.x, t), std::lerp(s.y, e.y, t));
+	}
 }
 
 void PlayScene::checkCollision()
@@ -51,19 +58,14 @@ void PlayScene::checkCollision()
 			}
 		}
 	}
-
-	// テストです
-	//bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
-	//if (res)
-	//{
-	//	//player->hit();
-	//}
-
 }
 
 PlayScene::PlayScene() :
-	camera(std::make_unique<GameCamera>())
+	camera(std::make_unique<GameCamera>()),
+	timer(std::make_unique<Stopwatch>())
 {
+	updateProc = std::bind(&PlayScene::update_start, this);
+
 	spriteBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
 									  spriteBase.get(),
@@ -78,10 +80,6 @@ PlayScene::PlayScene() :
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
-	// 仮にプレイヤーモデルを割り当て
-	//constexpr DirectX::XMFLOAT2 goalPos(80, 0);
-	//goal = std::make_unique<Goal>(nullptr, camera.get(),  goalPos);
-
 	backGround = std::make_unique<BackGround>(camera.get());
 
 	gameMap = std::make_unique<GameMap>(camera.get());
@@ -90,13 +88,51 @@ PlayScene::PlayScene() :
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
-
 }
 
 PlayScene::~PlayScene()
 {}
 
+void PlayScene::start()
+{
+	timer->reset();
+}
+
 void PlayScene::update()
+{
+	updateProc();
+
+	backGround->update();
+	gameMap->update();
+	player->update();
+
+	// ライトとカメラの更新
+	camera->update();
+	camera->gameCameraUpdate();
+
+	// 衝突確認
+	checkCollision();
+}
+
+void PlayScene::update_start()
+{
+	if (timer->getNowTime() > transitionTime)
+	{
+		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+		updateProc = std::bind(&PlayScene::update_main, this);
+		timer->reset();
+	} else
+	{
+		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
+		//raito = 1.f - std::clamp(raito, 0.f, 1.f);
+
+		//raito *= raito * raito * raito * raito;
+		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * float(WinAPI::window_width),
+												 raito * float(WinAPI::window_height)));
+	}
+}
+
+void PlayScene::update_main()
 {
 	// スペースでシーン切り替え
 	if (Input::ins()->triggerKey(DIK_SPACE))
@@ -111,17 +147,6 @@ void PlayScene::update()
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 		player->setSensorValue(state.accelY);
 	}
-
-	backGround->update();
-	gameMap->update();
-	player->update();
-
-	// ライトとカメラの更新
-	camera->update();
-	camera->gameCameraUpdate();
-
-	// 衝突確認
-	checkCollision();
 
 	// ゲームオーバー確認
 	if (player->getIsDead())
@@ -159,6 +184,8 @@ void PlayScene::drawObj3d()
 
 void PlayScene::drawFrontSprite()
 {
+#ifdef _DEBUG
+
 	// 対応パッドが無ければ何も表示しない
 	if (PadImu::ins()->getDevCount() <= 0) { return; }
 
@@ -168,4 +195,6 @@ void PlayScene::drawFrontSprite()
 	Begin("PlayScene::drawFrontSprite()", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
 	Text("accelY: %.1f", state.accelY);
 	End();
+
+#endif // _DEBUG
 }

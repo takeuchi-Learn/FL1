@@ -3,8 +3,9 @@
 #include <System/GameScene.h>
 #include <Util/Stopwatch.h>
 #include <memory>
+#include <functional>
 
-#include"../GameCamera.h"
+#include "../GameCamera.h"
 
 class Camera;
 class Light;
@@ -42,6 +43,9 @@ private:
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<GameMap> gameMap;
 
+	std::function<void()> updateProc;
+	std::unique_ptr<Stopwatch> timer;
+
 #pragma region ゲームオーバー関係
 	int gameOverTimer = 0;
 	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
@@ -51,14 +55,16 @@ private:
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
+
+	void update_start();
+	void update_main();
 	
 public:
 	PlayScene();
 	~PlayScene();
 
+	void start() override;
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
-
-
 };

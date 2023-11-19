@@ -77,7 +77,7 @@ private:
 	ComPtr<ID3D12DescriptorHeap> descHeapDSV;
 
 	// 画面クリアの色
-	static const float clearColor[4];
+	static constexpr float clearColor[4]{ 0.f, 0.f, 0.f, 1.f };
 
 	ComPtr<ID3D12PipelineState> pipelineState;
 	ComPtr<ID3D12RootSignature> rootSignature;

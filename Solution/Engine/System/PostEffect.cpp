@@ -6,8 +6,6 @@
 
 using namespace DirectX;
 
-const float PostEffect::clearColor[4] = { 0.f, 0.f, 0.f, 1.f };
-
 PostEffect::PostEffect()
 	: mosaicNum({ WinAPI::window_width, WinAPI::window_height }),
 	nowPPSet(0u),
