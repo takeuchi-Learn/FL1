@@ -226,7 +226,7 @@ void GameCamera::gameCameraUpdate()
 		break;
 	}
 
-	// OTHERでなければカメラ追従
+	// 追従
 	if (cameraState != GameCamera::CameraState::OTHER &&
 		cameraState != GameCamera::CameraState::FOLLOW_OFF)
 	{
@@ -234,7 +234,7 @@ void GameCamera::gameCameraUpdate()
 		followObject(true);
 	} else
 	{
-
+		// Xは固定
 		followObject(false);
 	}
 }
