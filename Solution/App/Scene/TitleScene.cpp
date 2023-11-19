@@ -2,8 +2,12 @@
 #include <Input/Input.h>
 #include <System/SceneManager.h>
 #include <Util/Timer.h>
-#include <algorithm>
 #include <PadImu.h>
+#include <2D/Sprite.h>
+#include <2D/SpriteBase.h>
+#include <Util/Util.h>
+#include <Sound/Sound.h>
+#include <algorithm>
 #include <JoyShockLibrary.h>
 
 #include "PlayScene.h"
@@ -12,14 +16,19 @@ using namespace DirectX;
 
 namespace
 {
-	constexpr float transitionTimeSec = 1.5f;
+	constexpr float transitionTimeSec = 1.25f;
 	constexpr auto transitionTime = static_cast<Timer::timeType>(Timer::oneSecF * transitionTimeSec);
 }
 
-TitleScene::TitleScene() :
-	debugStr("HIT SPACE")
+TitleScene::TitleScene()
 {
 	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+
+	spBase = std::make_unique<SpriteBase>();
+	titleSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+
+	bgm = Sound::ins()->loadWave("Resources/BGM.wav");
+	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
 
 	transitionTimer = std::make_unique<Timer>();
 	updateProc = std::bind(&TitleScene::update_main, this);
@@ -32,12 +41,16 @@ void TitleScene::start()
 {
 	// JoyShockLibraryのパッド接続状況をリセット
 	PadImu::ins()->reset();
+
+	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
 }
 
 void TitleScene::update_main()
 {
 	if (checkInputOfStartTransition())
 	{
+		Sound::stopWave(bgm);
+		Sound::playWave(transitionSe, 0u, 0.2f);
 		updateProc = std::bind(&TitleScene::update_end, this);
 		transitionTimer->reset();
 	}
@@ -48,8 +61,8 @@ void TitleScene::update_end()
 	const auto nowTime = transitionTimer->getNowTime();
 	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 
-	// 進行度を右詰め三桁で表示
-	debugStr = std::format("{:_>3.0f}%%", 100.f * std::clamp(rate, 0.f, 1.f));
+	titleSprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height), Util::easeOutBounce(rate));
+
 	if (nowTime >= transitionTime)
 	{
 		thread->join();
@@ -87,11 +100,6 @@ void TitleScene::update()
 
 void TitleScene::drawFrontSprite()
 {
-	using namespace ImGui;
-	Begin("TitleScene::drawFrontSprite()", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-	PushFont(DX12Base::ins()->getBigImFont());
-	Text("TitleScene");
-	PopFont();
-	Text(debugStr.c_str());
-	End();
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	titleSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 }

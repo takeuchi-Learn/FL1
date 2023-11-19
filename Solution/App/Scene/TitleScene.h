@@ -10,6 +10,9 @@
 #include <functional>
 
 class Timer;
+class Sprite;
+class SpriteBase;
+class SoundData;
 
 /// @brief タイトル画面シーンのクラス
 class TitleScene :
@@ -21,7 +24,11 @@ class TitleScene :
 	std::function<void()> updateProc{};
 	std::unique_ptr<Timer> transitionTimer;
 
-	std::string debugStr{};
+	std::unique_ptr<Sprite> titleSprite;
+	std::unique_ptr<SpriteBase> spBase;
+
+	std::weak_ptr<SoundData> bgm;
+	std::weak_ptr<SoundData> transitionSe;
 
 	void update_main();
 	void update_end();
