@@ -128,8 +128,8 @@ void GameCamera::checkInput()
 {
 	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
 
-	//checkKeyInput();
-	checkSensorInput();
+	checkKeyInput();
+	//checkSensorInput();
 }
 
 void GameCamera::checkSensorInput()
