@@ -217,8 +217,6 @@ void Player::jump()
 	constexpr float jumpPower = 18.f;
 	constexpr float bigJumpPower = 25.f;
 
-	// 一旦跳ね返り中はジャンプ禁止
-	if (isReboundY)return;
 
 	calcDropVec();
 
@@ -235,6 +233,8 @@ void Player::jump()
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
+			fallTime = 0;
+
 			// 大ジャンプ
 			if (Input::getInstance()->hitKey(DIK_X) || sensorValue >= bigSensorJyroValue)
 			{
@@ -246,7 +246,18 @@ void Player::jump()
 				fallStartSpeed = jumpPower;
 			}
 
+			// バウンド強制終了
+			if (isReboundY)
+			{
+				isReboundY = false;
+			}
+
 		}
+	}
+
+	if (isReboundY) 
+	{
+		return;
 	}
 
 	if (!isJump)
@@ -257,6 +268,8 @@ void Player::jump()
 
 	// ジャンプの更新処理
 	calcJumpPos();
+
+	
 
 }
 
