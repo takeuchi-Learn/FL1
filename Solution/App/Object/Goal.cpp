@@ -6,7 +6,7 @@
 using namespace DirectX;
 
 Goal::Goal(GameCamera* camera,  const DirectX::XMFLOAT2& pos,const float scale)
-	:gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
+	:gameObj(std::make_unique<Billboard>(L"Resources/Map/Tex/goal.png", camera))
 	, camera(camera)
 {
 	gameObj->add

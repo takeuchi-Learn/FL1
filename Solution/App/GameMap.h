@@ -9,6 +9,7 @@
 class Billboard;
 class GameCamera;
 class Collision;
+class Goal;
 
 // マップクラス
 // 動かない地形のみ扱う
@@ -37,6 +38,8 @@ private:
 	/// @brief 地形のAABB
 	std::vector<std::vector<CollisionShape::AABB>>mapAABBs;
 
+	std::unique_ptr<Goal>goal;
+
 	GameCamera* camera = nullptr;
 
 private:
@@ -47,6 +50,7 @@ private:
 	/// @param scale サイズ
 	void setAABBData(size_t x,size_t y,const DirectX::XMFLOAT3& pos,float scale);
 
+	bool checkTypeAndSetObject(MAPCHIP_DATA data, size_t x, size_t y, const DirectX::XMFLOAT2& pos, float scale);
 
 public:
 	GameMap(GameCamera* camera);
@@ -64,5 +68,7 @@ public:
 	/// @return 当たり判定配列の参照
 	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs()const { return mapAABBs; }
 
+	/// @brief ゲームオーバーになる座標
+	/// @return 
 	float getGameoverPos()const;
 };

@@ -43,6 +43,7 @@ void PlayScene::checkCollision()
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
+			// min、max両方0,0は通路なので確認せずにcontinue
 			if (!checkMinMax(mapAABBs[y][x]))continue;
 
 			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
