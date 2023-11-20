@@ -71,7 +71,7 @@ void GameCamera::startAutoRot()
 
 		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
 		// プレイヤーの角度を取得
-		const float objAngleZ = obj->position.z;
+		const float objAngleZ = obj->rotation;
 
 		// angleの最低値
 		constexpr float angleMin = 1.0f;
