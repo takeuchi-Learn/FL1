@@ -53,6 +53,13 @@ void PlayScene::checkCollision()
 		}
 	}
 
+	// ゴールとプレイヤーの判定(仮)
+	// 後々他のオブジェクトとまとめます
+	if (Collision::CheckSphere2AABB(player->getShape(), gameMap->getGoalAABB()))
+	{
+		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
+	}
+
 	// テストです
 	//bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
 	//if (res)

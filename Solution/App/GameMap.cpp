@@ -158,9 +158,9 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-
 	goal->draw();
 }
+
 
 float GameMap::getGameoverPos()const
 {

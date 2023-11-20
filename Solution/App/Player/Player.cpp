@@ -8,6 +8,7 @@
 #include <3D/Light/Light.h>
 
 #include<GameMap.h>
+#include<Object/Goal.h>
 
 using namespace DirectX;
 
@@ -195,7 +196,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 		gameObj->update(XMConvertToRadians(getObj()->rotation));
 	}
-    else if (hitObjName == typeid(GameMap).name())// ゴール衝突
+    else if (hitObjName == typeid(Goal).name())// ゴール衝突
 	{
 		camera->changeStateClear();
 		isClear = true;

@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include<Collision/CollisionShape.h>
+#include"Object/Goal.h"
 
 class Billboard;
 class GameCamera;
@@ -67,6 +68,10 @@ public:
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
 	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs()const { return mapAABBs; }
+
+	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
+	/// @return 
+	const CollisionShape::AABB& getGoalAABB()const { return goal->getShape(); }
 
 	/// @brief ゲームオーバーになる座標
 	/// @return 
