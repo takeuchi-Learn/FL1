@@ -71,8 +71,6 @@ class Player
 	float gameoverPos = 0.f;
 	bool isDead = false;
 
-	// センサーの値
-	float sensorValue = 0.0f;
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）

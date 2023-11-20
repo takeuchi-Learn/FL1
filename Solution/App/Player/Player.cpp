@@ -210,8 +210,9 @@ void Player::calcJumpPos()
 
 void Player::jump()
 {
+	// センサーの値
+	const float sensorValue = gameCamera->getGetAccelZ();
 
-	// センサーの値によってジャンプ量細かく変更するか聞く
 
 	// ジャンプパワー
 	constexpr float jumpPower = 18.f;
@@ -221,7 +222,7 @@ void Player::jump()
 	calcDropVec();
 
 	// ジャンプするのに必要なジャイロの値
-	constexpr float jumpSensorValue = 1.f;
+	constexpr float jumpSensorValue = 0.25f;
 	constexpr float bigSensorJyroValue = 2.f;
 
 	pushJumpKeyFrame = false;

@@ -151,11 +151,11 @@ void GameCamera::checkInput()
 	// 前の角度を保存
 	prevAngle = angle;
 
-	// ジャンプ判定用(仮)
-	if (getAccelZ >= 0.25f)
-	{
-		prevAngle = angle;
-	}
+	//// ジャンプ判定用(仮)
+	//if (getAccelZ >= 0.25f)
+	//{
+	//	prevAngle = angle;
+	//}
 }
 #pragma endregion
 

@@ -97,12 +97,10 @@ PlayScene::PlayScene() :
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
 
-	sensor = Sensor::create();
 }
 
 PlayScene::~PlayScene()
 {
-	sensor->erase();
 }
 
 void PlayScene::update()
@@ -114,14 +112,14 @@ void PlayScene::update()
 		return;
 	}
 
-	backGround->update();
-	gameMap->update();
-	player->update();
 
 	// ライトとカメラの更新
-	sensor->update();
 	camera->gameCameraUpdate();
 	camera->update();
+
+	player->update();
+	backGround->update();
+	gameMap->update();
 
 	// 衝突確認
 	checkCollision();
