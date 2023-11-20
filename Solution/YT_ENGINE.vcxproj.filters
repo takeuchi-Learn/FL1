@@ -231,6 +231,17 @@
     <ClCompile Include="App\GameCamera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+<<<<<<<<< Temporary merge branch 1
+    <ClCompile Include="Engine\Imu\Ini.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Imu\Sensor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Imu\Serial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="App\Player\Player.cpp">
     <ClCompile Include="App\GameMap.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -238,6 +249,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="App\BackGround.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="App\KalmanFilter.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="App\Scene\ClearScene.cpp">
@@ -401,7 +415,19 @@
     <ClInclude Include="App\GameMap.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Imu\Ini.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Imu\Sensor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Imu\Serial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="App\Object\Goal.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="App\KalmanFilter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="App\BackGround.h">

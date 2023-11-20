@@ -1,4 +1,9 @@
 ﻿#pragma once
+#include "../Engine/Camera/Camera.h"
+#include "../Engine/GameObject/AbstractGameObj.h"
+#include <Imu/Sensor.h>
+#include <Imu/Kalman.h>
+#include <Imu/MadgwickAHRS.h>
 #include <Camera/Camera.h>
 #include <3D/Billboard/Billboard.h>
 
@@ -11,7 +16,27 @@ class GameCamera :
 {
 private:
 
-	// 追従Obj
+	// センサー
+	Sensor* sensor = nullptr;
+	// カルマンフィルター
+	Kalman* kalman = new Kalman;
+	//
+	Madgwick* madgwick = new Madgwick;
+	// 角度Z
+	float prevAngle = 0.0f;
+	float degree = 0.0f;
+
+	float getGyroX = 0.0f;
+	float getGyroY = 0.0f;
+	float getGyroZ = 0.0f;
+	float prevGyroX = 0.0f;
+	float prevGyroY = 0.0f;
+	float prevGyroZ = 0.0f;
+
+	float accelAngle = 0.0f;
+	float getAccelX = 0.0f;
+	float getAccelY = 0.0f;
+	float getAccelZ = 0.0f;
 	BillboardData* obj = nullptr;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	float angle = 20.f;
@@ -44,7 +69,6 @@ private:
 
 private:
 #pragma region START
-
 	/// @brief CameraState::STARTのupdate
 	void updateStart();
 
@@ -63,13 +87,14 @@ private:
 
 	/// @brief 入力確認とそれに応じた角度の加算減算
 	void checkInput();
+	void checkSensorInput();
+	void checkKeyInput();
 #pragma endregion
 
 #pragma region CLEAR
 	/// @brief CameraState::CLEARのupdate
 	void updateClear();
 #pragma endregion
-
 
 	void preUpdate() override;
 
@@ -124,5 +149,12 @@ public:
 	/// @brief 追従のオンオフ
 	/// @param flag 
 	void setFollowFlag(const bool flag) { cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF; }
+	
+	// センサーのゲッター
+	Sensor* getSensor() { return sensor; }
+
+	void IMUDelete();
+
+	float getGetAccelZ()const { return getAccelZ; }
 };
 

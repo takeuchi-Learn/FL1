@@ -7,6 +7,7 @@
 
 #include "../GameCamera.h"
 
+#include<Collision/CollisionShape.h>
 class Camera;
 class Light;
 class ObjModel;
@@ -28,10 +29,13 @@ class PlayScene :
 private:
 
 	//std::unique_ptr<Camera> camera;
+	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<Sprite> sprite;
+
+	std::unique_ptr<ParticleMgr> particle;
 
 
 	std::unique_ptr<Player> player;
@@ -55,6 +59,8 @@ private:
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
+	bool checkMinMax(const CollisionShape::AABB& aabb);
+
 
 	void update_start();
 	void update_main();

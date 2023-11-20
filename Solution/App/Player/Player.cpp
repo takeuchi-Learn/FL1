@@ -6,7 +6,8 @@
 #include <fstream>
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
-
+#include <JoyShockLibrary.h>
+#include <PadImu.h>
 #include <GameMap.h>
 
 using namespace DirectX;
@@ -222,21 +223,23 @@ void Player::calcJumpPos()
 
 void Player::jump()
 {
-	// センサーの値によってジャンプ量細かく変更するか聞く
+	// センサーの値
+	float sensorValue = camera->getGetAccelZ();
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+		sensorValue = state.accelY / 8.f;
+	}
 
 	// ジャンプパワー
 	constexpr float jumpPower = 18.f;
 	constexpr float bigJumpPower = 25.f;
 
-	// 一旦跳ね返り中はジャンプ禁止
-	if (isReboundY)return;
-
 	calcDropVec();
 
 	// ジャンプするのに必要なジャイロの値
-	// todo 調整項目
-	constexpr float jumpSensorValue = 2.f;
-	constexpr float bigSensorJyroValue = 4.f;
+	constexpr float jumpSensorValue = 0.25f;
+	constexpr float bigSensorJyroValue = 2.f;
 
 	pushJumpKeyFrame = false;
 
@@ -249,6 +252,7 @@ void Player::jump()
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
+			fallTime = 0;
 
 			// 大ジャンプ
 			bool hitBigJump = Input::ins()->hitKey(DIK_X);
@@ -262,7 +266,18 @@ void Player::jump()
 				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
 				fallStartSpeed = jumpPower;
 			}
+
+			// バウンド強制終了
+			if (isReboundY)
+			{
+				isReboundY = false;
+			}
 		}
+	}
+
+	if (isReboundY)
+	{
+		return;
 	}
 
 	if (!isJump)

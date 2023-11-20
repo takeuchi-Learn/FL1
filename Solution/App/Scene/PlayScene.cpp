@@ -54,12 +54,22 @@ void PlayScene::checkCollision()
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
+			if (!checkMinMax(mapAABBs[y][x]))continue;
+
 			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
 				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
 			}
 		}
 	}
+}
+
+bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
+{
+	XMFLOAT2 minPos(aabb.minPos.m128_f32[0], aabb.minPos.m128_f32[1]);
+	XMFLOAT2 maxPos(aabb.maxPos.m128_f32[0], aabb.maxPos.m128_f32[1]);
+	if (minPos.x == 0.f && minPos.y == 0.f && maxPos.x == 0.f && maxPos.y == 0.f)return false;
+	return true;
 }
 
 PlayScene::PlayScene() :
@@ -114,13 +124,11 @@ void PlayScene::update()
 	// 衝突確認
 	checkCollision();
 
+	camera->gameCameraUpdate();
+	camera->update();
+	player->update();
 	backGround->update();
 	gameMap->update();
-	player->update();
-
-	// ライトとカメラの更新
-	camera->update();
-	camera->gameCameraUpdate();
 }
 
 void PlayScene::update_start()
@@ -150,13 +158,6 @@ void PlayScene::update_main()
 	{
 		SceneManager::ins()->changeScene<TitleScene>();
 		return;
-	}
-
-	// todo ジャンプのための加速度入力仮
-	if (PadImu::ins()->getDevCount() > 0)
-	{
-		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
-		player->setSensorValue(state.accelY);
 	}
 
 	// ゲームオーバー確認
@@ -194,18 +195,4 @@ void PlayScene::drawObj3d()
 }
 
 void PlayScene::drawFrontSprite()
-{
-#ifdef _DEBUG
-
-	// 対応パッドが無ければ何も表示しない
-	if (PadImu::ins()->getDevCount() <= 0) { return; }
-
-	const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
-
-	using namespace ImGui;
-	Begin("PlayScene::drawFrontSprite()", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-	Text("accelY: %.1f", state.accelY);
-	End();
-
-#endif // _DEBUG
-}
+{}

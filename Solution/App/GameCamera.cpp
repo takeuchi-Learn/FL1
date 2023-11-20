@@ -5,6 +5,26 @@
 #include <JoyShockLibrary.h>
 
 using namespace DirectX;
+GameCamera::GameCamera(BillboardData* obj)
+	:Camera(WinAPI::window_width,
+			WinAPI::window_height)
+	, obj(obj)
+{
+	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-500くらいがベスト)
+
+	// 平行投影に変更
+	setPerspectiveProjFlag(false);
+
+	// センサーの生成
+	if (sensor == nullptr)
+	{
+		sensor = Sensor::create();
+	}
+
+	madgwick->begin(50.0f);
+
+	kalman->setAngle(0.0f);
+}
 
 #pragma region START
 
@@ -84,10 +104,12 @@ void GameCamera::updateStartTimer()
 		cameraState = CameraState::INPUT;
 	}
 }
+
 void GameCamera::preUpdate()
 {
 	gameCameraUpdate();
 }
+
 
 
 #pragma endregion
@@ -106,6 +128,63 @@ void GameCamera::updateInput()
 
 void GameCamera::checkInput()
 {
+	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
+
+	//checkKeyInput();
+	checkSensorInput();
+}
+
+void GameCamera::checkSensorInput()
+{
+	sensor->update();
+	// 加速度取得
+	getAccelX = sensor->GetAccelX();
+	getAccelY = sensor->GetAccelY();
+	getAccelZ = sensor->GetAccelZ();
+	// 角速度取得
+	getGyroX = sensor->GetGyroX();
+	getGyroY = sensor->GetGyroY();
+	getGyroZ = sensor->GetGyroZ();
+
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+
+		// 加速度取得
+		getAccelX = -state.accelX;
+		getAccelY = state.accelY;
+		getAccelZ = state.accelZ;
+		// 角速度取得
+		getGyroX = state.gyroX;
+		getGyroY = state.gyroY;
+		getGyroZ = -state.gyroZ;
+	}
+
+	madgwick->updateIMU(getGyroX, getGyroY, getGyroZ, getAccelX, getAccelY, getAccelZ);
+
+	// Madgwickフィルタを使って補正
+	angle = -madgwick->getPitch();
+	angle = 0.8f * prevAngle + 0.2f * angle;
+
+	// 静止状態を大きめに取る
+	if (angle <= 2.0f && -2.0f <= angle)
+	{
+		angle = 0.0f;
+	}
+
+	// 前の角度を保存
+	prevAngle = angle;
+
+	//// ジャンプ判定用(仮)
+	//if (getAccelZ >= 0.25f)
+	//{
+	//	prevAngle = angle;
+	//}
+
+}
+
+void GameCamera::checkKeyInput()
+{
 	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
 	constexpr float frameAngle = 3.0f;
 
@@ -120,20 +199,6 @@ void GameCamera::checkInput()
 	{
 		angle += frameAngle;
 	}
-
-	// todo ジャイロ仮。加速度センサーのみで姿勢推定している。
-	if (PadImu::ins()->getDevCount() > 0)
-	{
-		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
-
-		// 補正の強度。値が大きいと誤差が吸収されるが反応が遅くなる
-		constexpr float rate = 0.05f, invRate = 1.f - rate;
-
-		const float roll = std::atan2(state.accelY, state.accelZ);
-		const auto delta = DX12Base::ins()->getFPS() / 1000.f;
-
-		angle = invRate * (angle + -state.accelX / delta) + rate * roll;
-	}
 }
 
 #pragma endregion
@@ -142,7 +207,6 @@ void GameCamera::checkInput()
 void GameCamera::updateClear()
 {}
 #pragma endregion
-
 
 
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
@@ -159,7 +223,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 40.0f;
+	constexpr float maxAngle = 60.0f;
 
 	// 制限
 	if (angle >= maxAngle)angle = maxAngle;
@@ -197,19 +261,14 @@ void GameCamera::followObject(const bool followX)
 	setEye(eye);
 }
 
-GameCamera::GameCamera(BillboardData* obj)
-	:Camera(WinAPI::window_width,
-			WinAPI::window_height)
-	, obj(obj)
+void GameCamera::IMUDelete()
 {
-
-	// 平行投影に変更
-	setPerspectiveProjFlag(false);
-	//setEye(XMFLOAT3(0,0,-700));
+	sensor->erase();
 }
 
 void GameCamera::gameCameraUpdate()
 {
+
 	switch (cameraState)
 	{
 	case GameCamera::CameraState::START:
@@ -222,8 +281,7 @@ void GameCamera::gameCameraUpdate()
 	case GameCamera::CameraState::CLEAR:
 		updateClear();
 		break;
-	default:
-		break;
+
 	}
 
 	// 追従
@@ -238,3 +296,6 @@ void GameCamera::gameCameraUpdate()
 		followObject(false);
 	}
 }
+
+
+

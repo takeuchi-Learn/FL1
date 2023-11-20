@@ -73,8 +73,6 @@ class Player
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
 	float leftScrollEndPos = 350.f;
 
-	// センサーの値
-	float sensorValue = 0.0f;
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
@@ -142,9 +140,6 @@ public:
 	/// @param posY
 	void setGameOverPos(const float posY) { gameoverPos = posY; }
 
-	/// @brief センサーの値格納用
-	/// @param value センサーの値
-	void setSensorValue(const float value) { sensorValue = value; }
 	inline const auto& getObj() { return gameObj->getFrontData(); }
 
 	inline const auto& getMapPos() const { return mapPos; }
