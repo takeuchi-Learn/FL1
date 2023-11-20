@@ -105,24 +105,10 @@ void GameCamera::updateStartTimer()
 
 void GameCamera::preUpdate()
 {
-	gameCameraUpdate(sensor);
+	gameCameraUpdate();
 }
 
-void GameCamera::changeCameraState()
-{
-	switch (cameraState)
-	{
-	case GameCamera::CameraState::START:
-		cameraState = CameraState::INPUT;
-		break;
-	case GameCamera::CameraState::INPUT:
-		break;
-	case GameCamera::CameraState::OTHER:
-		break;
-	default:
-		break;
-	}
-}
+
 
 #pragma endregion
 
@@ -222,14 +208,14 @@ void GameCamera::followObject()
 	setEye(eye);
 }
 
+void GameCamera::IMUDelete()
+{
+	sensor->erase();
+}
+
 void GameCamera::gameCameraUpdate()
-{	
-	
-=========
->>>>>>>>> Temporary merge branch 2
-	
-=========
->>>>>>>>> Temporary merge branch 2
+{
+
 	switch (cameraState)
 	{
 	case GameCamera::CameraState::START:
@@ -241,26 +227,13 @@ void GameCamera::gameCameraUpdate()
 	case GameCamera::CameraState::CLEAR:
 		updateClear();
 		break;
-	// ゲームオーバーでなければカメラ追従
-	if (cameraState != GameCamera::CameraState::GAEOVER)
-	{
-		// 追従
-		followObject();
+		// ゲームオーバーでなければカメラ追従
+		if (cameraState != GameCamera::CameraState::GAEOVER)
+		{
+			// 追従
+			followObject();
+		}
 	}
-}
 
 
-	// 追従
-	followObject();
-}
-
-void GameCamera::IMUDelete()
-{
-	sensor->erase();
-}
-	{
-		// 追従
-		followObject();
-	}
-}
 

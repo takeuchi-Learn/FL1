@@ -90,9 +90,7 @@ PlayScene::PlayScene() :
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setLight(light.get());
-
+	player = std::make_unique<Player>(camera.get());
 	
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
@@ -107,7 +105,6 @@ PlayScene::PlayScene() :
 						   0.2f);
 
 	sensor = Sensor::create();
-=========
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
 	player->setLight(light.get());
 
