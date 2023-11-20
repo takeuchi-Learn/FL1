@@ -146,6 +146,6 @@ public:
 	void IMUDelete();
 	void changeStateGameover(){ cameraState = CameraState::GAEOVER; }
 
-	float getAccelZ()const { return getAccelZ; }
+	float getGetAccelZ()const { return getAccelZ; }
 };
 
