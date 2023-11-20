@@ -253,12 +253,14 @@ void GameCamera::gameCameraUpdate()
 	case GameCamera::CameraState::CLEAR:
 		updateClear();
 		break;
-		// ゲームオーバーでなければカメラ追従
-		if (cameraState != GameCamera::CameraState::GAEOVER)
-		{
-			// 追従
-			followObject();
-		}
+		
+	}
+	
+	// ゲームオーバーでなければカメラ追従
+	if (cameraState != GameCamera::CameraState::GAEOVER)
+	{
+		// 追従
+		followObject();
 	}
 }
 
