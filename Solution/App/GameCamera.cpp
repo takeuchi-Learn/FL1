@@ -245,6 +245,14 @@ void GameCamera::followObject(const bool followX)
 	setEye(eye);
 }
 
+void GameCamera::setFollowFlag(const bool flag)
+{
+	if (cameraState == CameraState::INPUT || cameraState == CameraState::FOLLOW_OFF)
+	{
+		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
+	}
+}
+
 void GameCamera::IMUDelete()
 {
 	sensor->erase();

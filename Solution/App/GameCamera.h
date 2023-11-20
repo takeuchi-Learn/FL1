@@ -14,6 +14,16 @@
 class GameCamera :
 	public Camera
 {
+public:
+	/// @brief カメラの状態列挙
+	enum class CameraState
+	{
+		START,// 開始
+		INPUT,// 入力受付
+		FOLLOW_OFF,// 入力受付 追従オフ(画面端用)
+		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
+		OTHER, //その他(何も更新しないとき)
+	};
 private:
 
 	// センサー
@@ -41,18 +51,10 @@ private:
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	float angle = 20.f;
 
-	/// @brief カメラの状態列挙
-	enum class CameraState
-	{
-		START,// 開始
-		INPUT,// 入力受付
-		FOLLOW_OFF,// 入力受付 追従オフ(画面端用)
-		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
-		OTHER, //その他(何も更新しないとき)
-	};
+	
 
 	// カメラの状態
-	CameraState cameraState = CameraState::INPUT;
+	CameraState cameraState = CameraState::START;
 
 #pragma region START
 	// スタートするまでの時間
@@ -148,7 +150,7 @@ public:
 	
 	/// @brief 追従のオンオフ
 	/// @param flag 
-	void setFollowFlag(const bool flag) { cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF; }
+	void setFollowFlag(const bool flag);
 	
 	// センサーのゲッター
 	Sensor* getSensor() { return sensor; }
@@ -156,5 +158,7 @@ public:
 	void IMUDelete();
 
 	float getGetAccelZ()const { return getAccelZ; }
+
+	CameraState getCameraState()const { return cameraState; }
 };
 

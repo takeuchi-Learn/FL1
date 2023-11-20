@@ -49,8 +49,13 @@ void Player::update()
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
 
 	move();
-	jump();
-	rebound();
+
+	// スタート時はジャンプしないように
+	if(camera->getCameraState() != GameCamera::CameraState::START)
+	{
+		jump();
+		rebound();
+	}
 
 
 	sphere.center.m128_f32[0] = mapPos.x;
@@ -474,6 +479,7 @@ void Player::rot()
 void Player::checkStageSide()
 {
 	if (isDead)return;
+
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
 	if(mapPos.x <= leftScrollEndPos)
