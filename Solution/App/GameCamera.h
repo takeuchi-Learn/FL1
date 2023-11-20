@@ -86,6 +86,8 @@ private:
 
 	/// @brief 入力確認とそれに応じた角度の加算減算
 	void checkInput();
+	void checkSensorInput();
+	void checkKeyInput();
 #pragma endregion
 
 #pragma region CLEAR

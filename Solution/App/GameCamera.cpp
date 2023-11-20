@@ -126,6 +126,14 @@ void GameCamera::updateInput()
 
 void GameCamera::checkInput()
 {
+	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
+
+	checkKeyInput();
+	//checkSensorInput();
+}
+
+void GameCamera::checkSensorInput()
+{
 	sensor->update();
 	// 加速度取得
 	getAccelX = sensor->GetAccelX();
@@ -156,6 +164,24 @@ void GameCamera::checkInput()
 	//{
 	//	prevAngle = angle;
 	//}
+
+}
+
+void GameCamera::checkKeyInput()
+{
+	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
+	constexpr float frameAngle = 3.0f;
+
+	// 入力確認してカメラを傾ける
+	// ジャイロ使用時は直接角度を代入するためこちらも消す
+	if (Input::getInstance()->hitKey(DIK_LEFT))
+	{
+		angle -= frameAngle;
+	} else
+		if (Input::getInstance()->hitKey(DIK_RIGHT))
+		{
+			angle += frameAngle;
+		}
 }
 #pragma endregion
 
