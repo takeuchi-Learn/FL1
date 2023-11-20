@@ -269,16 +269,18 @@ void GameCamera::gameCameraUpdate()
 	}
 
 	// 追従
-	if (cameraState != GameCamera::CameraState::OTHER &&
-		cameraState != GameCamera::CameraState::FOLLOW_OFF)
-	{
-		// 追従
-		followObject(true);
-	}
-	else
+	if (cameraState == GameCamera::CameraState::FOLLOW_OFF)
 	{
 		// Xは固定
 		followObject(false);
+	}
+	else if(cameraState == GameCamera::CameraState::OTHER)
+	{
+	}
+	else 
+	{
+		// 追従
+		followObject(true);
 	}
 }
 
