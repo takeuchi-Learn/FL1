@@ -234,6 +234,7 @@ void GameCamera::gameCameraUpdate()
 			followObject();
 		}
 	}
+}
 
 
 

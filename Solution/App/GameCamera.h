@@ -23,7 +23,6 @@ private:
 	//
 	Madgwick* madgwick = new Madgwick;
 	// 角度Z
-	float angle = 0.0f;
 	float prevAngle = 0.0f;
 	float degree = 0.0f;
 
