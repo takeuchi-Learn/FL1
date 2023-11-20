@@ -66,6 +66,7 @@ public:
 	inline void setScaleX(float _scaleX) { obj->scale.x = _scaleX; }
 	inline void setScaleY(float _scaleY) { obj->scale.y = _scaleY; }
 	inline void setScaleZ(float _scaleZ) { obj->scale.z = _scaleZ; }
+	inline void setScaleXY(const DirectX::XMFLOAT2& _scale) { obj->scale = DirectX::XMFLOAT3(_scale.x, _scale.y, obj->scale.z); }
 	inline const DirectX::XMFLOAT3& getScale() const { return obj->scale; }
 
 	inline void setRotation(const DirectX::XMFLOAT3& _rotation) { obj->rotation = _rotation; }

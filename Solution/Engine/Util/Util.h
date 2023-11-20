@@ -16,6 +16,11 @@ public:
 	/// @brief std::stringの2次元配列(vector)
 	using CSVType = std::vector<std::vector<std::string>>;
 
+	static CSVType loadCsvFromString(const std::string& csvDataString,
+									 bool commentFlag = true,
+									 char divChar = ',',
+									 const std::string& commentStartStr = "//");
+
 	/// @brief loadCsvの入力をstd::stringにしたもの
 	/// @param csvFilePath 読み込むCSVファイルのパス
 	/// @param commentFlag //で始まる行を無視するかどうか(trueで無視)

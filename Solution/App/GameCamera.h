@@ -2,6 +2,8 @@
 #include "../Engine/Camera/Camera.h"
 #include "../Engine/GameObject/AbstractGameObj.h"
 #include <Imu/Sensor.h>
+#include <Camera/Camera.h>
+#include <3D/Billboard/Billboard.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも
@@ -12,22 +14,24 @@ class GameCamera :
 {
 private:
 
-	// 追従Obj
-	AbstractGameObj* obj = nullptr;
 	// センサー
 	Sensor* sensor = nullptr;
 	// 角度Z
-	float angle = 20.0f;
 	float getGyroX = 0.0f;
 	float getGyroZ = 0.0f;
 	float getAccelX = 0.0f;
 	float getAccelZ = 0.0f;
+	BillboardData* obj = nullptr;
+	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
+	float angle = 20.f;
 
 	/// @brief カメラの状態列挙
 	enum class CameraState
 	{
 		START,// 開始
 		INPUT,// 入力受付
+		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
+		GAEOVER,// ゲームオーバー 追従をオフにする
 		OTHER, //その他(何も更新しないとき)
 	};
 
@@ -58,8 +62,6 @@ private:
 	/// @brief 変数 startTimer の加算処理
 	void updateStartTimer();
 
-	/// @brief 現在の状態に応じて状態を切り替える
-	void changeCameraState();
 #pragma endregion
 
 #pragma region INPUT
@@ -70,6 +72,14 @@ private:
 	/// @brief 入力確認とそれに応じた角度の加算減算
 	void checkInput();
 #pragma endregion
+
+#pragma region CLEAR
+	/// @brief CameraState::CLEARのupdate
+	void updateClear();
+#pragma endregion
+
+
+	void preUpdate() override;
 
 	/// @brief 角度を上ベクトルに変換
 	/// @param angle 角度
@@ -82,21 +92,23 @@ private:
 	/// @brief 追従
 	void followObject();
 
+
 public:
 
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
-	GameCamera(AbstractGameObj* obj = nullptr);
-
+	GameCamera(BillboardData* obj = nullptr);
 	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
 	void gameCameraUpdate(Sensor* sensor);
+
+	inline float getAngleDeg() const { return angle; }
 
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }
 
 	/// @brief 追従先オブジェクト
 	/// @param obj 
-	void setParentObj(AbstractGameObj* obj) { this->obj = obj; }
+	void setParentObj(BillboardData* obj) { this->obj = obj; }
 
 	/// @brief Z座標
 	/// @param z 
@@ -106,5 +118,15 @@ public:
 	/// @return 角度
 	float getAngle()const { return angle; }
 
+	// ポーズしてるかどうか
+	void pause(const bool flag)
+	{
+		if(flag)cameraState = CameraState::OTHER;
+		else cameraState = CameraState::INPUT;
+	}
+
+	// クリア状態に変更
+	void changeStateGoal() { cameraState = CameraState::CLEAR; }
+	void changeStateGameover(){ cameraState = CameraState::GAEOVER; }
 };
 

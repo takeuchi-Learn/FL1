@@ -11,20 +11,55 @@
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
 #include <algorithm>
+
 #include <Player/Player.h>
+#include <Object/Goal.h>
+#include <BackGround.h>
+#include <GameMap.h>
+
+#include <Collision/Collision.h>
 
 #include "TitleScene.h"
 
 using namespace DirectX;
 
-PlayScene::PlayScene() :
-	light(std::make_unique<Light>()),
-	camera(std::make_unique<GameCamera>()),
-	stopwatch(std::make_unique<Stopwatch>()),
-	stopwatchPlayTime(Timer::timeType(0u))
+namespace
 {
-	bgm = Sound::ins()->loadWave("Resources/BGM.wav");
+	constexpr auto bgmPath = "Resources/BGM.wav";
+	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
+	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
+	constexpr auto mapYamlPath = "Resources/Map/map.yml";
 
+	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
+	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
+}
+
+void PlayScene::checkCollision()
+{
+	const auto& mapAABBs = gameMap->getAABBs();
+	for(auto y = 0; y < mapAABBs.size();y++)
+	{
+		for (auto x = 0; x < mapAABBs[y].size(); x++)
+		{
+			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			{
+				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
+			}
+		}
+	}
+
+	// テストです
+	//bool res = Collision::CheckSphere2AABB(player->getShape(), goal->getShape());
+	//if (res)
+	//{
+	//	//player->hit();
+	//}
+
+}
+
+PlayScene::PlayScene() :
+	camera(std::make_unique<GameCamera>())
+{
 	spriteBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
 									  spriteBase.get(),
@@ -33,27 +68,30 @@ PlayScene::PlayScene() :
 
 	camera->setEye(XMFLOAT3(0, 0, -5));
 	camera->setTarget(XMFLOAT3(0, 0, 0));
+	camera->setPerspectiveProjFlag(false);
 
-	light->setDirLightActive(0u, true);
-	light->setDirLightDir(0u, XMVectorSet(1, 0, 0, 0));
-	light->setPointLightPos(0u, camera->getEye());
+	player = std::make_unique<Player>(camera.get());
+	// 追従させるためにポインタを渡す
+	camera->setParentObj(player->getObj().get());
 
-	particle = std::make_unique<ParticleMgr>(L"Resources/judgeRange.png", camera.get());
+	// 仮にプレイヤーモデルを割り当て
+	//constexpr DirectX::XMFLOAT2 goalPos(80, 0);
+	//goal = std::make_unique<Goal>(nullptr, camera.get(),  goalPos);
 
-	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setLight(light.get());
+	backGround = std::make_unique<BackGround>(camera.get());
 
-	Sound::ins()->playWave(bgm,
-						   XAUDIO2_LOOP_INFINITE,
-						   0.2f);
+	gameMap = std::make_unique<GameMap>(camera.get());
+	const bool ret = gameMap->loadDataFile(mapYamlPath);
+	assert(false == ret);
+	
+	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
+	player->setGameOverPos(gameMap->getGameoverPos());
 
 	sensor = Sensor::create();
 }
 
 PlayScene::~PlayScene()
 {
-	Sound::ins()->stopWave(bgm);
 	sensor->erase();
 }
 
@@ -66,61 +104,32 @@ void PlayScene::update()
 		return;
 	}
 
-	if (Input::ins()->triggerKey(DIK_P))
-	{
-		constexpr float particleVel = 0.1f;
-		particle->createParticle({ 0,0,0 },
-								 10u,
-								 1.f,
-								 particleVel);
-	}
-
-	if (Input::ins()->triggerKey(DIK_B))
-	{
-		static bool isPlay = true;
-
-		if (isPlay)
-		{
-			bgm.lock()->stopVoice();
-		} else
-		{
-			bgm.lock()->startVoice();
-		}
-		isPlay = !isPlay;
-	}
-
-	// Tを押したらタイマーを停止/再開
-	if (Input::ins()->triggerKey(DIK_T))
-	{
-		stopwatch->stopOrResume();
-	}
-	// 測定中なら現在時間を更新
-	if (stopwatch->isPlay())
-	{
-		stopwatchPlayTime = stopwatch->getNowTime();
-	}
-
+	backGround->update();
+	gameMap->update();
 	player->update();
 
 	// ライトとカメラの更新
-	camera->update();
-	camera->gameCameraUpdate(sensor);
-	light->update();
 	sensor->update();
+	camera->gameCameraUpdate(sensor);
+	camera->update();
+
+	// 衝突確認
+	checkCollision();
+
+	// ゲームオーバー確認
+	if(player->getIsDead())
+	{
+		camera->changeStateGameover();
+	}
 }
 
 void PlayScene::drawObj3d()
 {
+	backGround->draw();
+	gameMap->draw();
 	player->draw();
-	particle->drawWithUpdate();
+	//goal->draw();
 }
 
 void PlayScene::drawFrontSprite()
-{
-	const auto mousePos = Input::ins()->calcMousePosFromSystem();
-	sprite->position.x = mousePos.x;
-	sprite->position.y = mousePos.y;
-
-	spriteBase->drawStart(DX12Base::ins()->getCmdList());
-	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
-}
+{}

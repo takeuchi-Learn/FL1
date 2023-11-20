@@ -41,26 +41,11 @@ void ObjModel::loadTextures(const std::string& dirPath, UINT texNum)
 
 	for (auto& m : materials)
 	{
-		auto& material = m.second;
-
-		// テクスチャあり
-		if (material->texFileName.size() > 0u)
-		{
-			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
-			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
-			// マテリアルにテクスチャ読み込み
-			material->loadTexture(directoryPath, texNum, cpuDescHandleSRV, gpuDescHandleSRV);
-			++textureIndex;
-		}
-		// テクスチャなし
-		else
-		{
-			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
-			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
-			// マテリアルにテクスチャ読み込み
-			material->loadTexture(directoryPath, texNum, cpuDescHandleSRV, gpuDescHandleSRV);
-			++textureIndex;
-		}
+		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize);
+		// マテリアルにテクスチャ読み込み
+		m.second->loadTexture(directoryPath, texNum, cpuDescHandleSRV, gpuDescHandleSRV);
+		++textureIndex;
 	}
 }
 
