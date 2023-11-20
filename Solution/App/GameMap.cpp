@@ -69,8 +69,11 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			}
 
 			// 道なら何も表示しない
-			if (n == MAPCHIP_ROAD)
+			if (n == MAPCHIP_ROAD
+				|| n == MAPCHIP_GOAL)
 			{
+				DirectX::XMFLOAT2 pos(0, 0);
+				mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
 				continue;
 			}
 
@@ -115,11 +118,6 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			{
 				// 判定作成
 				setAABBData(x, y, pos, scale);
-			}
-			else 
-			{
-				DirectX::XMFLOAT2 pos(0, 0);
-				mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
 			}
 		}
 	}

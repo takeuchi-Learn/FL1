@@ -41,6 +41,8 @@ void PlayScene::checkCollision()
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
+			if (!checkMinMax(mapAABBs[y][x]))continue;
+
 			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
 				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
@@ -55,6 +57,14 @@ void PlayScene::checkCollision()
 	//	//player->hit();
 	//}
 
+}
+
+bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
+{
+	XMFLOAT2 minPos(aabb.minPos.m128_f32[0], aabb.minPos.m128_f32[1]);
+	XMFLOAT2 maxPos(aabb.maxPos.m128_f32[0], aabb.maxPos.m128_f32[1]);
+	if (minPos.x == 0.f && minPos.y == 0.f && maxPos.x == 0.f && maxPos.y == 0.f)return false;
+	return true;
 }
 
 PlayScene::PlayScene() :

@@ -7,6 +7,7 @@
 #include"../GameCamera.h"
 #include <Imu/Sensor.h>
 
+#include<Collision/CollisionShape.h>
 class Camera;
 class Light;
 class ObjModel;
@@ -49,6 +50,7 @@ private:
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
+	bool checkMinMax(const CollisionShape::AABB& aabb);
 
 public:
 	PlayScene();
