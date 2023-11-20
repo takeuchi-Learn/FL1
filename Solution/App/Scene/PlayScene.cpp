@@ -90,56 +90,91 @@ PlayScene::PlayScene() :
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
-	gameMap = std::make_unique<GameMap>(camera.get());
-	const bool ret = gameMap->loadDataFile(mapYamlPath);
-	assert(false == ret);
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setLight(light.get());
+
 	
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
 
 	sensor = Sensor::create();
-}
+						   XAUDIO2_LOOP_INFINITE,
+						   0.2f);
 
-PlayScene::~PlayScene()
-{
+	sensor = Sensor::create();
 	sensor->erase();
-}
+						   XAUDIO2_LOOP_INFINITE,
+						   0.2f);
 
-void PlayScene::update()
-{
-	// スペースでシーン切り替え
-	if (Input::ins()->triggerKey(DIK_SPACE))
-	{
-		SceneManager::ins()->changeScene<TitleScene>();
-		return;
-	}
+	sensor = Sensor::create();
+=========
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setLight(light.get());
 
+	Sound::ins()->playWave(bgm,
+						   XAUDIO2_LOOP_INFINITE,
+						   0.2f);
 	backGround->update();
 	gameMap->update();
 	player->update();
 
-	// ライトとカメラの更新
-	sensor->update();
-	camera->gameCameraUpdate(sensor);
-	camera->update();
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setLight(light.get());
 
-	// 衝突確認
-	checkCollision();
+	Sound::ins()->playWave(bgm,
+						   XAUDIO2_LOOP_INFINITE,
+						   0.2f);
+
 
 	// ゲームオーバー確認
 	if(player->getIsDead())
 	{
 		camera->changeStateGameover();
 	}
+=========
+	gameMap = std::make_unique<GameMap>(camera.get());
+	const bool ret = gameMap->loadDataFile(mapYamlPath);
+	assert(false == ret);
+>>>>>>>>> Temporary merge branch 2
 }
 
-void PlayScene::drawObj3d()
+PlayScene::~PlayScene()
 {
-	backGround->draw();
-	gameMap->draw();
+<<<<<<<<< Temporary merge branch 1
+	Sound::ins()->stopWave(bgm);
+{}	gameMap->draw();
 	player->draw();
 	//goal->draw();
 }
 
 void PlayScene::drawFrontSprite()
-{}
+{
+	const auto mousePos = Input::ins()->calcMousePosFromSystem();
+	sprite->position.x = mousePos.x;
+	sprite->position.y = mousePos.y;
+
+	spriteBase->drawStart(DX12Base::ins()->getCmdList());
+	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+
+	using namespace ImGui;
+
+	SetNextWindowPos(ImVec2(0.f, 0.f));
+
+	Begin("PlaySceneGUI", nullptr, DX12Base::imGuiWinFlagsDef);
+	Text("スペース: シーン切り替え");
+	Text("x:%.1f, y:%.1f, z:%.1f",
+		camera->getEye().x,
+		camera->getEye().y,
+		camera->getEye().z);
+	Text("Accel : x:%.1f, y:%.1f, z:%.1f",
+		 camera->getSensor()->GetAccelX(),
+		 camera->getSensor()->GetAccelY(),
+		 camera->getSensor()->GetAccelZ());
+	Text("Gyro : x:%.1f, y:%.1f, z:%.1f",
+		 camera->getSensor()->GetGyroX(),
+		 camera->getSensor()->GetGyroY(),
+		 camera->getSensor()->GetGyroZ());
+	Text("Angle : %.1f",
+		 camera->getAngle());
+	End();
+}

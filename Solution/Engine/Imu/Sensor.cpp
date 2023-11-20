@@ -59,7 +59,7 @@ int Sensor::updateSensor()
 		{
 			const float accelSensitivity_16g = 2048;
 			const float gyroSensitivity_2kdps = 16.4f;
-			record[i] = *((const int16_t*)p) / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
+			record[i] = *((const int16_t*)p)/* / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps)*/;
 		}
 	}
 

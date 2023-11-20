@@ -3,6 +3,26 @@
 #include"../Engine/Input/Input.h"
 
 using namespace DirectX;
+GameCamera::GameCamera(BillboardData* obj)
+	:Camera(WinAPI::window_width,
+			WinAPI::window_height)
+	, obj(obj)
+{
+	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-500くらいがベスト)
+
+	// 平行投影に変更
+	setPerspectiveProjFlag(false);
+
+	// センサーの生成
+	if (sensor == nullptr)
+	{
+		sensor = Sensor::create();
+	}
+
+	madgwick->begin(50.0f);
+
+	kalman->setAngle(0.0f);
+}
 
 #pragma region START
 
@@ -82,11 +102,27 @@ void GameCamera::updateStartTimer()
 		cameraState = CameraState::INPUT;
 	}
 }
+
 void GameCamera::preUpdate()
 {
 	gameCameraUpdate(sensor);
 }
 
+void GameCamera::changeCameraState()
+{
+	switch (cameraState)
+	{
+	case GameCamera::CameraState::START:
+		cameraState = CameraState::INPUT;
+		break;
+	case GameCamera::CameraState::INPUT:
+		break;
+	case GameCamera::CameraState::OTHER:
+		break;
+	default:
+		break;
+	}
+}
 
 #pragma endregion
 
@@ -104,21 +140,43 @@ void GameCamera::updateInput()
 
 void GameCamera::checkInput()
 {
-
+	sensor->update();
+	// 加速度取得
 	getAccelX = sensor->GetAccelX();
+	getAccelY = sensor->GetAccelY();
 	getAccelZ = sensor->GetAccelZ();
+	// 角速度取得
 	getGyroX = sensor->GetGyroX();
+	getGyroY = sensor->GetGyroY();
 	getGyroZ = sensor->GetGyroZ();
 
+	madgwick->updateIMU(getGyroX, getGyroY, getGyroZ, getAccelX, getAccelY, getAccelZ);
 
-	// 入力確認してカメラを傾ける
-	angle = atan2f(getAccelX, getAccelZ) * 58.0f;
+	// Madgwickフィルタを使って補正
+	angle = -madgwick->getPitch();
+	angle = 0.8f * prevAngle + 0.2f * angle;
+
+	// 静止状態を大きめに取る
+	if (angle <= 2.0f && -2.0f <= angle)
+	{
+		angle = 0.0f;
+	}
+
+	// 前の角度を保存
+	prevAngle = angle;
+
+	// ジャンプ判定用(仮)
+	if (getAccelZ >= 0.25f)
+	{
+		prevAngle = angle;
+	}
 }
 #pragma endregion
 
 #pragma region CLEAR
 void GameCamera::updateClear()
 {
+
 }
 #pragma endregion
 
@@ -137,7 +195,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 360.0f;
+	constexpr float maxAngle = 60.0f;
 
 	// 制限
 	if (angle >= maxAngle)angle = maxAngle;
@@ -164,21 +222,14 @@ void GameCamera::followObject()
 	setEye(eye);
 }
 
-GameCamera::GameCamera(BillboardData* obj)
-	:Camera(WinAPI::window_width,
-			WinAPI::window_height)
-	, obj(obj)
-{
-
-	// 平行投影に変更
-	setPerspectiveProjFlag(false);
-	//setEye(XMFLOAT3(0,0,-700));
-}
-
-void GameCamera::gameCameraUpdate(Sensor* sensor)
-{
-	this->sensor = sensor;
+void GameCamera::gameCameraUpdate()
+{	
 	
+=========
+>>>>>>>>> Temporary merge branch 2
+	
+=========
+>>>>>>>>> Temporary merge branch 2
 	switch (cameraState)
 	{
 	case GameCamera::CameraState::START:
@@ -190,14 +241,23 @@ void GameCamera::gameCameraUpdate(Sensor* sensor)
 	case GameCamera::CameraState::CLEAR:
 		updateClear();
 		break;
-	default:
-		break;
-	}
-
-	// 回転
-	upRotate();
 	// ゲームオーバーでなければカメラ追従
 	if (cameraState != GameCamera::CameraState::GAEOVER)
+	{
+		// 追従
+		followObject();
+	}
+}
+
+
+	// 追従
+	followObject();
+}
+
+void GameCamera::IMUDelete()
+{
+	sensor->erase();
+}
 	{
 		// 追従
 		followObject();

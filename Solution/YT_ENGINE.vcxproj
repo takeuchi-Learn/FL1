@@ -126,6 +126,7 @@
     <ClCompile Include="Engine\Collision\CollisionShape.cpp" />
     <ClCompile Include="Engine\2D\DebugText.cpp" />
     <ClCompile Include="Engine\Imu\Ini.cpp" />
+    <ClCompile Include="Engine\Imu\MadgwickAHRS.cpp" />
     <ClCompile Include="Engine\Imu\Sensor.cpp" />
     <ClCompile Include="Engine\Imu\Serial.cpp" />
     <ClCompile Include="Engine\System\DX12Base.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="App\Player\Player.cpp" />
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
+    <ClCompile Include="Engine\Imu\Kalman.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\Goal.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="Engine\Collision\CollisionShape.h" />
     <ClInclude Include="Engine\2D\DebugText.h" />
     <ClInclude Include="Engine\Imu\Ini.h" />
+    <ClInclude Include="Engine\Imu\MadgwickAHRS.h" />
     <ClInclude Include="Engine\Imu\Sensor.h" />
     <ClInclude Include="Engine\Imu\Serial.h" />
     <ClInclude Include="Engine\System\DX12Base.h" />
@@ -215,6 +218,7 @@
     <ClInclude Include="App\Player\Player.h" />
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
+    <ClInclude Include="Engine\Imu\Kalman.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

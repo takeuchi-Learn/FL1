@@ -31,6 +31,7 @@ class PlayScene :
 private:
 
 	//std::unique_ptr<Camera> camera;
+	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
@@ -59,6 +60,4 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
-
-
 };
