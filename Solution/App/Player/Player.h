@@ -23,7 +23,7 @@ class Player
 	DirectX::XMFLOAT2 mapPos{};
 	std::unique_ptr<Billboard> gameObj;
 
-	GameCamera* gameCamera = nullptr;
+	GameCamera* camera = nullptr;
 
 	CollisionShape::Sphere sphere;
 
@@ -70,6 +70,10 @@ class Player
 	/// @brief 座標がこの数値を下回ったら落下死
 	float gameoverPos = 0.f;
 	bool isDead = false;
+	bool isClear = false;
+
+	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
+	float leftScrollEndPos = 350.f;
 
 private:
 	/// @brief データをYAMLファイルから読み込む
@@ -117,9 +121,12 @@ private:
 	void move();
 	// 回転
 	void rot();
+	/// @brief ステージの端にいるかの確認(スクロール停止用)
+	void checkStageSide();
 
 	/// @brief ゲームオーバーの確認
-	void checkGameover();
+	void checkGameOver();
+
 
 public:
 
@@ -140,6 +147,9 @@ public:
 	inline const auto& getMapPos() const { return mapPos; }
 
 	bool getIsDead() const{ return isDead; }
+	bool getIsClear()const { return isClear; }
+
+	float getStartPosX()const { return leftScrollEndPos; }
 	
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

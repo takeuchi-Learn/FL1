@@ -46,6 +46,12 @@ private:
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<GameMap> gameMap;
 
+#pragma region ゲームオーバー関係
+	int gameOverTimer = 0;
+	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
+#pragma endregion
+
+
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();

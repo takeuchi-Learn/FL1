@@ -128,8 +128,8 @@ void GameCamera::checkInput()
 {
 	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
 
-	checkKeyInput();
-	//checkSensorInput();
+	//checkKeyInput();
+	checkSensorInput();
 }
 
 void GameCamera::checkSensorInput()
@@ -219,18 +219,29 @@ void GameCamera::upRotate()
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 
-void GameCamera::followObject()
+void GameCamera::followObject(const bool followX)
 {
 	if (!obj)return;
 
 	// 追従
 	// Targetをobjの座標に
 	DirectX::XMFLOAT3 objPos = obj->position;
+
+	if(!followX)
+	{
+		objPos.x = getEye().x;
+	}
+
 	setTarget(objPos);
 
 	// eyeをXYだけobjの座標に
 	DirectX::XMFLOAT3 eye = objPos;
 	eye.z = getEye().z;
+
+	if (!followX)
+	{
+		objPos.x = getTarget().x;
+	}
 	setEye(eye);
 }
 
@@ -248,6 +259,7 @@ void GameCamera::gameCameraUpdate()
 		updateStart();
 		break;
 	case GameCamera::CameraState::INPUT:
+	case GameCamera::CameraState::FOLLOW_OFF:
 		updateInput();
 		break;
 	case GameCamera::CameraState::CLEAR:
@@ -255,12 +267,18 @@ void GameCamera::gameCameraUpdate()
 		break;
 		
 	}
-	
-	// ゲームオーバーでなければカメラ追従
-	if (cameraState != GameCamera::CameraState::GAEOVER)
+
+	// 追従
+	if (cameraState != GameCamera::CameraState::OTHER &&
+		cameraState != GameCamera::CameraState::FOLLOW_OFF)
 	{
 		// 追従
-		followObject();
+		followObject(true);
+	}
+	else
+	{
+		// Xは固定
+		followObject(false);
 	}
 }
 

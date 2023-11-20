@@ -26,7 +26,7 @@ bool Player::loadYamlFile()
 
 Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
-	, gameCamera(camera)
+	, camera(camera)
 {
 
 	constexpr float scale = 100.0f;
@@ -59,7 +59,11 @@ void Player::update()
 
 	gameObj->update(XMConvertToRadians(getObj()->rotation));
 
-	checkGameover();
+	// 左右スクロールのオンオフ
+	checkStageSide();
+	// ゲームオーバー確認
+	checkGameOver();
+
 }
 
 void Player::draw()
@@ -186,14 +190,16 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 		}
 
-		// ゴール衝突
-		//gameCamera->changeStateGoal();
 
 
 		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 		gameObj->update(XMConvertToRadians(getObj()->rotation));
 	}
-
+    else if (hitObjName == typeid(GameMap).name())// ゴール衝突
+	{
+		camera->changeStateClear();
+		isClear = true;
+	}
 }
 
 void Player::calcJumpPos()
@@ -211,7 +217,7 @@ void Player::calcJumpPos()
 void Player::jump()
 {
 	// センサーの値
-	const float sensorValue = gameCamera->getGetAccelZ();
+	const float sensorValue = camera->getGetAccelZ();
 
 
 	// ジャンプパワー
@@ -416,7 +422,7 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 void Player::move()
 {
 	// 角度を取得
-	const float angle = gameCamera->getAngle();
+	const float angle = camera->getAngle();
 
 	// 角度に応じて移動
 	// 一旦加速は考慮せずに実装
@@ -464,10 +470,27 @@ void Player::rot()
 	getObj()->rotation = std::fmod(angleVec, angleMax);
 }
 
-void Player::checkGameover()
+void Player::checkStageSide()
+{
+	if (isDead)return;
+
+	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
+	if(mapPos.x <= leftScrollEndPos)
+	{
+		camera->setFollowFlag(false);
+	}
+	else
+	{
+		camera->setFollowFlag(true);
+	}
+
+}
+
+void Player::checkGameOver()
 {
 	if(mapPos.y <= gameoverPos)
 	{
 		isDead = true;
 	}
 }
+

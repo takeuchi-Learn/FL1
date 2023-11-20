@@ -114,6 +114,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App\BackGround.cpp" />
+    <ClCompile Include="App\Scene\ClearScene.cpp" />
+    <ClCompile Include="App\Scene\GameOverScene.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
@@ -161,10 +163,13 @@
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Imu\Kalman.cpp" />
+    <ClCompile Include="App\Object\TransparentWall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\Goal.h" />
     <ClInclude Include="App\BackGround.h" />
+    <ClInclude Include="App\Scene\ClearScene.h" />
+    <ClInclude Include="App\Scene\GameOverScene.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />
@@ -219,6 +224,7 @@
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Imu\Kalman.h" />
+    <ClInclude Include="App\Object\TransparentWall.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
