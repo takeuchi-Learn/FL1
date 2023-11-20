@@ -116,6 +116,11 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				// 判定作成
 				setAABBData(x, y, pos, scale);
 			}
+			else
+			{
+				DirectX::XMFLOAT2 pos(0, 0);
+				mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
+			}
 		}
 	}
 
