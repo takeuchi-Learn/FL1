@@ -69,8 +69,11 @@ bool GameMap::loadDataFile(const std::string& filePath)
 			}
 
 			// 道なら何も表示しない
-			if (n == MAPCHIP_ROAD)
+			if (n == MAPCHIP_ROAD
+				|| n == MAPCHIP_GOAL)
 			{
+				DirectX::XMFLOAT2 pos(0, 0);
+				mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
 				continue;
 			}
 
@@ -133,7 +136,7 @@ void GameMap::update()
 {
 	for (auto& i : billboard)
 	{
-		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
+		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
 }
 

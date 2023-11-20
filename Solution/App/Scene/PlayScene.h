@@ -6,6 +6,7 @@
 
 #include"../GameCamera.h"
 
+#include<Collision/CollisionShape.h>
 class Camera;
 class Light;
 class ObjModel;
@@ -29,10 +30,13 @@ class PlayScene :
 private:
 
 	//std::unique_ptr<Camera> camera;
+	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<Sprite> sprite;
+
+	std::unique_ptr<ParticleMgr> particle;
 
 
 	std::unique_ptr<Player> player;
@@ -42,9 +46,16 @@ private:
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<GameMap> gameMap;
 
+#pragma region ゲームオーバー関係
+	int gameOverTimer = 0;
+	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
+#pragma endregion
+
+
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
+	bool checkMinMax(const CollisionShape::AABB& aabb);
 
 public:
 	PlayScene();
@@ -53,6 +64,4 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
-
-
 };

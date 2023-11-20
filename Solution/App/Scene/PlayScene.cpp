@@ -20,6 +20,8 @@
 #include <Collision/Collision.h>
 
 #include "TitleScene.h"
+#include "ClearScene.h"
+#include "GameOverScene.h"
 
 using namespace DirectX;
 
@@ -37,11 +39,13 @@ namespace
 void PlayScene::checkCollision()
 {
 	const auto& mapAABBs = gameMap->getAABBs();
-	for(auto y = 0; y < mapAABBs.size();y++)
+	for (auto y = 0; y < mapAABBs.size(); y++)
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
-			if(Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			if (!checkMinMax(mapAABBs[y][x]))continue;
+
+			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
 			{
 				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
 			}
@@ -55,6 +59,14 @@ void PlayScene::checkCollision()
 	//	//player->hit();
 	//}
 
+}
+
+bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
+{
+	XMFLOAT2 minPos(aabb.minPos.m128_f32[0], aabb.minPos.m128_f32[1]);
+	XMFLOAT2 maxPos(aabb.maxPos.m128_f32[0], aabb.maxPos.m128_f32[1]);
+	if (minPos.x == 0.f && minPos.y == 0.f && maxPos.x == 0.f && maxPos.y == 0.f)return false;
+	return true;
 }
 
 PlayScene::PlayScene() :
@@ -83,7 +95,7 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
-	
+
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
 
@@ -102,21 +114,41 @@ void PlayScene::update()
 		return;
 	}
 
-	backGround->update();
-	gameMap->update();
-	player->update();
 
 	// ライトとカメラの更新
-	camera->update();
 	camera->gameCameraUpdate();
+	camera->update();
+
+	player->update();
+	backGround->update();
+	gameMap->update();
 
 	// 衝突確認
 	checkCollision();
 
 	// ゲームオーバー確認
-	if(player->getIsDead())
+	if (player->getIsDead())
 	{
 		camera->changeStateGameover();
+		
+		gameOverTimer++;
+
+		// 一定時間後にゲームオーバーシーン切り替え
+		if (gameOverTimer >= GAME_OVER_TIME_MAX)
+		{
+			SceneManager::ins()->changeScene<GameOverScene>();
+		}
+	}
+
+	// クリア確認
+	if(player->getIsClear())
+	{
+		camera->changeStateClear();
+		// クリア演出後シーン切り替え
+		if(1)
+		{
+			SceneManager::ins()->changeScene<ClearScene>();
+		}
 	}
 }
 
