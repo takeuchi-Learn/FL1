@@ -4,8 +4,8 @@
 #include <string>
 #include <unordered_map>
 
-#include<Collision/CollisionShape.h>
-#include"Object/Goal.h"
+#include <Collision/CollisionShape.h>
+#include "Object/Goal.h"
 
 class Billboard;
 class GameCamera;
@@ -37,19 +37,19 @@ private:
 private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
-	std::vector<std::vector<CollisionShape::AABB>>mapAABBs;
+	std::vector<std::vector<CollisionShape::AABB>> mapAABBs;
 
 	std::unique_ptr<Goal>goal;
 
 	GameCamera* camera = nullptr;
 
 private:
-	/// @brief AABBのデータをセット
+	/// @brief 指定要素のAABB情報を変更
 	/// @param x 配列の添え字
 	/// @param y 配列の添え字
 	/// @param pos 座標
-	/// @param scale サイズ
-	void setAABBData(size_t x,size_t y,const DirectX::XMFLOAT3& pos,float scale);
+	/// @param scale 大きさ
+	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
 
 	bool checkTypeAndSetObject(MAPCHIP_DATA data, size_t x, size_t y, const DirectX::XMFLOAT2& pos, float scale);
 
@@ -67,13 +67,11 @@ public:
 
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
-	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs()const { return mapAABBs; }
+	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	/// @return 
 	const CollisionShape::AABB& getGoalAABB()const { return goal->getShape(); }
 
 	/// @brief ゲームオーバーになる座標
-	/// @return 
-	float getGameoverPos()const;
+	float getGameoverPos() const;
 };

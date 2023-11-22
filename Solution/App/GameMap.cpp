@@ -23,6 +23,7 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	// ここでTypeに応じてオブジェクトを配置
 	// なにかマップチップで指定してオブジェクトを置く場合はここに処理を追加してください
 
+	// todo switch文を使わない構成が望ましい
 	bool result = true;
 	switch (data)
 	{
@@ -30,6 +31,7 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 		goal = std::make_unique<Goal>(camera, pos, scale);
 		break;
 
+		// todo なにこれ？
 		// 処理無いけど消さないでね
 	case GameMap::MAPCHIP_ROAD:
 		break;
@@ -38,6 +40,7 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 		break;
 	}
 
+	// todo 適切でない方法
 	// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
 	if (result)
 	{
@@ -93,8 +96,6 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				return true;
 			}
 
-
-
 			constexpr auto scale = float(WinAPI::window_height) / 10.f;
 			const auto pos = XMFLOAT3(float(x) * scale,
 									  -float(y) * scale,
@@ -102,7 +103,6 @@ bool GameMap::loadDataFile(const std::string& filePath)
 
 			// 地形以外ならcontinueする
 			if (checkTypeAndSetObject(MAPCHIP_DATA(n), x, y, XMFLOAT2(pos.x, pos.y), scale))continue;
-
 
 			std::wstring wTexPath{};
 
@@ -124,13 +124,12 @@ bool GameMap::loadDataFile(const std::string& filePath)
 				return true;
 			}
 
-
 			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
 			// YAML内の画像ファイルパスを反映させる
 			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
 			auto& data = addRet.first->second;
 			data->setCamera(camera);
-			
+
 			// 新たに挿入されたら addRet.second == true
 
 			data->add(pos, scale);
@@ -161,8 +160,7 @@ void GameMap::draw()
 	goal->draw();
 }
 
-
-float GameMap::getGameoverPos()const
+float GameMap::getGameoverPos() const
 {
-	return mapAABBs[mapAABBs.size() - 1][0].minPos.m128_f32[1];
+	return XMVectorGetY(mapAABBs.back().front().minPos);
 }

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include<memory>
+#include <memory>
 
 class AbstractGameObj;
 class ObjModel;
@@ -13,7 +13,7 @@ public:
 
 private:
 	GameCamera* camera = nullptr;
-	
+
 	// 背景
 	std::unique_ptr<AbstractGameObj> obj;
 	std::unique_ptr<ObjModel> model;
@@ -29,4 +29,3 @@ public:
 	void update();
 	void draw();
 };
-

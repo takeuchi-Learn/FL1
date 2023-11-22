@@ -1,22 +1,18 @@
 ﻿#pragma once
 #include <array>
-#include <vector>
+#include <memory>
 #include "ini.h"
 #include "serial.h"
 
 class Sensor
 {
-private:
-	Sensor(const char* serialDevice);
+public:
+	Sensor();
 
 	~Sensor();
-public:
-	// 生成
-	static Sensor* create();
+
 	// 更新
 	bool update();
-	// 消去
-	void erase();
 
 	// 加速度X(傾き)
 	float GetAccelX()
@@ -50,12 +46,12 @@ public:
 	}
 
 private:
-	int updateSensor();
+	uint32_t updateSensor();
 
-	static const int accelCount = 3;
-	static const int gyroCount = 3;
-	static const int sensorCount = accelCount + gyroCount;
+	static constexpr uint32_t accelCount = 3u;
+	static constexpr uint32_t gyroCount = 3u;
+	static constexpr uint32_t sensorCount = accelCount + gyroCount;
 
-	Serial* serial;
-	std::array<float, sensorCount> record;
+	std::unique_ptr<Serial> serial;
+	std::array<float, sensorCount> record{};
 };

@@ -18,7 +18,7 @@ GameCamera::GameCamera(BillboardData* obj)
 	// センサーの生成
 	if (sensor == nullptr)
 	{
-		sensor = Sensor::create();
+		sensor = new Sensor();
 	}
 
 	madgwick->begin(50.0f);
@@ -93,8 +93,8 @@ void GameCamera::startAutoRot()
 
 void GameCamera::updateStartTimer()
 {
-	if (!addStartTimer)return;
-	startTimer++;
+	if (!addStartTimer) { return; }
+	++startTimer;
 
 	// タイマーの最大値
 	// 自動傾き終了後にタイマーが起動し、以下の時間を上回ったら入力受付開始となる
@@ -109,8 +109,6 @@ void GameCamera::preUpdate()
 {
 	gameCameraUpdate();
 }
-
-
 
 #pragma endregion
 
@@ -174,15 +172,9 @@ void GameCamera::checkSensorInput()
 
 	// 前の角度を保存
 	prevAngle = angle;
-
-	//// ジャンプ判定用(仮)
-	//if (getAccelZ >= 0.25f)
-	//{
-	//	prevAngle = angle;
-	//}
-
 }
 
+// todo 関数名とやっていることが違う（checkではなく角度変更をしている）
 void GameCamera::checkKeyInput()
 {
 	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
@@ -208,14 +200,12 @@ void GameCamera::updateClear()
 {}
 #pragma endregion
 
-
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算
 	angle += 90.0f;
 
 	// 変換
-	constexpr float pi = 3.14f;
 	upXY.x = std::cos(XMConvertToRadians(angle));
 	upXY.y = std::sin(XMConvertToRadians(angle));
 }
@@ -225,19 +215,20 @@ void GameCamera::upRotate()
 	// 傾きの最大値
 	constexpr float maxAngle = 60.0f;
 
+	// todo std::clampを使う
 	// 制限
 	if (angle >= maxAngle)angle = maxAngle;
 	else if (angle <= -maxAngle)angle = -maxAngle;
 
 	// angleを上ベクトルに変換してセット
-	DirectX::XMFLOAT2 upXY;
+	DirectX::XMFLOAT2 upXY{};
 	angleToUp(angle, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 
 void GameCamera::followObject(const bool followX)
 {
-	if (!obj)return;
+	if (!obj) { return; }
 
 	// 追従
 	// Targetをobjの座標に
@@ -271,12 +262,11 @@ void GameCamera::setFollowFlag(const bool flag)
 
 void GameCamera::IMUDelete()
 {
-	sensor->erase();
+	delete sensor; sensor = nullptr;
 }
 
 void GameCamera::gameCameraUpdate()
 {
-
 	switch (cameraState)
 	{
 	case GameCamera::CameraState::START:
@@ -289,7 +279,6 @@ void GameCamera::gameCameraUpdate()
 	case GameCamera::CameraState::CLEAR:
 		updateClear();
 		break;
-
 	}
 
 	// 追従
@@ -297,16 +286,11 @@ void GameCamera::gameCameraUpdate()
 	{
 		// Xは固定
 		followObject(false);
-	}
-	else if(cameraState == GameCamera::CameraState::OTHER)
+	} else if (cameraState == GameCamera::CameraState::OTHER)
 	{
-	}
-	else 
+	} else
 	{
 		// 追従
 		followObject(true);
 	}
 }
-
-
-

@@ -10,8 +10,8 @@
 #include <PadImu.h>
 #include <GameMap.h>
 
-#include<GameMap.h>
-#include<Object/Goal.h>
+#include <GameMap.h>
+#include <Object/Goal.h>
 
 using namespace DirectX;
 
@@ -173,8 +173,8 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 
 		switch (hitArea)
 		{
-		case HIT_AREA::UP:
-
+			using enum HIT_AREA;
+		case UP:
 			// 地面衝突
 			if (!pushJumpKeyFrame || !reboundYFrame)
 			{
@@ -188,22 +188,22 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 				}
 			}
 			break;
-		case HIT_AREA::DOWN:
+		case DOWN:
 			// 下方向に落下
 			fallStartSpeed = -0.2f;
 			fallTime = 0;
 			break;
-		case HIT_AREA::LEFT:
+		case LEFT:
 			// 横のバウンド開始
 			startSideRebound(hitAABB.minPos.m128_f32[0], true);
 
 			break;
-		case HIT_AREA::RIGTH:
+		case RIGTH:
 			// 横のバウンド開始
 			startSideRebound(hitAABB.maxPos.m128_f32[0], false);
 			break;
 		}
-	} else if (hitObjName == typeid(GameMap).name())// ゴール衝突
+	} else if (hitObjName == typeid(Goal).name())// ゴール衝突
 	{
 		camera->changeStateClear();
 		isClear = true;
@@ -477,7 +477,6 @@ void Player::rot()
 void Player::checkStageSide()
 {
 	if (isDead)return;
-
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
 	if (mapPos.x <= leftScrollEndPos)

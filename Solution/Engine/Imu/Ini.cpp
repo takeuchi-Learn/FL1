@@ -13,7 +13,7 @@ Ini::Ini(const char* filePath)
 
 	std::string line;
 	std::string section;
-	while(getline(file, line))
+	while (getline(file, line))
 	{
 		if (line[0] == '\0' || line[0] == ';') continue;
 		if (line[0] == '[')
@@ -25,8 +25,7 @@ Ini::Ini(const char* filePath)
 			}
 			section = line.substr(1, endIndex - 1);
 			this->content[section] = std::map<std::string, std::string>();
-		} 
-		else 
+		} else
 		{
 			const size_t equalIndex = line.find(" = ");
 			if (equalIndex == std::string::npos)
@@ -40,7 +39,6 @@ Ini::Ini(const char* filePath)
 
 std::string Ini::getValue(const char* section, const char* key)
 {
-
 	if (!this->content.count(section))
 	{
 		this->raise(std::string("Section not found: ") + section);

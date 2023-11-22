@@ -21,7 +21,8 @@
 
 //--------------------------------------------------------------------------------------------
 // Variable declaration
-class Madgwick{
+class Madgwick
+{
 private:
 	static float invSqrt(float x);
 	float beta;				// algorithm gain
@@ -38,8 +39,8 @@ public:
 	float q2;
 	float q3;	// quaternion of sensor frame relative to auxiliary frame
 
-//-------------------------------------------------------------------------------------------
-// Function declarations
+	//-------------------------------------------------------------------------------------------
+	// Function declarations
 public:
 	Madgwick(void);
 	void begin(float sampleFrequency) { invSampleFreq = 1.0f / sampleFrequency; }
@@ -48,30 +49,35 @@ public:
 	//float getPitch(){return atan2f(2.0f * q2 * q3 - 2.0f * q0 * q1, 2.0f * q0 * q0 + 2.0f * q3 * q3 - 1.0f);};
 	//float getRoll(){return -1.0f * asinf(2.0f * q1 * q3 + 2.0f * q0 * q2);};
 	//float getYaw(){return atan2f(2.0f * q1 * q2 - 2.0f * q0 * q3, 2.0f * q0 * q0 + 2.0f * q1 * q1 - 1.0f);};
-	float getRoll() {
+	float getRoll()
+	{
 		if (!anglesComputed) computeAngles();
 		return roll * 57.29578f;
 	}
-	float getPitch() {
+	float getPitch()
+	{
 		if (!anglesComputed) computeAngles();
 		return DirectX::XMConvertToDegrees(pitch);
 	}
-	float getYaw() {
+	float getYaw()
+	{
 		if (!anglesComputed) computeAngles();
 		return yaw * 57.29578f + 180.0f;
 	}
-	float getRollRadians() {
+	float getRollRadians()
+	{
 		if (!anglesComputed) computeAngles();
 		return roll;
 	}
-	float getPitchRadians() {
+	float getPitchRadians()
+	{
 		if (!anglesComputed) computeAngles();
 		return pitch;
 	}
-	float getYawRadians() {
+	float getYawRadians()
+	{
 		if (!anglesComputed) computeAngles();
 		return yaw;
 	}
 };
 #endif
-

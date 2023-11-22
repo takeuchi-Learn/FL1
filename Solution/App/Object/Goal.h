@@ -1,11 +1,8 @@
 ﻿#pragma once
 
-#include <DirectXMath.h>
-#include <functional>
 #include <memory>
-#include<GameObject/AbstractGameObj.h>
-
-#include<Collision/CollisionShape.h>
+#include <DirectXMath.h>
+#include <Collision/CollisionShape.h>
 
 class Light;
 class ObjModel;
@@ -22,16 +19,14 @@ private:
 
 	bool isGoal = false;
 
-
-	CollisionShape::AABB aabb;
+	CollisionShape::AABB aabb{};
 
 private:
-
-	// ゴールフラグをtrueにする
-	void trueIsGoal() { isGoal = true; }
+	/// @brief ゴールフラグをtrueにする
+	void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera,const DirectX::XMFLOAT2& pos,float scale);
+	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
 	void update();
 	void draw();
 
@@ -40,6 +35,5 @@ public:
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報
-	const CollisionShape::AABB& getShape()const { return aabb; }
+	const auto& getShape() const { return aabb; }
 };
-

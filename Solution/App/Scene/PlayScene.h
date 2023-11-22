@@ -7,7 +7,7 @@
 
 #include "../GameCamera.h"
 
-#include<Collision/CollisionShape.h>
+#include <Collision/CollisionShape.h>
 class Camera;
 class Light;
 class ObjModel;
@@ -37,7 +37,6 @@ private:
 
 	std::unique_ptr<ParticleMgr> particle;
 
-
 	std::unique_ptr<Player> player;
 
 	std::unique_ptr<Goal> goal;
@@ -55,16 +54,14 @@ private:
 	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
 #pragma endregion
 
-
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
 	bool checkMinMax(const CollisionShape::AABB& aabb);
 
-
 	void update_start();
 	void update_main();
-	
+
 public:
 	PlayScene();
 	~PlayScene();

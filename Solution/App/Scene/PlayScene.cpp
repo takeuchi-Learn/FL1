@@ -36,9 +36,6 @@ namespace
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
 	constexpr auto mapYamlPath = "Resources/Map/map.yml";
 
-	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
-	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
-
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
 
 	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
@@ -49,24 +46,28 @@ namespace
 
 void PlayScene::checkCollision()
 {
-	const auto& mapAABBs = gameMap->getAABBs();
-	for (auto y = 0; y < mapAABBs.size(); y++)
+	for (auto& y : gameMap->getAABBs())
 	{
-		for (auto x = 0; x < mapAABBs[y].size(); x++)
+		for (auto& x : y)
 		{
 			// min、max両方0,0は通路なので確認せずにcontinue
-			if (!checkMinMax(mapAABBs[y][x]))continue;
+			if (!checkMinMax(x)) { continue; }
 
-			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
+			if (Collision::CheckHit(player->getShape(), x))
 			{
-				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
+				player->hit(x, typeid(*gameMap).name());
 			}
 		}
 	}
 
 	// ゴールとプレイヤーの判定(仮)
 	// 後々他のオブジェクトとまとめます
-	if (Collision::CheckSphere2AABB(player->getShape(), gameMap->getGoalAABB()))
+	const bool isHitGoal = Collision::CheckHit(player->getShape(), gameMap->getGoalAABB());
+	if (Input::ins()->triggerKey(DIK_H))
+	{
+		int num = 0;
+	}
+	if (isHitGoal)
 	{
 		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
 	}
@@ -74,10 +75,10 @@ void PlayScene::checkCollision()
 
 bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
 {
-	XMFLOAT2 minPos(aabb.minPos.m128_f32[0], aabb.minPos.m128_f32[1]);
-	XMFLOAT2 maxPos(aabb.maxPos.m128_f32[0], aabb.maxPos.m128_f32[1]);
-	if (minPos.x == 0.f && minPos.y == 0.f && maxPos.x == 0.f && maxPos.y == 0.f)return false;
-	return true;
+	return !(XMVectorGetX(aabb.minPos) == 0.f &&
+			 XMVectorGetY(aabb.minPos) == 0.f &&
+			 XMVectorGetX(aabb.maxPos) == 0.f &&
+			 XMVectorGetY(aabb.maxPos) == 0.f);
 }
 
 PlayScene::PlayScene() :
