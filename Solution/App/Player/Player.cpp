@@ -10,6 +10,9 @@
 #include <PadImu.h>
 #include <GameMap.h>
 
+#include<GameMap.h>
+#include<Object/Goal.h>
+
 using namespace DirectX;
 
 namespace
@@ -474,6 +477,7 @@ void Player::rot()
 void Player::checkStageSide()
 {
 	if (isDead)return;
+
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
 	if (mapPos.x <= leftScrollEndPos)

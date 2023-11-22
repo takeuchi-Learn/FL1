@@ -73,7 +73,7 @@ void GameCamera::startAutoRot()
 
 		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
 		// プレイヤーの角度を取得
-		const float objAngleZ = obj->position.z;
+		const float objAngleZ = obj->rotation;
 
 		// angleの最低値
 		constexpr float angleMin = 1.0f;
@@ -130,8 +130,8 @@ void GameCamera::checkInput()
 {
 	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
 
-	//checkKeyInput();
-	checkSensorInput();
+	checkKeyInput();
+	//checkSensorInput();
 }
 
 void GameCamera::checkSensorInput()
@@ -261,6 +261,14 @@ void GameCamera::followObject(const bool followX)
 	setEye(eye);
 }
 
+void GameCamera::setFollowFlag(const bool flag)
+{
+	if (cameraState == CameraState::INPUT || cameraState == CameraState::FOLLOW_OFF)
+	{
+		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
+	}
+}
+
 void GameCamera::IMUDelete()
 {
 	sensor->erase();
@@ -285,15 +293,18 @@ void GameCamera::gameCameraUpdate()
 	}
 
 	// 追従
-	if (cameraState != GameCamera::CameraState::OTHER &&
-		cameraState != GameCamera::CameraState::FOLLOW_OFF)
-	{
-		// 追従
-		followObject(true);
-	} else
+	if (cameraState == GameCamera::CameraState::FOLLOW_OFF)
 	{
 		// Xは固定
 		followObject(false);
+	}
+	else if(cameraState == GameCamera::CameraState::OTHER)
+	{
+	}
+	else 
+	{
+		// 追従
+		followObject(true);
 	}
 }
 

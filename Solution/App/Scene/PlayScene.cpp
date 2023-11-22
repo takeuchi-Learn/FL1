@@ -54,6 +54,7 @@ void PlayScene::checkCollision()
 	{
 		for (auto x = 0; x < mapAABBs[y].size(); x++)
 		{
+			// min、max両方0,0は通路なので確認せずにcontinue
 			if (!checkMinMax(mapAABBs[y][x]))continue;
 
 			if (Collision::CheckSphere2AABB(player->getShape(), mapAABBs[y][x]))
@@ -61,6 +62,13 @@ void PlayScene::checkCollision()
 				player->hit(mapAABBs[y][x], typeid(*gameMap).name());
 			}
 		}
+	}
+
+	// ゴールとプレイヤーの判定(仮)
+	// 後々他のオブジェクトとまとめます
+	if (Collision::CheckSphere2AABB(player->getShape(), gameMap->getGoalAABB()))
+	{
+		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
 	}
 }
 
