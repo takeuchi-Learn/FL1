@@ -10,8 +10,6 @@ GameCamera::GameCamera(BillboardData* obj)
 			WinAPI::window_height)
 	, obj(obj)
 {
-	// 平行投影の場合、相当カメラ離したほうがいい(デフォルト猿モデルだとeyeのZ値-500くらいがベスト)
-
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
 
@@ -267,6 +265,8 @@ void GameCamera::IMUDelete()
 
 void GameCamera::gameCameraUpdate()
 {
+	// todo カメラがどう動くかは、カメラの構成要素ではないので、別クラスに分けるべき。（ビヘイビアツリーやstateパターンを使う）
+
 	switch (cameraState)
 	{
 	case GameCamera::CameraState::START:
