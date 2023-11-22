@@ -31,7 +31,7 @@ using namespace DirectX;
 
 namespace
 {
-	constexpr auto bgmPath = "Resources/BGM.wav";
+	constexpr auto bgmPath = "Resources/BGM/A-Sense-of-Loss.wav";
 	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
 	constexpr auto mapYamlPath = "Resources/Map/map.yml";
@@ -87,7 +87,7 @@ PlayScene::PlayScene() :
 {
 	updateProc = std::bind(&PlayScene::update_start, this);
 
-	bgm = Sound::ins()->loadWave("Resources/A-Sense-of-Loss.wav");
+	bgm = Sound::ins()->loadWave(bgmPath);
 
 	spriteBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),

@@ -27,7 +27,7 @@ TitleScene::TitleScene()
 	spBase = std::make_unique<SpriteBase>();
 	titleSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 
-	bgm = Sound::ins()->loadWave("Resources/BGM.wav");
+	bgm = Sound::ins()->loadWave("Resources/BGM/mmc_140_BGM1.wav");
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
 
 	transitionTimer = std::make_unique<Timer>();
