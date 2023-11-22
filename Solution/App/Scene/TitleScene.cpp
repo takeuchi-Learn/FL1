@@ -22,8 +22,6 @@ namespace
 
 TitleScene::TitleScene()
 {
-	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
-
 	spBase = std::make_unique<SpriteBase>();
 	titleSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 
@@ -51,7 +49,10 @@ void TitleScene::update_main()
 	{
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
+
+		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 		updateProc = std::bind(&TitleScene::update_end, this);
+
 		transitionTimer->reset();
 	}
 }
