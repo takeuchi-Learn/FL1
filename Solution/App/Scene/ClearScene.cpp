@@ -24,7 +24,7 @@ void ClearScene::start()
 void ClearScene::update()
 {
 	debugText->Print("Clear Scene\nHIT SPACE", 0.f, 0.f);
-	if (Input::ins()->triggerKey(DIK_SPACE))
+	if (checkInputOfStartTransition())
 	{
 		SceneManager::ins()->changeScene<TitleScene>();
 	}

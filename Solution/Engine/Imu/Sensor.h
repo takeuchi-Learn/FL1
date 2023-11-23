@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <array>
 #include <memory>
-#include "ini.h"
 #include "serial.h"
 
 class Sensor

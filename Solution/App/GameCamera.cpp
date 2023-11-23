@@ -18,10 +18,6 @@ GameCamera::GameCamera(BillboardData* obj)
 	{
 		sensor = new Sensor();
 	}
-
-	madgwick->begin(50.0f);
-
-	kalman->setAngle(0.0f);
 }
 
 #pragma region START
@@ -127,7 +123,7 @@ void GameCamera::checkInput()
 	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
 
 	checkKeyInput();
-	//checkSensorInput();
+	checkSensorInput();
 }
 
 void GameCamera::checkSensorInput()
@@ -147,23 +143,27 @@ void GameCamera::checkSensorInput()
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
 		// 加速度取得
-		getAccelX = -state.accelX;
-		getAccelY = state.accelY;
-		getAccelZ = state.accelZ;
+		getAccelX = -state.accelX / 16384.f;
+		getAccelY = state.accelY / 16384.f;
+		getAccelZ = state.accelZ / 16384.f;
 		// 角速度取得
-		getGyroX = state.gyroX;
-		getGyroY = state.gyroY;
-		getGyroZ = -state.gyroZ;
+		getGyroX = state.gyroX / 131.f;
+		getGyroY = state.gyroY / 131.f;
+		getGyroZ = -state.gyroZ / 131.f;
 	}
 
-	madgwick->updateIMU(getGyroX, getGyroY, getGyroZ, getAccelX, getAccelY, getAccelZ);
+	// 相補フィルターで補正
+	{
+		// 調整項目
+		constexpr float raito = 0.05f, invRaito = 1.f - raito;
 
-	// Madgwickフィルタを使って補正
-	angle = -madgwick->getPitch();
-	angle = 0.8f * prevAngle + 0.2f * angle;
+		angle += raito * (getAccelX / DX12Base::ins()->getFPS())
+			+ invRaito * std::atan2(getAccelX, getAccelY) + getGyroZ;
+	}
 
 	// 静止状態を大きめに取る
-	if (angle <= 2.0f && -2.0f <= angle)
+	constexpr float stopRange = 1.f;
+	if (angle <= stopRange && -stopRange <= angle)
 	{
 		angle = 0.0f;
 	}

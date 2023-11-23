@@ -2,8 +2,6 @@
 #include "../Engine/Camera/Camera.h"
 #include "../Engine/GameObject/AbstractGameObj.h"
 #include <Imu/Sensor.h>
-#include <Imu/Kalman.h>
-#include <Imu/MadgwickAHRS.h>
 #include <Camera/Camera.h>
 #include <3D/Billboard/Billboard.h>
 
@@ -35,15 +33,11 @@ private:
 
 	// センサー
 	Sensor* sensor = nullptr;
-	// カルマンフィルター
-	Kalman* kalman = new Kalman;
-	//
-	Madgwick* madgwick = new Madgwick;
 	// 角度Z
 	float prevAngle = 0.0f;
 	float degree = 0.0f;
 
-	// todo XMFLOAT3等のクラスを使う
+	// todo XMFLOAT3等のクラスを使う（JoyShockLibraryのIMU_STATEでも良い）
 	float getGyroX = 0.0f;
 	float getGyroY = 0.0f;
 	float getGyroZ = 0.0f;
