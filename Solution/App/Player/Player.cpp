@@ -242,7 +242,7 @@ void Player::jump()
 	pushJumpKeyFrame = false;
 
 
-	if (!isJump && fallTime < 1)
+	if (!isJump && fallTime < 1 || fallTime > 1 && isReboundY)
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 		{
@@ -262,10 +262,7 @@ void Player::jump()
 			}
 
 			// バウンド強制終了
-			if (isReboundY)
-			{
-				isReboundY = false;
-			}
+			isReboundY = false;
 
 		}
 	}
@@ -300,6 +297,8 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	mapPos.y = extrusionEndPosY + 0.01f;
 	
 	isDrop = false;
+
+
 	startRebound();
 }
 
