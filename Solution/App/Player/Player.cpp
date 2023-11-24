@@ -242,7 +242,7 @@ void Player::jump()
 	pushJumpKeyFrame = false;
 
 	
-	if (!isJump && fallTime < 1 || isReboundY && fallTime > 1 && fallTime < (int)(60.f * 0.4f))
+	if (!isJump && fallTime < 1 || isReboundY)
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 		{
@@ -289,7 +289,6 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 {
 	// ジャンプ終了処理
 	isJump = false;
-	fallTime = 0;
 
 	// 押し出し後の位置
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
@@ -298,8 +297,11 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	
 	isDrop = false;
 
-
-	startRebound();
+	if (fallTime > 2)
+	{
+		startRebound();
+	}
+	fallTime = 0;
 }
 
 void Player::calcDropVec()
