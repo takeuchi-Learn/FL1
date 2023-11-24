@@ -105,10 +105,13 @@ PlayScene::PlayScene() :
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
-	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) +".yml";
+	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) + ".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());
-	const bool ret = gameMap->loadDataFile(mapYamlPath);
+
+	XMFLOAT2 startPos{ 3.f, -1.f };
+	const bool ret = gameMap->loadDataFile(mapYamlPath, &startPos);
 	assert(false == ret);
+	player->setMapPos(startPos);
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
@@ -190,11 +193,8 @@ void PlayScene::update_main()
 	{
 		camera->changeStateClear();
 		// クリア演出後シーン切り替え
-		if (1)
-		{
-			stageNum++;
-			SceneManager::ins()->changeScene<ClearScene>();
-		}
+		++stageNum;
+		SceneManager::ins()->changeScene<ClearScene>();
 	}
 }
 

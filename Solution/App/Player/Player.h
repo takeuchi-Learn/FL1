@@ -143,6 +143,8 @@ public:
 	// 描画
 	void draw();
 
+	void setMapPos(const DirectX::XMFLOAT2& mapPos);
+
 	/// @brief ゲームオーバー扱いになる座標をセットする関数
 	/// @param posY
 	void setGameOverPos(const float posY) { gameoverPos = posY; }

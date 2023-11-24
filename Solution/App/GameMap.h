@@ -66,8 +66,9 @@ public:
 
 	/// @brief YAMLファイルから読み込み
 	/// @param filePath YAMLファイルパス
+	/// @param startPosBuf 開始時のマップ座標を格納する変数
 	/// @return エラーがあるかどうか
-	bool loadDataFile(const std::string& filePath);
+	bool loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf = nullptr);
 
 	void update();
 	void draw();

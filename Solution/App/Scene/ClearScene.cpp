@@ -27,8 +27,10 @@ void ClearScene::update()
 	debugText->Print("Clear Scene\nHIT SPACE", 0.f, 0.f);
 	if (checkInputOfStartTransition())
 	{
+		// todo ファイルがあるかどうかで決める
+		constexpr unsigned short stageMax = 3;
+
 		const unsigned short stageNum = PlayScene::getStageNum();
-		constexpr unsigned short stageMax = 2;
 		if (stageNum == stageMax)
 		{
 			PlayScene::resetStageNum();

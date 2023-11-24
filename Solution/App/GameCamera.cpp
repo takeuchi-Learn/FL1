@@ -99,6 +99,23 @@ void GameCamera::updateInput()
 
 void GameCamera::checkInput()
 {
+	// 指定の入力で角度リセット
+	{
+		constexpr BYTE key = DIK_R;
+		constexpr WORD pad_xinput = XINPUT_GAMEPAD_X | XINPUT_GAMEPAD_Y;
+		constexpr int pad_other = JSMASK_W | JSMASK_N;
+
+		const bool padInput = PadImu::ins()->getDevCount() > 0 && PadImu::ins()->hitButtons(PadImu::ins()->getStates()[0].buttons, pad_other);
+
+		if (Input::ins()->hitKey(key) ||
+			Input::ins()->hitPadButton(pad_xinput) ||
+			padInput)
+		{
+			prevAngle = 0.f;
+			angle = 0.f;
+		}
+	}
+
 	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
 
 	checkKeyInput();

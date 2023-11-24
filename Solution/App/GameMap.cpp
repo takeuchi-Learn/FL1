@@ -32,7 +32,6 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 		goalPosX = pos.x;
 		break;
 
-		// todo なにこれ？
 		// 処理無いけど消さないでね
 	case GameMap::MAPCHIP_ROAD:
 		break;
@@ -56,13 +55,20 @@ GameMap::GameMap(GameCamera* camera) :
 	camera(camera)
 {}
 
-bool GameMap::loadDataFile(const std::string& filePath)
+bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf)
 {
 	Yaml::Node root{};
 	if (YamlLoader::LoadYamlFile(root, filePath))
 	{
 		return true;
 	}
+
+	if (startPosBuf)
+	{
+		XMFLOAT2& startPos = *startPosBuf;
+		LoadYamlDataToFloat2(root, startPos);
+	}
+
 	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
 	auto& texFileNameNode = root["texFileName"];
 

@@ -30,14 +30,7 @@ bool Player::loadYamlFile()
 	XMFLOAT2& startPos = mapPos;
 	LoadYamlDataToFloat2(root, startPos);
 
-	// todo mapPosの扱いを正したら消す
-	constexpr float shiftVal = mapSize * 2.f;
-	mapPos.x *= shiftVal;
-	mapPos.y *= shiftVal;
-
-	getObj()->position = XMFLOAT3(mapPos.x,
-								  mapPos.y,
-								  getObj()->position.z);
+	this->setMapPos(startPos);
 
 	return false;
 }
@@ -49,7 +42,8 @@ Player::Player(GameCamera* camera) :
 	constexpr float scale = mapSize;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
-	loadYamlFile();
+	// todo player.ymlに読み込む値が増えたらコメントアウトを解除する
+	//loadYamlFile();
 
 	// 判定仮設定
 	sphere.radius = scale / 2.f;
@@ -65,7 +59,7 @@ void Player::update()
 	rot();
 
 	// スタート時はジャンプしないように
-	if(camera->getCameraState() != GameCamera::CameraState::START)
+	if (camera->getCameraState() != GameCamera::CameraState::START)
 	{
 		moveLimit();
 
@@ -91,6 +85,19 @@ void Player::update()
 void Player::draw()
 {
 	gameObj->draw();
+}
+
+void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
+{
+	XMFLOAT2 pos = mapPos;
+
+	// todo mapPosの扱いを正したら消す
+	constexpr float shiftVal = mapSize;
+	pos.x *= shiftVal;
+	pos.y *= shiftVal;
+
+	this->mapPos = pos;
+	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
 }
 
 void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName)
@@ -255,7 +262,7 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	
+
 	if (!isJump && fallTime < 1 || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
@@ -491,7 +498,7 @@ void Player::checkStageSide()
 	if (isDead)return;
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if(mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
+	if (mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
 	{
 		camera->setFollowFlag(false);
 	} else

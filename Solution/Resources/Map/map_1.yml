@@ -1,6 +1,11 @@
 # 最後の / までつける
 texFolderPath: Resources/Map/Tex/
 
+# 開始時の自機の位置。y=0で一番上。
+startPos:
+  x:2
+  y:-7
+
 # 拡張子もつける
 # 数字は下のcsvに対応している
 texFileName:
