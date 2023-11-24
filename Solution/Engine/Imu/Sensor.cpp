@@ -6,29 +6,26 @@ Sensor::Sensor()
 	serial.reset(Serial::create("COM3"));
 }
 
-Sensor::~Sensor()
-{}
-
 bool Sensor::update()
 {
 	return this->updateSensor() > 0;
 }
 
-uint32_t Sensor::updateSensor()
+int Sensor::updateSensor()
 {
 	if (!this->serial) { return 0; }
 
 	static char buf[1024]{};
-	static uint32_t contentSize = 0;
+	static int contentSize = 0;
 	const int receivedSize = this->serial->read(buf + contentSize, sizeof(buf) - contentSize);
 	if (receivedSize == -1) { return 0; }
-	contentSize += static_cast<uint32_t>(receivedSize);
+	contentSize += receivedSize;
 
 	char* p = buf;
 	constexpr char header[] = { 'D', 'A', 'T', 'F' };
-	constexpr uint32_t packetSize = sizeof(header) + sizeof(int16_t) * Sensor::sensorCount;
+	constexpr int packetSize = sizeof(header) + sizeof(int16_t) * Sensor::sensorCount;
 
-	uint32_t dataCount = 0;
+	int dataCount = 0;
 
 	for (; p < buf + contentSize - packetSize; )
 	{
@@ -42,9 +39,9 @@ uint32_t Sensor::updateSensor()
 
 		for (int i = 0; i < Sensor::sensorCount; i++, p += sizeof(int16_t))
 		{
-			constexpr float accelSensitivity_16g = 2048.f;
-			constexpr float gyroSensitivity_2kdps = 16.4f;
-			record[i] = *((const int16_t*)p)/* / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps)*/;
+			constexpr float accelSensitivity_16g = 16384.f;
+			constexpr float gyroSensitivity_2kdps = 131.f;
+			record[i] = *((const int16_t*)p) / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
 		}
 	}
 
