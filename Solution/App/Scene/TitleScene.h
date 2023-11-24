@@ -24,7 +24,8 @@ class TitleScene :
 	std::function<void()> updateProc{};
 	std::unique_ptr<Timer> transitionTimer;
 
-	std::unique_ptr<Sprite> titleSprite;
+	std::unique_ptr<Sprite> backSprite;
+	std::unique_ptr<Sprite> logoSprite;
 	std::unique_ptr<Sprite> nowLoading;
 	std::unique_ptr<SpriteBase> spBase;
 

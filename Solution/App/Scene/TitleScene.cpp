@@ -22,9 +22,14 @@ namespace
 TitleScene::TitleScene()
 {
 	spBase = std::make_unique<SpriteBase>();
-	titleSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	backSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title/Title_Back.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	logoSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title/Title_logo.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
+
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
+	backSprite->setSize(winSize);
+	logoSprite->setSize(winSize);
 
 	bgm = Sound::ins()->loadWave("Resources/BGM/mmc_140_BGM1.wav");
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
@@ -71,7 +76,8 @@ void TitleScene::update_end()
 	const auto nowTime = transitionTimer->getNowTime();
 	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 
-	titleSprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height), Util::easeOutBounce(rate));
+	logoSprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height), Util::easeOutBounce(rate));
+	backSprite->position.y = logoSprite->position.y;
 
 	if (nowTime >= transitionTime)
 	{
@@ -116,5 +122,6 @@ void TitleScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
-	titleSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+	backSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+	logoSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 }
