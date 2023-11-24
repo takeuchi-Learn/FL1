@@ -207,7 +207,7 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 60.0f;
+	constexpr float maxAngle = 40.0f;
 
 	// 制限
 	if (angle >= maxAngle)angle = maxAngle;
