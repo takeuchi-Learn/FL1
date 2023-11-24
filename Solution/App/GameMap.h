@@ -29,6 +29,8 @@ private:
 		MAPCHIP_GOAL,
 		/// @brief 道路
 		MAPCHIP_PLAIN_ROAD,
+		/// @brief 障害物
+		MAPCHIP_OBSTACLE_OBJECT,
 
 		/// @brief 最後の要素
 		MAPCHIP_ALLNUM

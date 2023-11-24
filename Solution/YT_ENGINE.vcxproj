@@ -163,7 +163,7 @@
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Imu\Kalman.cpp" />
-    <ClCompile Include="App\Object\TransparentWall.cpp" />
+    <ClCompile Include="App\Object\ObstacleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\Goal.h" />
@@ -224,7 +224,7 @@
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Imu\Kalman.h" />
-    <ClInclude Include="App\Object\TransparentWall.h" />
+    <ClInclude Include="App\Object\ObstacleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
