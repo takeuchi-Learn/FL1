@@ -83,4 +83,10 @@ void GameOverScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	sprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+	ImGui::PushFont(DX12Base::ins()->getBigImFont());
+	ImGui::Text("Press Space...");
+	ImGui::PopFont();
+	ImGui::End();
 }

@@ -15,7 +15,7 @@ using namespace DirectX;
 
 namespace
 {
-	constexpr float transitionTimeSec = 1.25f;
+	constexpr float transitionTimeSec = 1.5f;
 	constexpr auto transitionTime = static_cast<Timer::timeType>(Timer::oneSecF * transitionTimeSec);
 }
 
@@ -124,4 +124,10 @@ void TitleScene::drawFrontSprite()
 	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
 	backSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 	logoSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+	ImGui::PushFont(DX12Base::ins()->getBigImFont());
+	ImGui::Text("Press Space...");
+	ImGui::PopFont();
+	ImGui::End();
 }
