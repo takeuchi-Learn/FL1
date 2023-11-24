@@ -36,7 +36,6 @@ namespace
 	constexpr auto bgmPath = "Resources/BGM/A-Sense-of-Loss.wav";
 	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
-	//constexpr auto mapYamlPath = "Resources/Map/map.yml";
 
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
 
