@@ -122,7 +122,10 @@ void PlayScene::update()
 	// スペースでシーン切り替え
 	if (Input::ins()->triggerKey(DIK_SPACE))
 	{
-		resetStageNum();
+		if (!Input::ins()->hitKey(DIK_LCONTROL))
+		{
+			resetStageNum();
+		}
 		SceneManager::ins()->changeScene<TitleScene>();
 		return;
 	}
