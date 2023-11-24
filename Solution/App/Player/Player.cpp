@@ -229,7 +229,7 @@ void Player::jump()
 
 
 	// ジャンプパワー
-	constexpr float jumpPower = 12.f;
+	constexpr float jumpPower = 10.f;
 	constexpr float bigJumpPower = 18.f;
 
 
