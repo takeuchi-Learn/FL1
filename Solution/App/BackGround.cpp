@@ -10,7 +10,7 @@
 
 using namespace DirectX;
 
-BackGround::BackGround(GameCamera* camera, const unsigned int stageNum)
+BackGround::BackGround(GameCamera* camera,const float mapY, const unsigned int stageNum)
 	:camera(camera)
 	, light(std::make_unique<Light>())
 	, model(std::make_unique<ObjModel>("Resources/backGround/back_" + std::to_string(stageNum) + "/",
@@ -23,7 +23,8 @@ BackGround::BackGround(GameCamera* camera, const unsigned int stageNum)
 	constexpr float scale = 2.5f;
 	obj->setScaleXY(XMFLOAT2(3840.f * scale,2000.f * scale));
 
-	obj->setPosition(XMFLOAT3(6000.f, 1250.f, 10.f));
+	const float y = 1200.f + 64.f * -mapY;
+	obj->setPosition(XMFLOAT3(6000.f,1200.f + 64.f * -mapY, 10.f));
 }
 
 void BackGround::update()

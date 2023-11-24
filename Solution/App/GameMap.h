@@ -83,4 +83,6 @@ public:
 	float getGameoverPos() const;
 
 	float getGoalPosX() const { return goalPosX; }
+
+	size_t getMapY()const { return mapAABBs.size(); }
 };

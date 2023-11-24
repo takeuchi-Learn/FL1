@@ -103,12 +103,12 @@ PlayScene::PlayScene() :
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
-	backGround = std::make_unique<BackGround>(camera.get());
 
 	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) +".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
+	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
