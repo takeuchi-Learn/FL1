@@ -15,7 +15,7 @@ GameCamera::GameCamera(BillboardData* obj)
 	// センサーの生成
 	if (sensor == nullptr)
 	{
-		sensor = new Sensor();
+		sensor = Sensor::ins();
 	}
 }
 
