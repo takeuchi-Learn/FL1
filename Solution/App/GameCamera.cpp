@@ -134,7 +134,9 @@ void GameCamera::checkSensorInput()
 	getGyroY = sensor->GetGyroY();
 	getGyroZ = sensor->GetGyroZ();
 
-	if (PadImu::ins()->getDevCount() > 0)
+	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
+
+	if (imuPadIsConnected)
 	{
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
@@ -157,8 +159,17 @@ void GameCamera::checkSensorInput()
 			+ invRaito * std::atan2(getAccelX, getAccelY) + getGyroZ;
 	}
 
+	if (imuPadIsConnected)
+	{
+		// angleを動かす大きさ
+		constexpr float shiftVal = 2.f;
+
+		const float stick = JslGetSimpleState(PadImu::ins()->getHandles()[0]).stickRX;
+		angle += stick * shiftVal;
+	}
+
 	// 静止状態を大きめに取る
-	constexpr float stopRange = 0.5f;
+	constexpr float stopRange = 0.25f;
 	if (angle <= stopRange && -stopRange <= angle)
 	{
 		angle = 0.0f;

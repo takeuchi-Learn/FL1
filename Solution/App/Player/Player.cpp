@@ -266,7 +266,15 @@ void Player::jump()
 	if (!isJump && fallTime < 1 || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
-		triggerJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B);
+		triggerJump |= Input::ins()->hitInputPadLT() || Input::ins()->hitInputPadRT();
+
+		if (PadImu::ins()->getDevCount() > 0)
+		{
+			const auto& state = PadImu::ins()->getStates()[0];
+
+			// 左右どちらかのトリガーが半分以上押されていたらジャンプ
+			triggerJump |= state.lTrigger >= 0.5f || state.rTrigger >= 0.5f;
+		}
 
 		if (triggerJump || sensorValue >= jumpSensorValue)
 		{
