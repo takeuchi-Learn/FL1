@@ -49,7 +49,7 @@ void GameCamera::startAutoRot()
 		addStartTimer = true;
 	} else
 	{
-		if (!startLerp)
+		//if (!startLerp)
 		{
 			// 傾きの最低値
 			constexpr float startFrameAngleMin = 0.1f;
@@ -69,23 +69,23 @@ void GameCamera::startAutoRot()
 			angle -= startFrameAngle;
 		}
 
-		// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
-		// プレイヤーの角度を取得
-		const float objAngleZ = obj->rotation;
+		//// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
+		//// プレイヤーの角度を取得
+		//const float objAngleZ = obj->rotation;
 
-		// angleの最低値
-		constexpr float angleMin = 1.0f;
-		if (angle <= angleMin && !startLerp)
-		{
-			angle = angleMin;
-			startLerp = true;
-		}
+		//// angleの最低値
+		//constexpr float angleMin = 1.0f;
+		//if (angle <= angleMin && !startLerp)
+		//{
+		//	angle = angleMin;
+		//	startLerp = true;
+		//}
 
-		if (startLerp && objAngleZ > -angleMin)
-		{
-			angle = 0.f;
-			//obj->setRotationZ(0.f);
-		}
+		//if (startLerp && objAngleZ > -angleMin)
+		//{
+		//	angle = 0.f;
+		//	//obj->setRotationZ(0.f);
+		//}
 	}
 }
 
