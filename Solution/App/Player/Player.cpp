@@ -6,8 +6,7 @@
 #include <fstream>
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
-#include <JoyShockLibrary.h>
-#include <PadImu.h>
+#include <Input/PadImu.h>
 #include <GameMap.h>
 
 #include <GameMap.h>

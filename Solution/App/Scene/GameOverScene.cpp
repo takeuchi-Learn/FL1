@@ -6,8 +6,7 @@
 #include <Util/Util.h>
 #include <Sound/Sound.h>
 #include <algorithm>
-#include <PadImu.h>
-#include <JoyShockLibrary.h>
+#include <Input/PadImu.h>
 
 #include "TitleScene.h"
 

@@ -160,7 +160,7 @@
     <ClCompile Include="App\Player\Player.cpp" />
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
-    <ClCompile Include="App\PadImu.cpp" />
+    <ClCompile Include="Engine\Input\PadImu.cpp" />
     <ClCompile Include="App\Object\ObstacleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -219,7 +219,7 @@
     <ClInclude Include="App\Player\Player.h" />
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
-    <ClInclude Include="App\PadImu.h" />
+    <ClInclude Include="Engine\Input\PadImu.h" />
     <ClInclude Include="App\Object\ObstacleObject.h" />
   </ItemGroup>
   <ItemGroup>

@@ -2,13 +2,12 @@
 #include <Input/Input.h>
 #include <System/SceneManager.h>
 #include <Util/Timer.h>
-#include <PadImu.h>
+#include <Input/PadImu.h>
 #include <2D/Sprite.h>
 #include <2D/SpriteBase.h>
 #include <Util/Util.h>
 #include <Sound/Sound.h>
 #include <algorithm>
-#include <JoyShockLibrary.h>
 
 #include "PlayScene.h"
 
@@ -39,9 +38,6 @@ TitleScene::~TitleScene()
 
 void TitleScene::start()
 {
-	// JoyShockLibraryのパッド接続状況をリセット
-	PadImu::ins()->reset();
-
 	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
 }
 
@@ -62,6 +58,9 @@ void TitleScene::update_main()
 		// Rキーでステージをリセット
 		if (Input::ins()->triggerKey(DIK_R))
 		{
+			// JoyShockLibraryのパッド接続状況をリセット
+			PadImu::ins()->reset();
+
 			PlayScene::resetStageNum();
 		}
 	}
@@ -96,9 +95,13 @@ bool TitleScene::checkInputOfStartTransition()
 
 	if (PadImu::ins()->getDevCount() > 0)
 	{
-		const auto state = JslGetSimpleState(PadImu::ins()->getHandles()[0]);
-		// todo hitkey相当になっているのでトリガーに変更する
-		return static_cast<bool>(state.buttons & (useJSLMask));
+		const int preState = PadImu::ins()->getPreStates()[0].buttons;
+		const int state = PadImu::ins()->getStates()[0].buttons;
+
+		const bool pre = PadImu::hitButtons(preState, useJSLMask);
+		const bool current = PadImu::hitButtons(state, useJSLMask);
+
+		if (!pre && current) { return true; }
 	}
 
 	return false;

@@ -1,8 +1,7 @@
 ﻿#include "GameCamera.h"
 #include <Input/Input.h>
 
-#include <PadImu.h>
-#include <JoyShockLibrary.h>
+#include <Input/PadImu.h>
 
 using namespace DirectX;
 GameCamera::GameCamera(BillboardData* obj)

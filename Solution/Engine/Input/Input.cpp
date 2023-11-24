@@ -7,6 +7,7 @@
 #pragma comment(lib, "dxguid.lib")
 
 #include "System/WinAPI.h"
+#include <Input/PadImu.h>
 
 Input::Input()
 {
@@ -53,6 +54,8 @@ void Input::update()
 	ScreenToClient(WinAPI::getInstance()->getHwnd(), &mousePos);
 
 	updatePad(padNum);
+
+	PadImu::ins()->update();
 }
 
 void Input::resetState()

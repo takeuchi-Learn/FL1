@@ -73,6 +73,6 @@ public:
 	void drawObj3d() override;
 	void drawFrontSprite() override;
 
-	static void resetStageNum() { stageNum = 0; }
-	static unsigned short getStageNum() { return stageNum; }
+	static inline void resetStageNum() { stageNum = 0; }
+	static inline unsigned short getStageNum() { return stageNum; }
 };

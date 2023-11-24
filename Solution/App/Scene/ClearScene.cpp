@@ -3,8 +3,7 @@
 #include <2D/DebugText.h>
 #include <Input/Input.h>
 #include <System/SceneManager.h>
-#include <PadImu.h>
-#include <JoyShockLibrary.h>
+#include <Input/PadImu.h>
 
 #include "TitleScene.h"
 

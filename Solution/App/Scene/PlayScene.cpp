@@ -20,8 +20,7 @@
 #include <Collision/Collision.h>
 #include <Sound/Sound.h>
 
-#include <PadImu.h>
-#include <JoyShockLibrary.h>
+#include <Input/PadImu.h>
 
 #include "TitleScene.h"
 #include "ClearScene.h"
