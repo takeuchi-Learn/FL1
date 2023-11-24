@@ -242,7 +242,7 @@ void Player::jump()
 	pushJumpKeyFrame = false;
 
 
-	if (!isJump)
+	if (!isJump && fallTime < 1)
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 		{
