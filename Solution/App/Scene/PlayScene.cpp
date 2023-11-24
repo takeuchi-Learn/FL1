@@ -111,6 +111,7 @@ PlayScene::PlayScene() :
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
+	player->setGoalPosX(gameMap->getGoalPosX());
 
 	// 開始時は物理挙動をしない
 	player->isDynamic = false;
@@ -200,7 +201,6 @@ void PlayScene::drawObj3d()
 	backGround->draw();
 	gameMap->draw();
 	player->draw();
-	//goal->draw();
 }
 
 void PlayScene::drawFrontSprite()

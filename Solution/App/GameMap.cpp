@@ -29,6 +29,7 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	{
 	case GameMap::MAPCHIP_GOAL:
 		goal = std::make_unique<Goal>(camera, pos, scale);
+		goalPosX = pos.x;
 		break;
 
 		// todo なにこれ？

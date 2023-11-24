@@ -245,8 +245,8 @@ void Player::jump()
 	}
 
 	// ジャンプパワー
-	constexpr float jumpPower = 18.f;
-	constexpr float bigJumpPower = 25.f;
+	constexpr float jumpPower = 10.f;
+	constexpr float bigJumpPower = 18.f;
 
 	calcDropVec();
 
@@ -256,7 +256,8 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	if (!isJump)
+
+	if (!isJump && fallTime < 1)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B);
@@ -489,7 +490,7 @@ void Player::checkStageSide()
 	if (isDead)return;
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if (mapPos.x <= leftScrollEndPos)
+	if(mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
 	{
 		camera->setFollowFlag(false);
 	} else
@@ -512,6 +513,8 @@ void Player::moveLimit()
 
 	// 操作可能になったタイミングの座標をセット
 	leftScrollEndPos = mapPos.x;
+	// ゴールが中心に表示されたらスクロール停止
+	rightScrollEndPos = goalPosX;
 
 	setMoveLimitFlag = true;
 }

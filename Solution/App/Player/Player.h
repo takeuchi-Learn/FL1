@@ -72,6 +72,10 @@ class Player
 
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
 	float leftScrollEndPos = 0.f;
+	// 上の右版
+	float rightScrollEndPos = 0.f;
+
+	float goalPosX = 0.f;
 
 	bool setMoveLimitFlag = false;
 private:
@@ -143,7 +147,11 @@ public:
 	/// @param posY
 	void setGameOverPos(const float posY) { gameoverPos = posY; }
 
-	inline const auto& getObj() { return gameObj->getFrontData(); }
+	/// @brief ゴールの座標をセットする関数(スクロール停止用)
+	/// @param posX 
+	void setGoalPosX(const float posX) { goalPosX = posX; }
+
+	inline const auto& getObj()const { return gameObj->getFrontData(); }
 
 	inline const auto& getMapPos() const { return mapPos; }
 
