@@ -255,8 +255,8 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-
-	if (!isJump && fallTime < 1)
+	
+	if (!isJump && fallTime < 1 || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B);
@@ -281,10 +281,8 @@ void Player::jump()
 			}
 
 			// バウンド強制終了
-			if (isReboundY)
-			{
-				isReboundY = false;
-			}
+			isReboundY = false;
+
 		}
 	}
 
@@ -307,7 +305,6 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 {
 	// ジャンプ終了処理
 	isJump = false;
-	fallTime = 0;
 
 	// 押し出し後の位置
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
@@ -315,7 +312,12 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	mapPos.y = extrusionEndPosY + 0.01f;
 
 	isDrop = false;
-	startRebound();
+
+	if (fallTime > 2)
+	{
+		startRebound();
+	}
+	fallTime = 0;
 }
 
 void Player::calcDropVec()

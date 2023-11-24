@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <Input/PadImu.h>
 
-#include "TitleScene.h"
+#include "PlayScene.h"
 
 using namespace DirectX;
 
@@ -21,7 +21,7 @@ GameOverScene::GameOverScene()
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
 
 	updateProc = std::bind(&GameOverScene::update_main, this);
-	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<TitleScene>(); });
+	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 }
 
 GameOverScene::~GameOverScene()
