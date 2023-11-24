@@ -5,6 +5,8 @@
 #include <System/SceneManager.h>
 #include "ClearScene.h"
 
+#include"PlayScene.h"
+
 ClearScene::ClearScene() :
 	spriteBase(std::make_unique<SpriteBase>())
 {
@@ -21,7 +23,17 @@ void ClearScene::update()
 					 0.f, 0.f);
 	if (Input::ins()->triggerKey(DIK_SPACE))
 	{
-		SceneManager::ins()->changeScene<TitleScene>();
+		const unsigned short stageNum = PlayScene::getStageNum();
+		constexpr unsigned short stageMax = 2;
+		if (stageNum == stageMax)
+		{
+			PlayScene::resetStageNum();
+			SceneManager::ins()->changeScene<TitleScene>();
+		}
+		else
+		{
+			SceneManager::ins()->changeScene<PlayScene>();
+		}
 	}
 }
 

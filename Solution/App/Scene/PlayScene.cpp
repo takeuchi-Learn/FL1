@@ -25,12 +25,14 @@
 
 using namespace DirectX;
 
+unsigned short PlayScene::stageNum = 0;
+
 namespace
 {
 	constexpr auto bgmPath = "Resources/BGM.wav";
 	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
-	constexpr auto mapYamlPath = "Resources/Map/map.yml";
+	//constexpr auto mapYamlPath = "Resources/Map/map.yml";
 
 	constexpr XMFLOAT3 objectPosDef = XMFLOAT3(0, 0, 0);
 	constexpr XMFLOAT3 cameraPosDef = XMFLOAT3(0, 0, -600);
@@ -100,6 +102,7 @@ PlayScene::PlayScene() :
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
+	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) +".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
@@ -156,6 +159,7 @@ void PlayScene::update()
 		// クリア演出後シーン切り替え
 		if(1)
 		{
+			stageNum++;
 			SceneManager::ins()->changeScene<ClearScene>();
 		}
 	}
@@ -166,7 +170,6 @@ void PlayScene::drawObj3d()
 	backGround->draw();
 	gameMap->draw();
 	player->draw();
-	//goal->draw();
 }
 
 void PlayScene::drawFrontSprite()

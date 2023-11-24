@@ -46,6 +46,9 @@ private:
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<GameMap> gameMap;
 
+
+	static unsigned short stageNum;
+
 #pragma region ゲームオーバー関係
 	int gameOverTimer = 0;
 	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
@@ -64,4 +67,7 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
+
+	static void resetStageNum() { stageNum = 0; }
+	static unsigned short getStageNum() { return stageNum; }
 };

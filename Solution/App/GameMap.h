@@ -33,6 +33,8 @@ private:
 		MAPCHIP_OBSTACLE_OBJECT,
 		/// @brief ステージ外進行防止の透明な壁
 		MAPCHIP_TRANSPARENT_BLOCK,
+		/// @brief ただのブロック
+		MAPCHIP_BLOCK,
 
 		/// @brief 最後の要素
 		MAPCHIP_ALLNUM
