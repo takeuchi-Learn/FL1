@@ -45,43 +45,22 @@ void GameCamera::startAutoRot()
 		addStartTimer = true;
 	} else
 	{
-		//if (!startLerp)
+		// 傾きの最低値
+		constexpr float startFrameAngleMin = 0.1f;
+		// 最低値を下回ったら固定
+		if (startFrameAngle <= startFrameAngleMin)
 		{
-			// 傾きの最低値
-			constexpr float startFrameAngleMin = 0.1f;
-			// 最低値を下回ったら固定
-			if (startFrameAngle <= startFrameAngleMin)
-			{
-				startFrameAngle = startFrameAngleMin;
-			} else
-			{
-				// 1フレームに減算する量
-				constexpr float subStartFrameAngle = 0.25f;
-				// 段々遅くするために少しずつ減らす
-				startFrameAngle -= subStartFrameAngle;
-			}
-
-			// 少しずつ平行にしていく
-			angle -= startFrameAngle;
+			startFrameAngle = startFrameAngleMin;
+		} else
+		{
+			// 1フレームに減算する量
+			constexpr float subStartFrameAngle = 0.25f;
+			// 段々遅くするために少しずつ減らす
+			startFrameAngle -= subStartFrameAngle;
 		}
 
-		//// 自動傾き終了時にプレイヤーのアングルが0になるように調整する
-		//// プレイヤーの角度を取得
-		//const float objAngleZ = obj->rotation;
-
-		//// angleの最低値
-		//constexpr float angleMin = 1.0f;
-		//if (angle <= angleMin && !startLerp)
-		//{
-		//	angle = angleMin;
-		//	startLerp = true;
-		//}
-
-		//if (startLerp && objAngleZ > -angleMin)
-		//{
-		//	angle = 0.f;
-		//	//obj->setRotationZ(0.f);
-		//}
+		// 少しずつ平行にしていく
+		angle -= startFrameAngle;
 	}
 }
 
@@ -97,7 +76,6 @@ void GameCamera::updateStartTimer()
 	if (startTimer >= startTimeMax)
 	{
 		cameraState = CameraState::INPUT;
-
 	}
 }
 
