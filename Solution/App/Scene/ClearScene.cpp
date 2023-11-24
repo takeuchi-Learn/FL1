@@ -6,6 +6,7 @@
 #include <Input/PadImu.h>
 #include <Util/Timer.h>
 #include <Util/Util.h>
+#include <filesystem>
 
 #include "TitleScene.h"
 #include "PlayScene.h"
@@ -71,17 +72,15 @@ void ClearScene::update_main()
 	{
 		nowLoading->isInvisible = false;
 
-		// todo ファイルがあるかどうかで決める
-		constexpr unsigned short stageMax = 3;
-
-		const unsigned short stageNum = PlayScene::getStageNum();
-		if (stageNum == stageMax)
+		// 該当ステージがあればそれを始め、無ければタイトルへ戻る
+		const auto mapYamlPath = "Resources/Map/map_" + std::to_string(PlayScene::getStageNum()) + ".yml";
+		if (std::filesystem::exists(mapYamlPath))
+		{
+			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+		} else
 		{
 			PlayScene::resetStageNum();
 			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<TitleScene>(); });
-		} else
-		{
-			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 		}
 
 		updateProc = std::bind(&ClearScene::update_end, this);
@@ -93,7 +92,7 @@ void ClearScene::update_end()
 {
 	const auto nowTime = transitionTimer->getNowTime();
 	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
-	
+
 	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 10.f;
 	sprite->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
 
