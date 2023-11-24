@@ -142,7 +142,7 @@ void GameCamera::checkSensorInput()
 	}
 
 	// 静止状態を大きめに取る
-	constexpr float stopRange = 1.f;
+	constexpr float stopRange = 0.5f;
 	if (angle <= stopRange && -stopRange <= angle)
 	{
 		angle = 0.0f;
