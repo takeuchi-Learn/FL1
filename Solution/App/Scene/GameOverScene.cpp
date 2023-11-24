@@ -64,7 +64,8 @@ void GameOverScene::update_end()
 	const auto nowTime = transitionTimer->getNowTime();
 	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 
-	sprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height + 1), Util::easeOutBounce(rate));
+	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 1.f;
+	sprite->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
 
 	if (thread->joinable()
 		&& nowTime >= transitionTime)
