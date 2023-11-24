@@ -92,7 +92,8 @@ void GameCamera::updateStartTimer()
 
 	// タイマーの最大値
 	// 自動傾き終了後にタイマーが起動し、以下の時間を上回ったら入力受付開始となる
-	constexpr unsigned short startTimeMax = static_cast<short>(60.f * 1.5f);
+	// todo シーン側で行うべき要素
+	constexpr unsigned short startTimeMax = 0;
 	if (startTimer >= startTimeMax)
 	{
 		cameraState = CameraState::INPUT;
