@@ -8,6 +8,8 @@
 
 #include "TitleScene.h"
 
+#include"PlayScene.h"
+
 ClearScene::ClearScene() :
 	spriteBase(std::make_unique<SpriteBase>())
 {
@@ -26,7 +28,17 @@ void ClearScene::update()
 	debugText->Print("Clear Scene\nHIT SPACE", 0.f, 0.f);
 	if (checkInputOfStartTransition())
 	{
-		SceneManager::ins()->changeScene<TitleScene>();
+		const unsigned short stageNum = PlayScene::getStageNum();
+		constexpr unsigned short stageMax = 2;
+		if (stageNum == stageMax)
+		{
+			PlayScene::resetStageNum();
+			SceneManager::ins()->changeScene<TitleScene>();
+		}
+		else
+		{
+			SceneManager::ins()->changeScene<PlayScene>();
+		}
 	}
 }
 

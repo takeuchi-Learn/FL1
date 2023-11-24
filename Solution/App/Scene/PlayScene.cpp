@@ -29,12 +29,14 @@
 
 using namespace DirectX;
 
+unsigned short PlayScene::stageNum = 0;
+
 namespace
 {
 	constexpr auto bgmPath = "Resources/BGM/A-Sense-of-Loss.wav";
 	constexpr auto particleGraphPath = L"Resources/judgeRange.png";
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
-	constexpr auto mapYamlPath = "Resources/Map/map.yml";
+	//constexpr auto mapYamlPath = "Resources/Map/map.yml";
 
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
 
@@ -105,6 +107,7 @@ PlayScene::PlayScene() :
 
 	backGround = std::make_unique<BackGround>(camera.get());
 
+	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) +".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());
 	const bool ret = gameMap->loadDataFile(mapYamlPath);
 	assert(false == ret);
@@ -191,6 +194,7 @@ void PlayScene::update_main()
 		// クリア演出後シーン切り替え
 		if (1)
 		{
+			stageNum++;
 			SceneManager::ins()->changeScene<ClearScene>();
 		}
 	}

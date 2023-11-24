@@ -245,7 +245,7 @@ void Player::jump()
 	}
 
 	// ジャンプパワー
-	constexpr float jumpPower = 10.f;
+	constexpr float jumpPower = 15.f;
 	constexpr float bigJumpPower = 18.f;
 
 	calcDropVec();
