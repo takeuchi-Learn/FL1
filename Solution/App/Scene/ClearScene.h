@@ -21,11 +21,7 @@ class ClearScene :
 	// スプライト
 	// --------------------
 	std::unique_ptr<SpriteBase> spriteBase;
-
-	// --------------------
-	// デバッグテキスト
-	// --------------------
-	std::unique_ptr<DebugText> debugText;
+	std::unique_ptr<Sprite> sprite;
 
 	std::unique_ptr<GameScene> nextScene = nullptr;
 	std::unique_ptr<std::jthread> thread{};

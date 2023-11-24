@@ -9,11 +9,12 @@
 
 #include"PlayScene.h"
 
+using namespace DirectX;
+
 ClearScene::ClearScene() :
 	spriteBase(std::make_unique<SpriteBase>())
 {
-	debugText = std::make_unique<DebugText>(spriteBase->loadTexture(L"Resources/debugfont.png"),
-											spriteBase.get());
+	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/gameclear.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
 }
 
 ClearScene::~ClearScene()
@@ -24,7 +25,6 @@ void ClearScene::start()
 
 void ClearScene::update()
 {
-	debugText->Print("Clear Scene\nHIT SPACE", 0.f, 0.f);
 	if (checkInputOfStartTransition())
 	{
 		// todo ファイルがあるかどうかで決める
@@ -69,5 +69,5 @@ bool ClearScene::checkInputOfStartTransition()
 void ClearScene::drawFrontSprite()
 {
 	spriteBase->drawStart(DX12Base::ins()->getCmdList());
-	debugText->DrawAll();
+	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
 }
