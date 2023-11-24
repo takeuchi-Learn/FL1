@@ -18,6 +18,8 @@ namespace
 {
 	// todo mapSizeはGameMapのconstexpr定数にする
 	constexpr float mapSize = 100.f;
+
+	constexpr float defaultJumpPower = 15.f;
 }
 
 bool Player::loadYamlFile()
@@ -25,12 +27,22 @@ bool Player::loadYamlFile()
 	constexpr const char filePath[] = "Resources/DataFile/player.yml";
 
 	Yaml::Node root{};
-	YamlLoader::LoadYamlFile(root, filePath);
 
-	XMFLOAT2& startPos = mapPos;
-	LoadYamlDataToFloat2(root, startPos);
+	if (YamlLoader::LoadYamlFile(root, filePath))
+	{
+		return true;
+	}
 
-	this->setMapPos(startPos);
+	LoadYamlData(root, jumpPower);
+	LoadYamlData(root, bigJumpPower);
+	LoadYamlData(root, jumpSensorValue);
+	LoadYamlData(root, bigSensorJyroValue);
+	LoadYamlData(root, boundEndVel);
+	LoadYamlData(root, speedMag);
+	LoadYamlData(root, fallVelMag);
+	LoadYamlData(root, sideReboundAddVal);
+	LoadYamlData(root, maxSpeedX);
+	LoadYamlData(root, accMagX);
 
 	return false;
 }
@@ -42,11 +54,11 @@ Player::Player(GameCamera* camera) :
 	constexpr float scale = mapSize;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
-	// todo player.ymlに読み込む値が増えたらコメントアウトを解除する
-	//loadYamlFile();
+	loadYamlFile();
 
 	// 判定仮設定
-	sphere.radius = scale / 2.f;
+	constexpr float r = scale / 2.f * 0.8f;
+	sphere.radius = r;
 }
 
 void Player::update()
@@ -250,18 +262,9 @@ void Player::jump()
 		sensorValue = state.accelY / 8.f;
 	}
 
-	// ジャンプパワー
-	constexpr float jumpPower = 15.f;
-	constexpr float bigJumpPower = 18.f;
-
 	calcDropVec();
 
-	// ジャンプするのに必要なジャイロの値
-	constexpr float jumpSensorValue = 0.25f;
-	constexpr float bigSensorJyroValue = 2.f;
-
 	pushJumpKeyFrame = false;
-
 
 	if (!isJump && fallTime < 1 || isReboundY)
 	{
@@ -297,7 +300,6 @@ void Player::jump()
 
 			// バウンド強制終了
 			isReboundY = false;
-
 		}
 	}
 
@@ -366,7 +368,6 @@ void Player::startRebound()
 	// 跳ね返り開始処理
 	isReboundY = true;
 
-	constexpr float fallVelMag = 0.4f;
 	// 落下した高さに合わせて跳ね返り量を変える
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
 
@@ -382,7 +383,6 @@ void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
 
-	constexpr float boundEndVel = 3.f;
 	if (-currentFallVelovity <= boundEndVel)
 	{
 		isReboundY = false;
@@ -403,10 +403,9 @@ void Player::calcSideRebound()
 	// 加算値を加算または減算
 
 	// 変化する値
-	constexpr float changeValue = 2.5f;
 	if (sideAddX > 0)
 	{
-		sideAddX -= changeValue;
+		sideAddX -= sideReboundAddVal;
 
 		// 負の値になったら演算終了
 		if (sideAddX <= 0)
@@ -416,7 +415,7 @@ void Player::calcSideRebound()
 		}
 	} else
 	{
-		sideAddX += changeValue;
+		sideAddX += sideReboundAddVal;
 
 		if (sideAddX >= 0)
 		{
@@ -460,11 +459,6 @@ void Player::move()
 	// 角度を取得
 	const float angle = camera->getAngle();
 
-	// 角度に応じて移動
-	// 一旦加速は考慮せずに実装
-	// ここ変更すると速度が変わる
-	constexpr float speedMag = 0.35f;
-
 	const float addPos = angle * speedMag;
 
 	DirectX::XMFLOAT2 position = mapPos;
@@ -472,11 +466,9 @@ void Player::move()
 
 	// 加速度計算と加算
 	// 最大速度
-	constexpr float maxSpeed = 5.f;
-	if (abs(preFramePos.x - position.x) <= maxSpeed)
+	if (abs(preFramePos.x - position.x) <= maxSpeedX)
 	{
-		constexpr float accMag = 0.015f;
-		acc += addPos * accMag;
+		acc += addPos * accMagX;
 		position.x += acc;
 
 		// 停止したらリセット
@@ -534,4 +526,3 @@ void Player::moveLimit()
 
 	setMoveLimitFlag = true;
 }
-

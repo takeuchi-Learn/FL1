@@ -58,9 +58,13 @@ bool ClearScene::checkInputOfStartTransition()
 
 	if (PadImu::ins()->getDevCount() > 0)
 	{
-		const auto state = JslGetSimpleState(PadImu::ins()->getHandles()[0]);
-		// todo hitkey相当になっているのでトリガーに変更する
-		return static_cast<bool>(state.buttons & (useJSLMask));
+		const int preState = PadImu::ins()->getPreStates()[0].buttons;
+		const int state = PadImu::ins()->getStates()[0].buttons;
+
+		const bool pre = PadImu::hitButtons(preState, useJSLMask);
+		const bool current = PadImu::hitButtons(state, useJSLMask);
+
+		if (!pre && current) { return true; }
 	}
 
 	return false;

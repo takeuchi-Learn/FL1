@@ -1,3 +1,24 @@
-startPos:
-  x:3
-  y:-1
+# ジャンプ力
+jumpPower: 15.0
+bigJumpPower: 18.0
+
+# ジャンプに必要なセンサーの値
+jumpSensorValue: 0.25
+bigSensorJyroValue: 2.0
+
+boundEndVel: 3.0
+
+# 角度に応じって移動
+# いったん加速度は考慮せずに実装
+# ここを変えると速度が変わる
+# 使用コード: position.x += angle * speedMag
+speedMag: 0.35
+
+# startReboundで使用
+# fallStartSpeed = -currentFallVelovity * fallVelMag;
+fallVelMag: 0.4
+
+sideReboundAddVal: 2.5
+
+maxSpeedX: 5.0
+accMagX: 0.015

@@ -26,6 +26,18 @@ class Player
 
 	CollisionShape::Sphere sphere;
 
+	// yamlから読む変数
+	float jumpPower{};
+	float bigJumpPower{};
+	float jumpSensorValue{};
+	float bigSensorJyroValue{};
+	float boundEndVel{};
+	float speedMag{};
+	float fallVelMag{};
+	float sideReboundAddVal{};
+	float maxSpeedX{};
+	float accMagX{};
+
 	// 現在のフレームでジャンプキー押したかどうか(ジャンプできない不具合防止用)
 	bool pushJumpKeyFrame = false;
 	bool reboundYFrame = false;
