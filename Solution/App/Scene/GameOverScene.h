@@ -9,6 +9,7 @@
 #include <thread>
 #include <functional>
 
+class Timer;
 class Sprite;
 class SpriteBase;
 class SoundData;
@@ -21,6 +22,7 @@ class GameOverScene :
 	std::unique_ptr<std::jthread> thread{};
 
 	std::function<void()> updateProc{};
+	std::unique_ptr<Timer> transitionTimer;
 
 	std::unique_ptr<SpriteBase> spBase;
 	std::unique_ptr<Sprite> sprite;

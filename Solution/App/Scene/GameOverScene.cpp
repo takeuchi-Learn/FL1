@@ -5,6 +5,7 @@
 #include <2D/SpriteBase.h>
 #include <Util/Util.h>
 #include <Sound/Sound.h>
+#include <Util/Timer.h>
 #include <algorithm>
 #include <Input/PadImu.h>
 
@@ -12,7 +13,13 @@
 
 using namespace DirectX;
 
-GameOverScene::GameOverScene()
+namespace
+{
+	constexpr Timer::timeType transitionTime = Timer::timeType(Timer::oneSecF * 1.5f);
+}
+
+GameOverScene::GameOverScene() :
+	transitionTimer(std::make_unique<Timer>())
 {
 	spBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/gameover.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
@@ -48,12 +55,19 @@ void GameOverScene::update_main()
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
 		updateProc = std::bind(&GameOverScene::update_end, this);
+		transitionTimer->reset();
 	}
 }
 
 void GameOverScene::update_end()
 {
-	if (thread->joinable())
+	const auto nowTime = transitionTimer->getNowTime();
+	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
+
+	sprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height + 1), Util::easeOutBounce(rate));
+
+	if (thread->joinable()
+		&& nowTime >= transitionTime)
 	{
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
