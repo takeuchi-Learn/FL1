@@ -57,6 +57,13 @@ void TitleScene::update_main()
 		updateProc = std::bind(&TitleScene::update_end, this);
 
 		transitionTimer->reset();
+	} else
+	{
+		// Rキーでステージをリセット
+		if (Input::ins()->triggerKey(DIK_R))
+		{
+			PlayScene::resetStageNum();
+		}
 	}
 }
 
