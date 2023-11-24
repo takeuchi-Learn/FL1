@@ -21,7 +21,6 @@ class Goal;
 class BackGround;
 class Collision;
 class GameMap;
-class SoundData;
 
 class PlayScene :
 	public GameScene

@@ -16,6 +16,7 @@
 class Camera;
 class ObjModel;
 class Light;
+class SoundData;
 
 class Player
 {
@@ -90,10 +91,21 @@ class Player
 	float goalPosX = 0.f;
 
 	bool setMoveLimitFlag = false;
+
+
+#pragma region SE
+	std::weak_ptr<SoundData> jumpSE;
+	std::weak_ptr<SoundData> boundXSE;
+	std::weak_ptr<SoundData> boundYSE;
+
+#pragma endregion
+
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
 	bool loadYamlFile();
+
+	void loadSE();
 
 	/// @brief 自由落下(投げ上げ)の速度を計算します。
 	/// @param startVel 初速度
