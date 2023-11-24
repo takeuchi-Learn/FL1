@@ -5,6 +5,8 @@
 #include <System/SceneManager.h>
 #include "GameOverScene.h"
 
+#include"PlayScene.h"
+
 GameOverScene::GameOverScene() :
 	spriteBase(std::make_unique<SpriteBase>())
 {
@@ -21,7 +23,7 @@ void GameOverScene::update()
 					 0.f, 0.f);
 	if (Input::ins()->triggerKey(DIK_SPACE))
 	{
-		SceneManager::ins()->changeScene<TitleScene>();
+		SceneManager::ins()->changeScene<PlayScene>();
 	}
 }
 
