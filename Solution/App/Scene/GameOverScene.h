@@ -22,8 +22,9 @@ class GameOverScene :
 
 	std::function<void()> updateProc{};
 
-	std::unique_ptr<Sprite> sprite;
 	std::unique_ptr<SpriteBase> spBase;
+	std::unique_ptr<Sprite> sprite;
+	std::unique_ptr<Sprite> nowLoading;
 
 	std::weak_ptr<SoundData> bgm;
 	std::weak_ptr<SoundData> transitionSe;

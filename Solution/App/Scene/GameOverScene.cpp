@@ -16,6 +16,8 @@ GameOverScene::GameOverScene()
 {
 	spBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/gameover.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading->isInvisible = true;
 
 	bgm = Sound::ins()->loadWave("Resources/BGM/BGM.wav");
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
@@ -41,6 +43,8 @@ void GameOverScene::update_main()
 {
 	if (checkInputOfStartTransition())
 	{
+		nowLoading->isInvisible = false;
+
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
 		updateProc = std::bind(&GameOverScene::update_end, this);
@@ -86,11 +90,15 @@ bool GameOverScene::checkInputOfStartTransition()
 void GameOverScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
+	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
 	sprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 
-	ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-	ImGui::PushFont(DX12Base::ins()->getBigImFont());
-	ImGui::Text("Press Space...");
-	ImGui::PopFont();
-	ImGui::End();
+	if (nowLoading->isInvisible)
+	{
+		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+		ImGui::PushFont(DX12Base::ins()->getBigImFont());
+		ImGui::Text("Press Space...");
+		ImGui::PopFont();
+		ImGui::End();
+	}
 }

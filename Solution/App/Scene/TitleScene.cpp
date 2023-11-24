@@ -76,7 +76,7 @@ void TitleScene::update_end()
 	const auto nowTime = transitionTimer->getNowTime();
 	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 
-	logoSprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height), Util::easeOutBounce(rate));
+	logoSprite->position.y = std::lerp(0.f, static_cast<float>(WinAPI::window_height + 1), Util::easeOutBounce(rate));
 	backSprite->position.y = logoSprite->position.y;
 
 	if (nowTime >= transitionTime)
@@ -125,9 +125,12 @@ void TitleScene::drawFrontSprite()
 	backSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 	logoSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 
-	ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-	ImGui::PushFont(DX12Base::ins()->getBigImFont());
-	ImGui::Text("Press Space...");
-	ImGui::PopFont();
-	ImGui::End();
+	if (nowLoading->isInvisible)
+	{
+		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+		ImGui::PushFont(DX12Base::ins()->getBigImFont());
+		ImGui::Text("Press Space...");
+		ImGui::PopFont();
+		ImGui::End();
+	}
 }
