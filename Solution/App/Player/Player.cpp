@@ -195,14 +195,17 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 		case LEFT:
 			// 横のバウンド開始
-			startSideRebound(hitAABB.minPos.m128_f32[0], true);
+			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
 
 			break;
 		case RIGTH:
 			// 横のバウンド開始
-			startSideRebound(hitAABB.maxPos.m128_f32[0], false);
+			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
 			break;
 		}
+
+		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+		gameObj->update(XMConvertToRadians(getObj()->rotation));
 	} else if (hitObjName == typeid(Goal).name())// ゴール衝突
 	{
 		camera->changeStateClear();

@@ -130,14 +130,14 @@ void PlayScene::update()
 {
 	updateProc();
 
-	// 衝突確認
-	checkCollision();
-
 	camera->gameCameraUpdate();
 	camera->update();
 	player->update();
 	backGround->update();
 	gameMap->update();
+
+	// 衝突確認
+	checkCollision();
 }
 
 void PlayScene::update_start()
