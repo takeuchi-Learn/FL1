@@ -7,10 +7,11 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 #include <Input/PadImu.h>
-#include <GameMap.h>
 
 #include <GameMap.h>
 #include <Object/Goal.h>
+#include<Sound/SoundData.h>
+
 
 using namespace DirectX;
 
@@ -18,6 +19,10 @@ namespace
 {
 	// todo mapSizeはGameMapのconstexpr定数にする
 	constexpr float mapSize = 100.f;
+
+	constexpr auto jumpSEPath = "Resources/SE/Player/jump.wav";
+	constexpr auto boundXSEPath = "Resources/SE/Player/boundX.wav";
+	constexpr auto boundYSEPath = "Resources/SE/Player/boundY.wav";
 }
 
 bool Player::loadYamlFile()
@@ -42,6 +47,13 @@ bool Player::loadYamlFile()
 	return false;
 }
 
+void Player::loadSE()
+{
+	jumpSE = Sound::ins()->loadWave(jumpSEPath);
+	boundXSE = Sound::ins()->loadWave(boundXSEPath);
+	boundYSE = Sound::ins()->loadWave(boundYSEPath);
+}
+
 Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
@@ -50,6 +62,7 @@ Player::Player(GameCamera* camera) :
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
 	loadYamlFile();
+	loadSE();
 
 	// 判定仮設定
 	sphere.radius = scale / 2.f;
@@ -283,6 +296,7 @@ void Player::jump()
 			// バウンド強制終了
 			isReboundY = false;
 
+			Sound::playWave(jumpSE, 0, 0.2f);
 		}
 	}
 
@@ -356,6 +370,12 @@ void Player::startRebound()
 	fallStartSpeed = -currentFallVelovity * fallVelMag;
 
 	reboundYFrame = true;
+
+	// 高さがあったら鳴らす
+	if (abs(currentFallVelovity) >= 8.f)
+	{
+		Sound::playWave(boundYSE, 0, 0.2f);
+	}
 }
 
 void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
@@ -436,6 +456,12 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	isReboundX = true;
 	// 衝突時の座標を代入
 	terrainHitObjPosX = mapPos.x;
+
+	// 速度があったら鳴らす
+	if(abs(sideAddX) >= 14.f)
+	{
+		Sound::playWave(boundXSE, 0, 0.2f);
+	}
 }
 
 void Player::move()
