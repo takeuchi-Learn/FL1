@@ -25,6 +25,7 @@ class TitleScene :
 	std::unique_ptr<Timer> transitionTimer;
 
 	std::unique_ptr<Sprite> titleSprite;
+	std::unique_ptr<Sprite> nowLoading;
 	std::unique_ptr<SpriteBase> spBase;
 
 	std::weak_ptr<SoundData> bgm;

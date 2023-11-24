@@ -24,6 +24,8 @@ TitleScene::TitleScene()
 {
 	spBase = std::make_unique<SpriteBase>();
 	titleSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading->isInvisible = true;
 
 	bgm = Sound::ins()->loadWave("Resources/BGM/mmc_140_BGM1.wav");
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
@@ -50,6 +52,7 @@ void TitleScene::update_main()
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
 
+		nowLoading->isInvisible = false;
 		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 		updateProc = std::bind(&TitleScene::update_end, this);
 
@@ -102,5 +105,6 @@ void TitleScene::update()
 void TitleScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
+	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
 	titleSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 }
