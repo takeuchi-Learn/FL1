@@ -100,6 +100,7 @@ void GameCamera::updateStartTimer()
 	if (startTimer >= startTimeMax)
 	{
 		cameraState = CameraState::INPUT;
+
 	}
 }
 

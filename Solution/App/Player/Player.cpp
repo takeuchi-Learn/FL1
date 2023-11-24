@@ -53,6 +53,8 @@ void Player::update()
 	// スタート時はジャンプしないように
 	if(camera->getCameraState() != GameCamera::CameraState::START)
 	{
+		moveLimit();
+
 		jump();
 		rebound();
 	}
@@ -499,5 +501,15 @@ void Player::checkGameOver()
 	{
 		isDead = true;
 	}
+}
+
+void Player::moveLimit()
+{
+	if (setMoveLimitFlag)return;
+
+	// 操作可能になったタイミングの座標をセット
+	leftScrollEndPos = mapPos.x;
+
+	setMoveLimitFlag = true;
 }
 

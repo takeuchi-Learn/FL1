@@ -66,6 +66,7 @@ private:
 	float startFrameAngle = 1.5f;
 	// スタート演出の補間処理
 	bool startLerp = false;
+
 #pragma endregion
 
 
