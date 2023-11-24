@@ -106,6 +106,7 @@ PlayScene::PlayScene() :
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
+	player->setGoalPosX(gameMap->getGoalPosX());
 
 }
 

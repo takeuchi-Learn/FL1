@@ -44,6 +44,7 @@ private:
 	std::vector<std::vector<CollisionShape::AABB>>mapAABBs;
 
 	std::unique_ptr<Goal>goal;
+	float goalPosX = 0.f;
 
 	GameCamera* camera = nullptr;
 
@@ -80,4 +81,6 @@ public:
 	/// @brief ゲームオーバーになる座標
 	/// @return 
 	float getGameoverPos()const;
+
+	float getGoalPosX()const { return goalPosX; }
 };

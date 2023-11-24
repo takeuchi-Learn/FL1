@@ -484,7 +484,7 @@ void Player::checkStageSide()
 
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if(mapPos.x <= leftScrollEndPos)
+	if(mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
 	{
 		camera->setFollowFlag(false);
 	}
@@ -509,6 +509,8 @@ void Player::moveLimit()
 
 	// 操作可能になったタイミングの座標をセット
 	leftScrollEndPos = mapPos.x;
+	// ゴールが中心に表示されたらスクロール停止
+	rightScrollEndPos = goalPosX;
 
 	setMoveLimitFlag = true;
 }
