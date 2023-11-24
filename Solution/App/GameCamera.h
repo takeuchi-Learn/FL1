@@ -24,6 +24,7 @@ public:
 		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
 		OTHER, //その他(何も更新しないとき)
 	};
+
 private:
 	// todo センサー周りもカメラが持つべきでない。形式を指定して、外部クラスでその形式に変換して扱う方がよい。
 
@@ -81,6 +82,9 @@ private:
 	// スタート演出の補間処理
 	bool startLerp = false;
 
+	// スティックを使用するかどうか
+	bool isActiveStickControll = false;
+
 #pragma endregion
 
 private:
@@ -125,14 +129,17 @@ private:
 	/// @brief 追従
 	void followObject(bool followX);
 
+	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
+	void gameCameraUpdate();
+
 public:
 	/// @brief コンストラクタ
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(BillboardData* obj = nullptr);
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
 
 	inline float getAngleDeg() const { return angle; }
+
+	inline bool getIsActiveStickControll() const { return isActiveStickControll; }
 
 	/// @brief ジャイロの値のセット。
 	void setGyroValue(float value) { angle = value; }

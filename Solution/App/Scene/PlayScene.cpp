@@ -135,7 +135,6 @@ void PlayScene::update()
 {
 	updateProc();
 
-	camera->gameCameraUpdate();
 	camera->update();
 	player->update();
 	backGround->update();
@@ -210,4 +209,12 @@ void PlayScene::drawObj3d()
 }
 
 void PlayScene::drawFrontSprite()
-{}
+{
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		ImGui::SetNextWindowSize(ImVec2(300.f, 100.f));
+		ImGui::Begin("ghjh", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+		ImGui::Text(std::format("Stick Rotation: {}", camera->getIsActiveStickControll() ? "有効" : "無効").c_str());
+		ImGui::End();
+	}
+}

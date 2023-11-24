@@ -36,6 +36,12 @@ public:
 	inline const auto& getStates() const { return joyShockStates; }
 	inline const auto& getPreStates() const { return joyShockPreStates; }
 
+	/// @param arrayNum getHandlesの配列の添え字
+	inline int getContollerType(size_t arrayNum) const
+	{
+		return JslGetControllerType(devHandles[arrayNum]);
+	}
+
 	static inline constexpr bool hitButtons(int stateButtons, int JSMASK)
 	{
 		return static_cast<bool>(stateButtons & JSMASK);

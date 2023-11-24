@@ -4,6 +4,7 @@
 #include <Input/PadImu.h>
 
 using namespace DirectX;
+
 GameCamera::GameCamera(BillboardData* obj)
 	:Camera(WinAPI::window_width,
 			WinAPI::window_height)
@@ -161,11 +162,31 @@ void GameCamera::checkSensorInput()
 
 	if (imuPadIsConnected)
 	{
-		// angleを動かす大きさ
-		constexpr float shiftVal = 2.f;
+		const auto& state = PadImu::ins()->getStates()[0];
+		const auto& preState = PadImu::ins()->getPreStates()[0];
 
-		const float stick = JslGetSimpleState(PadImu::ins()->getHandles()[0]).stickRX;
-		angle += stick * shiftVal;
+		constexpr auto mask = JSMASK_L | JSMASK_R;
+		if (PadImu::ins()->hitButtons(state.buttons, mask)
+			&& !PadImu::ins()->hitButtons(preState.buttons, mask))
+		{
+			isActiveStickControll = !isActiveStickControll;
+		}
+
+		if (isActiveStickControll)
+		{
+			// angleを動かす大きさ
+			constexpr float shiftVal = 2.f;
+
+			float stick = state.stickRX;
+
+			if (JS_TYPE_JOYCON_LEFT
+			   == PadImu::ins()->getContollerType(0))
+			{
+				stick = state.stickLX;
+			}
+
+			angle += stick * shiftVal;
+		}
 	}
 
 	// 静止状態を大きめに取る
@@ -266,9 +287,7 @@ void GameCamera::setFollowFlag(const bool flag)
 }
 
 void GameCamera::IMUDelete()
-{
-	delete sensor; sensor = nullptr;
-}
+{}
 
 void GameCamera::gameCameraUpdate()
 {
