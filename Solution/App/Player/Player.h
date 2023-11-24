@@ -71,8 +71,9 @@ class Player
 	bool isClear = false;
 
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
-	float leftScrollEndPos = 350.f;
+	float leftScrollEndPos = 0.f;
 
+	bool setMoveLimitFlag = false;
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
@@ -124,6 +125,8 @@ private:
 	/// @brief ゲームオーバーの確認
 	void checkGameOver();
 
+	/// @brief 移動制限設定
+	void moveLimit();
 public:
 	// 物理挙動をするかどうか
 	bool isDynamic = true;

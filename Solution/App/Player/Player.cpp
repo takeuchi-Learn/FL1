@@ -64,8 +64,15 @@ void Player::update()
 
 	move();
 	rot();
-	jump();
-	rebound();
+
+	// スタート時はジャンプしないように
+	if(camera->getCameraState() != GameCamera::CameraState::START)
+	{
+		moveLimit();
+
+		jump();
+		rebound();
+	}
 
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 	// todo 本来下のようであるべき（mapPosはマップチップでの座標であってワールド座標ではない）
@@ -498,3 +505,14 @@ void Player::checkGameOver()
 		isDead = true;
 	}
 }
+
+void Player::moveLimit()
+{
+	if (setMoveLimitFlag)return;
+
+	// 操作可能になったタイミングの座標をセット
+	leftScrollEndPos = mapPos.x;
+
+	setMoveLimitFlag = true;
+}
+

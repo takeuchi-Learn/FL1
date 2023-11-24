@@ -80,6 +80,7 @@ private:
 	// todo 不適切な命名＆フラグを使うべきではない。最低でもstd::function等で振る舞いを変更する。
 	// スタート演出の補間処理
 	bool startLerp = false;
+
 #pragma endregion
 
 private:
