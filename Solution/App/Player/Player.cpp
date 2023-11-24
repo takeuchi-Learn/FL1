@@ -241,8 +241,8 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-
-	if (!isJump && fallTime < 1 || fallTime > 1 && isReboundY)
+	
+	if (!isJump && fallTime < 1 || isReboundY && fallTime > 1 && fallTime < (int)(60.f * 0.4))
 	{
 		if (Input::getInstance()->triggerKey(DIK_Z) || sensorValue >= jumpSensorValue)
 		{
