@@ -20,10 +20,10 @@ BackGround::BackGround(GameCamera* camera, const unsigned int stageNum)
 
 	// 比率計算のためにテクスチャサイズ取得
 	// 取得できないため一旦直接入力
-	constexpr float scale = 2.f;
+	constexpr float scale = 2.5f;
 	obj->setScaleXY(XMFLOAT2(3840.f * scale,2000.f * scale));
 
-	obj->setPosition(XMFLOAT3(6000.f, 1450.f, 10.f));
+	obj->setPosition(XMFLOAT3(6000.f, 1250.f, 10.f));
 }
 
 void BackGround::update()
