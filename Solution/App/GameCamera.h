@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../Engine/Camera/Camera.h"
-#include "../Engine/GameObject/AbstractGameObj.h"
-#include <Imu/Sensor.h>
 #include <Camera/Camera.h>
+#include <GameObject/AbstractGameObj.h>
+#include <Imu/Sensor.h>
 #include <3D/Billboard/Billboard.h>
+#include <DirectXMath.h>
 
 // 後々の追従を想定してObjのやつ
 // CameraObjだと上ベクトルの制御が不可能になるからこちらで追従機能を追加したほうがいいかも
@@ -39,9 +39,7 @@ private:
 	float degree = 0.0f;
 
 	// todo XMFLOAT3等のクラスを使う（JoyShockLibraryのIMU_STATEでも良い）
-	float getGyroX = 0.0f;
-	float getGyroY = 0.0f;
-	float getGyroZ = 0.0f;
+	DirectX::XMFLOAT3 gyro{};
 	// todo XMFLOAT3等のクラスを使う
 	float prevGyroX = 0.0f;
 	float prevGyroY = 0.0f;
@@ -50,9 +48,7 @@ private:
 	float accelAngle = 0.0f;
 
 	// todo XMFLOAT3等のクラスを使う
-	float getAccelX = 0.0f;
-	float getAccelY = 0.0f;
-	float getAccelZ = 0.0f;
+	DirectX::XMFLOAT3 accel{};
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	// todo 変数名にradかdegを付ければ単位がわかる
 	float angle = 20.f;
@@ -84,6 +80,9 @@ private:
 
 	// スティックを使用するかどうか
 	bool isActiveStickControll = false;
+
+	float angleFilterRaito{};
+	float angleStopRange{};
 
 #pragma endregion
 
@@ -137,6 +136,8 @@ public:
 	/// @param obj プレイヤーのポインタ(追従させるために渡す)
 	GameCamera(BillboardData* obj = nullptr);
 
+	bool loadYaml();
+
 	inline float getAngleDeg() const { return angle; }
 
 	inline bool getIsActiveStickControll() const { return isActiveStickControll; }
@@ -176,7 +177,7 @@ public:
 
 	void IMUDelete();
 
-	float getGetAccelZ() const { return getAccelZ; }
+	float getGetAccelZ() const { return accel.z; }
 
 	CameraState getCameraState() const { return cameraState; }
 };

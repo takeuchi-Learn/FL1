@@ -2,8 +2,14 @@
 #include <algorithm>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
+#include <Util/YamlLoader.h>
 
 using namespace DirectX;
+
+namespace
+{
+	constexpr const char yamlPath[] = "Resources/DataFile/camera.yml";
+}
 
 GameCamera::GameCamera(BillboardData* obj)
 	:Camera(WinAPI::window_width,
@@ -13,11 +19,41 @@ GameCamera::GameCamera(BillboardData* obj)
 	// 平行投影に変更
 	setPerspectiveProjFlag(false);
 
+	loadYaml();
+
 	// センサーの生成
 	if (sensor == nullptr)
 	{
 		sensor = Sensor::ins();
 	}
+}
+
+bool GameCamera::loadYaml()
+{
+	Yaml::Node node{};
+	if (YamlLoader::LoadYamlFile(node, yamlPath))
+	{
+		return true;
+	}
+
+	try
+	{
+		LoadYamlData(node, angleFilterRaito);
+		LoadYamlData(node, angleStopRange);
+		const auto str = node["isActiveStickControll"].As<std::string>("false");
+		if (str == "true" || str == "TRUE")
+		{
+			isActiveStickControll = true;
+		} else
+		{
+			isActiveStickControll = false;
+		}
+	} catch (...)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 #pragma region START
@@ -127,13 +163,13 @@ void GameCamera::checkSensorInput()
 {
 	sensor->update();
 	// 加速度取得
-	getAccelX = sensor->GetAccelX();
-	getAccelY = sensor->GetAccelY();
-	getAccelZ = sensor->GetAccelZ();
+	accel.x = sensor->GetAccelX();
+	accel.y = sensor->GetAccelY();
+	accel.z = sensor->GetAccelZ();
 	// 角速度取得
-	getGyroX = sensor->GetGyroX();
-	getGyroY = sensor->GetGyroY();
-	getGyroZ = sensor->GetGyroZ();
+	gyro.x = sensor->GetGyroX();
+	gyro.y = sensor->GetGyroY();
+	gyro.z = sensor->GetGyroZ();
 
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
 
@@ -142,35 +178,23 @@ void GameCamera::checkSensorInput()
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
 		// 加速度取得
-		getAccelX = -state.accelX / 16384.f;
-		getAccelY = state.accelY / 16384.f;
-		getAccelZ = state.accelZ / 16384.f;
+		accel.x = -state.accelX / 16384.f;
+		accel.y = state.accelY / 16384.f;
+		accel.z = state.accelZ / 16384.f;
 		// 角速度取得
-		getGyroX = state.gyroX / 131.f;
-		getGyroY = state.gyroY / 131.f;
-		getGyroZ = -state.gyroZ / 131.f;
+		gyro.x = state.gyroX / 131.f;
+		gyro.y = state.gyroY / 131.f;
+		gyro.z = -state.gyroZ / 131.f;
 	}
 
 	// 相補フィルターで補正
-	{
-		// 調整項目
-		constexpr float raito = 0.05f, invRaito = 1.f - raito;
-
-		angle += raito * (getAccelX / DX12Base::ins()->getFPS())
-			+ invRaito * std::atan2(getAccelX, getAccelY) + getGyroZ;
-	}
+	angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
+		+ (1.f - angleFilterRaito) * std::atan2(accel.x, accel.y) + gyro.z;
 
 	if (imuPadIsConnected)
 	{
 		const auto& state = PadImu::ins()->getStates()[0];
 		const auto& preState = PadImu::ins()->getPreStates()[0];
-
-		constexpr auto mask = JSMASK_L | JSMASK_R;
-		if (PadImu::ins()->hitButtons(state.buttons, mask)
-			&& !PadImu::ins()->hitButtons(preState.buttons, mask))
-		{
-			isActiveStickControll = !isActiveStickControll;
-		}
 
 		if (isActiveStickControll)
 		{
@@ -190,8 +214,7 @@ void GameCamera::checkSensorInput()
 	}
 
 	// 静止状態を大きめに取る
-	constexpr float stopRange = 0.25f;
-	if (angle <= stopRange && -stopRange <= angle)
+	if (angle <= angleStopRange && -angleStopRange <= angle)
 	{
 		angle = 0.0f;
 	}
