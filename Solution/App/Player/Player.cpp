@@ -126,8 +126,22 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 
 void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName)
 {
-	if (hitObjName == typeid(GameMap).name())
+	if (hitObjName == typeid(Goal).name()) // ゴール衝突
 	{
+		camera->changeStateClear();
+		isClear = true;
+	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
+	{
+		enum class HIT_AREA : uint8_t
+		{
+			NONE = 0,
+			TOP = 1 << 0,
+			BOTTOM = 1 << 1,
+			RIGHT = 1 << 2,
+			LEFT = 1 << 3,
+		};
+		HIT_AREA activeDir = HIT_AREA::NONE;
+
 #pragma region 衝突位置確認
 
 		// todo XVectorGetX等を使う
@@ -146,59 +160,38 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 					 spherePos.y - boxCenter.y,
 					 spherePos.z - boxCenter.z);
 
-		struct DIRECTION
-		{
-			enum : uint8_t
-			{
-				TOP = 1 << 0,
-				BOTTOM = 1 << 1,
-				RIGHT = 1 << 2,
-				LEFT = 1 << 3
-			};
-		};
-
-		uint8_t activeDir = 0u;
-
 		// 衝突した辺を四方向でとる
-		if (0.f <= boxCenter2Sphere.x)
-		{
-			activeDir |= DIRECTION::RIGHT;
-		} else if (boxCenter2Sphere.x <= -0.f)
-		{
-			activeDir |= DIRECTION::LEFT;
-		}
-
-		if (0.f < boxCenter2Sphere.y)
-		{
-			activeDir |= DIRECTION::TOP;
-		} else if (boxCenter2Sphere.y <= 0.f)
-		{
-			activeDir |= DIRECTION::BOTTOM;
-		}
-
 		// 上下と左右どちらかだけにする
 		if (std::abs(boxCenter2Sphere.x) >=
 			std::abs(boxCenter2Sphere.y))
 		{
 			// x > yならx方向のみ判定
-			activeDir &= DIRECTION::RIGHT | DIRECTION::LEFT;
+			if (0.f <= boxCenter2Sphere.x)
+			{
+				activeDir = HIT_AREA::RIGHT;
+			} else if (boxCenter2Sphere.x <= -0.f)
+			{
+				activeDir = HIT_AREA::LEFT;
+			}
 		} else
 		{
 			// y > xならy方向のみ判定
-			activeDir &= DIRECTION::TOP | DIRECTION::BOTTOM;
+			if (0.f < boxCenter2Sphere.y)
+			{
+				activeDir = HIT_AREA::TOP;
+			} else if (boxCenter2Sphere.y <= 0.f)
+			{
+				activeDir = HIT_AREA::BOTTOM;
+			}
 		}
-
 
 #pragma endregion 衝突位置確認ここまで
 
 		// 方向ごとに分岐
-		if (activeDir & DIRECTION::BOTTOM)
+		switch (activeDir)
 		{
-			// 下方向に落下
-			fallStartSpeed = -0.2f;
-			fallTime = 0;
-		} else if (activeDir & DIRECTION::TOP)
-		{
+			using enum HIT_AREA;
+		case TOP:
 			// 地面衝突
 			if (!pushJumpKeyFrame || !reboundYFrame)
 			{
@@ -211,23 +204,33 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 					jumpEnd(hitAABB);
 				}
 			}
-		} 
-		if (activeDir & DIRECTION::RIGHT)
-		{
+			break;
+
+		case BOTTOM:
+			// 下方向に落下
+			fallStartSpeed = -0.2f;
+			fallTime = 0;
+			break;
+
+		case RIGHT:
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
-		} else if (activeDir & DIRECTION::LEFT)
-		{
+			break;
+
+		case LEFT:
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
+			break;
+
+		default:
+			break;
 		}
 
-		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-		gameObj->update(XMConvertToRadians(getObj()->rotation));
-	} else if (hitObjName == typeid(Goal).name())// ゴール衝突
-	{
-		camera->changeStateClear();
-		isClear = true;
+		if (activeDir != HIT_AREA::NONE)
+		{
+			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+			gameObj->update(XMConvertToRadians(getObj()->rotation));
+		}
 	}
 }
 
