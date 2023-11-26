@@ -1,6 +1,6 @@
 ﻿#include "GameCamera.h"
+#include <algorithm>
 #include <Input/Input.h>
-
 #include <Input/PadImu.h>
 
 using namespace DirectX;
@@ -239,12 +239,10 @@ void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 void GameCamera::upRotate()
 {
 	// 傾きの最大値
-	constexpr float maxAngle = 40.0f;
+	constexpr float maxAngle = 35.0f;
 
-	// todo std::clampを使う
 	// 制限
-	if (angle >= maxAngle)angle = maxAngle;
-	else if (angle <= -maxAngle)angle = -maxAngle;
+	angle = std::clamp(angle, -maxAngle, maxAngle);
 
 	// angleを上ベクトルに変換してセット
 	DirectX::XMFLOAT2 upXY{};

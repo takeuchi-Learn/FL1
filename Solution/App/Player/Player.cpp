@@ -12,7 +12,6 @@
 #include <Object/Goal.h>
 #include<Sound/SoundData.h>
 
-
 using namespace DirectX;
 
 namespace
@@ -63,14 +62,14 @@ Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
 {
-	constexpr float scale = mapSize;
+	constexpr float scale = mapSize * 0.9f;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
 	loadYamlFile();
 	loadSE();
 
 	// 判定仮設定
-	constexpr float r = scale / 2.f * 0.8f;
+	constexpr float r = scale / 2.f;
 	sphere.radius = r;
 }
 
@@ -131,88 +130,75 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 #pragma region 衝突位置確認
 
-		enum class HIT_AREA
+		// todo XVectorGetX等を使う
+		const XMFLOAT3 boxSize(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0],
+							   hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1],
+							   hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2]);
+		const XMFLOAT3 boxCenter(hitAABB.maxPos.m128_f32[0] - boxSize.x / 2.f,
+								 hitAABB.maxPos.m128_f32[1] - boxSize.y / 2.f,
+								 hitAABB.maxPos.m128_f32[2] - boxSize.z / 2.f);
+
+		XMFLOAT3 spherePos{};
+		XMStoreFloat3(&spherePos, sphere.center);
+
+		const auto boxCenter2Sphere =
+			XMFLOAT3(spherePos.x - boxCenter.x,
+					 spherePos.y - boxCenter.y,
+					 spherePos.z - boxCenter.z);
+
+		struct DIRECTION
 		{
-			NONE,
-			UP,
-			DOWN,
-			LEFT,
-			RIGTH,
+			enum : uint8_t
+			{
+				TOP = 1 << 0,
+				BOTTOM = 1 << 1,
+				RIGHT = 1 << 2,
+				LEFT = 1 << 3
+			};
 		};
 
-		HIT_AREA hitArea = HIT_AREA::NONE;
+		uint8_t activeDir = 0u;
 
-		//topが1 Xが多い
-		//topが2 Yが多い
-		short top = 0;
-
-		XMFLOAT3 boxSize
-		(
-			(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0]),
-			(hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1]),
-			(hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2])
-		);
-		XMFLOAT3 boxPointPos
-		(
-			hitAABB.maxPos.m128_f32[0] - boxSize.x / 2,
-			hitAABB.maxPos.m128_f32[1] - boxSize.y / 2,
-			hitAABB.maxPos.m128_f32[2] - boxSize.z / 2
-		);
-
-		XMFLOAT3 spherePos
-		(
-			sphere.center.m128_f32[0],
-			sphere.center.m128_f32[1],
-			sphere.center.m128_f32[2]
-		);
-		XMFLOAT3 sphereToVector
-		(
-			boxPointPos.x - spherePos.x,
-			boxPointPos.y - spherePos.y,
-			boxPointPos.z - spherePos.z
-		);
-
-		if (abs(sphereToVector.x) > abs(sphereToVector.y) &&
-			abs(sphereToVector.x) > boxSize.x / 2)
+		// 衝突した辺を四方向でとる
+		if (0.f <= boxCenter2Sphere.x)
 		{
-			top = 1;
-			if (abs(sphereToVector.z) > abs(sphereToVector.x) &&
-				abs(sphereToVector.z) > boxSize.z / 2)
-				top = 3;
+			activeDir |= DIRECTION::RIGHT;
+		} else if (boxCenter2Sphere.x <= -0.f)
+		{
+			activeDir |= DIRECTION::LEFT;
+		}
+
+		if (0.f < boxCenter2Sphere.y)
+		{
+			activeDir |= DIRECTION::TOP;
+		} else if (boxCenter2Sphere.y <= 0.f)
+		{
+			activeDir |= DIRECTION::BOTTOM;
+		}
+
+		// 上下と左右どちらかだけにする
+		if (std::abs(boxCenter2Sphere.x) >=
+			std::abs(boxCenter2Sphere.y))
+		{
+			// x > yならx方向のみ判定
+			activeDir &= DIRECTION::RIGHT | DIRECTION::LEFT;
 		} else
 		{
-			top = 2;
-			if (abs(sphereToVector.z) > abs(sphereToVector.y) &&
-				abs(sphereToVector.z) > boxSize.z / 2)
-				top = 3;
+			// y > xならy方向のみ判定
+			activeDir &= DIRECTION::TOP | DIRECTION::BOTTOM;
 		}
 
-		if (top == 1)
-		{
-			if (sphereToVector.x >= 0)
-			{
-				hitArea = HIT_AREA::LEFT;
-			} else
-			{
-				hitArea = HIT_AREA::RIGTH;
-			}
-		} else if (top == 2)
-		{
-			if (sphereToVector.y >= 0)
-			{
-				hitArea = HIT_AREA::DOWN;
-			} else
-			{
-				hitArea = HIT_AREA::UP;
-			}
-		}
 
-#pragma endregion
+#pragma endregion 衝突位置確認ここまで
 
-		switch (hitArea)
+		// 方向ごとに分岐
+		if (activeDir & DIRECTION::BOTTOM)
 		{
-			using enum HIT_AREA;
-		case UP:
+			// 下方向に落下
+			fallStartSpeed = -0.2f;
+			fallTime = 0;
+		} else if (activeDir & DIRECTION::TOP)
+		{
 			// 地面衝突
 			if (!pushJumpKeyFrame || !reboundYFrame)
 			{
@@ -225,21 +211,15 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 					jumpEnd(hitAABB);
 				}
 			}
-			break;
-		case DOWN:
-			// 下方向に落下
-			fallStartSpeed = -0.2f;
-			fallTime = 0;
-			break;
-		case LEFT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
-
-			break;
-		case RIGTH:
+		} 
+		if (activeDir & DIRECTION::RIGHT)
+		{
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
-			break;
+		} else if (activeDir & DIRECTION::LEFT)
+		{
+			// 横のバウンド開始
+			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
 		}
 
 		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
@@ -255,7 +235,7 @@ void Player::calcJumpPos()
 {
 	if (!isDynamic) { return; }
 
-	fallTime++;
+	++fallTime;
 
 	const float PRE_VEL_Y = currentFallVelovity;
 	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
@@ -473,7 +453,7 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	terrainHitObjPosX = mapPos.x;
 
 	// 速度があったら鳴らす
-	if(abs(sideAddX) >= 14.f)
+	if (abs(sideAddX) >= 14.f)
 	{
 		Sound::playWave(boundXSE, 0, 0.2f);
 	}
