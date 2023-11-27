@@ -19,18 +19,23 @@ Looper::Looper()
 
 void Looper::pushImGuiCol()
 {
-	constexpr XMFLOAT3 guiCol = XMFLOAT3(0.f, 1.f, 1.f);
+	constexpr float whiteVal = float(0xf8) / 256.f;
+	constexpr float blackVal = float(0x03) / 256.f;
+
+	constexpr XMFLOAT3 guiCol = XMFLOAT3(blackVal, blackVal, blackVal);
 	constexpr float guiColDarkVel = 0.25f;
 	constexpr XMFLOAT3 guiColTitleBg = XMFLOAT3(guiCol.x * guiColDarkVel,
 												guiCol.y * guiColDarkVel,
 												guiCol.z * guiColDarkVel);
 	constexpr float guiBgVel = 0.5f;
-	constexpr XMFLOAT3 guiBg = XMFLOAT3(guiCol.x * guiBgVel,
-										guiCol.y * guiBgVel,
-										guiCol.z * guiBgVel);
+	constexpr XMFLOAT3 guiBg = XMFLOAT3(whiteVal * guiBgVel,
+										whiteVal * guiBgVel,
+										whiteVal * guiBgVel);
 
-	constexpr float guiAlpha = 0.125f;
-	constexpr float guiTitleAlpha = 0.25f;
+	constexpr XMFLOAT3 textCol = guiCol;
+
+	constexpr float guiAlpha = 0.25f;
+	constexpr float guiTitleAlpha = guiAlpha * 2.f;
 
 	// タイトルバーの色
 	ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_TitleBg, ImVec4(guiColTitleBg.x,
@@ -53,9 +58,9 @@ void Looper::pushImGuiCol()
 																  guiAlpha));
 
 	// その他の色
-	ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Text, ImVec4(guiCol.x,
-														   guiCol.y,
-														   guiCol.z,
+	ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Text, ImVec4(textCol.x,
+														   textCol.y,
+														   textCol.z,
 														   1.f));
 	ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Border, ImVec4(guiCol.x,
 															 guiCol.y,

@@ -1,0 +1,9 @@
+# ジャイロ操作の誤差吸収
+angleFilterRaito: 0.4
+
+# JoyShockLibraryのパッドのスティック入力で角度を変えるかどうか
+# trueもしくはTRUEで有効
+isActiveStickControll: false
+
+# 静止状態
+angleStopRange: 0.5

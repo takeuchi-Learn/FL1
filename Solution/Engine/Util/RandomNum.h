@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include<random>
+#include <random>
 
  /// @brief 乱数生成クラス
 class RandomNum

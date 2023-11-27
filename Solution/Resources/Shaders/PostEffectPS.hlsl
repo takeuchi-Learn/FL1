@@ -150,7 +150,8 @@ float4 chromaticAberration(float2 uv, float level = 3.f, float spread = 0.015f)
 
 float4 main(VSOutput input) : SV_TARGET
 {
-	return float4(tex0.Sample(smp, input.uv).rgb, 1.f);
+	// エフェクトをかけずにそのまま描画する
+	//return float4(tex0.Sample(smp, input.uv).rgb, 1.f);
 	
 	// --------------------
 	// モザイク
@@ -179,6 +180,8 @@ float4 main(VSOutput input) : SV_TARGET
 	const float ditherSize = winSize.y / 512.f;
 	float4 texColor0 = dither(tex0.Sample(smp, uv), uv, ditherSize);
 	texColor0.g = dither(tex0.Sample(smp, uv + rgbShiftNum), uv, ditherSize).g;
+	
+	// 色収差
 	texColor0 += chromaticAberration(uv);
 
 	float noiseNum = noise(input.uv, time);

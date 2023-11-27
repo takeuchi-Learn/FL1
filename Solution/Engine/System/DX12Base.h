@@ -56,7 +56,7 @@ public:
 		// 移動不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
 
-	static const ImGuiWindowFlags ImGuiWinFlagsNoTitleBar = DX12Base::imGuiWinFlagsDef | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
+	static const ImGuiWindowFlags imGuiWinFlagsNoTitleBar = DX12Base::imGuiWinFlagsDef | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
 
 #pragma region FPS
 private:
@@ -65,12 +65,14 @@ private:
 	constexpr static USHORT divLen = divNum - 1;
 	float fps;
 	std::unique_ptr<Timer> fpsTimer;
+	Timer::timeType deltaTime = 0u;
 
 	void flipTimeFPS();
 	void updateFPS();
 
 public:
 	inline float getFPS() const { return fps; }
+	inline auto getDeltaTime() const { return deltaTime; }
 
 #pragma endregion
 

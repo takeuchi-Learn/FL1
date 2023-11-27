@@ -1,32 +1,137 @@
 ﻿#include "TitleScene.h"
-#include <2D/Sprite.h>
-#include <2D/DebugText.h>
 #include <Input/Input.h>
 #include <System/SceneManager.h>
+#include <Util/Timer.h>
+#include <Input/PadImu.h>
+#include <2D/Sprite.h>
+#include <2D/SpriteBase.h>
+#include <Util/Util.h>
+#include <Sound/Sound.h>
+#include <algorithm>
+
 #include "PlayScene.h"
 
-TitleScene::TitleScene() :
-	spriteBase(std::make_unique<SpriteBase>())
+using namespace DirectX;
+
+namespace
 {
-	debugText = std::make_unique<DebugText>(spriteBase->loadTexture(L"Resources/debugfont.png"),
-											spriteBase.get());
+	constexpr float transitionTimeSec = 1.5f;
+	constexpr auto transitionTime = static_cast<Timer::timeType>(Timer::oneSecF * transitionTimeSec);
+}
+
+TitleScene::TitleScene()
+{
+	spBase = std::make_unique<SpriteBase>();
+	backSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title/Title_Back.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	logoSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/title/Title_logo.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	nowLoading->isInvisible = true;
+
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
+	backSprite->setSize(winSize);
+	logoSprite->setSize(winSize);
+
+	bgm = Sound::ins()->loadWave("Resources/BGM/mmc_140_BGM1.wav");
+	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
+
+	transitionTimer = std::make_unique<Timer>();
+	updateProc = std::bind(&TitleScene::update_main, this);
 }
 
 TitleScene::~TitleScene()
 {}
 
+void TitleScene::start()
+{
+	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
+}
+
+void TitleScene::update_main()
+{
+	if (checkInputOfStartTransition())
+	{
+		Sound::stopWave(bgm);
+		Sound::playWave(transitionSe, 0u, 0.2f);
+
+		nowLoading->isInvisible = false;
+		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+		updateProc = std::bind(&TitleScene::update_end, this);
+
+		transitionTimer->reset();
+	} else
+	{
+		// Rキーでステージをリセット
+		if (Input::ins()->triggerKey(DIK_R))
+		{
+			// JoyShockLibraryのパッド接続状況をリセット
+			PadImu::ins()->reset();
+
+			PlayScene::resetStageNum();
+		}
+	}
+}
+
+void TitleScene::update_end()
+{
+	const auto nowTime = transitionTimer->getNowTime();
+	const float rate = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
+
+	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 10.f;
+	logoSprite->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
+	backSprite->position.y = logoSprite->position.y;
+
+	if (nowTime >= transitionTime)
+	{
+		thread->join();
+		SceneManager::ins()->changeSceneFromInstance(nextScene);
+	}
+}
+
+bool TitleScene::checkInputOfStartTransition()
+{
+	constexpr auto useKey = DIK_SPACE;
+	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
+	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
+
+	if (Input::ins()->triggerKey(useKey)) { return true; }
+
+	if (Input::ins()->triggerPadButton(useXInputButton))
+	{
+		return true;
+	}
+
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		const int preState = PadImu::ins()->getPreStates()[0].buttons;
+		const int state = PadImu::ins()->getStates()[0].buttons;
+
+		const bool pre = PadImu::hitButtons(preState, useJSLMask);
+		const bool current = PadImu::hitButtons(state, useJSLMask);
+
+		if (!pre && current) { return true; }
+	}
+
+	return false;
+}
+
 void TitleScene::update()
 {
-	debugText->Print(Input::ins()->hitKey(DIK_SPACE) ? "Title Scene\nHIT SPACE" : "Title Scene",
-					 0.f, 0.f);
-	if (Input::ins()->triggerKey(DIK_SPACE))
-	{
-		SceneManager::ins()->changeScene<PlayScene>();
-	}
+	updateProc();
 }
 
 void TitleScene::drawFrontSprite()
 {
-	spriteBase->drawStart(DX12Base::ins()->getCmdList());
-	debugText->DrawAll();
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
+	backSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+	logoSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	if (nowLoading->isInvisible)
+	{
+		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+		ImGui::PushFont(DX12Base::ins()->getBigImFont());
+		ImGui::Text("Press Space...");
+		ImGui::PopFont();
+		ImGui::End();
+	}
 }
