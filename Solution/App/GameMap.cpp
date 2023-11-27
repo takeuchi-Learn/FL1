@@ -169,5 +169,5 @@ void GameMap::draw()
 
 float GameMap::getGameoverPos() const
 {
-	return XMVectorGetY(mapAABBs.back().front().minPos);
+	return XMVectorGetY(mapAABBs.back().front().maxPos);
 }
