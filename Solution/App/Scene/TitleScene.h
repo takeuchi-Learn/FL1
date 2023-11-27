@@ -27,12 +27,14 @@ class TitleScene :
 	std::unique_ptr<Sprite> backSprite;
 	std::unique_ptr<Sprite> logoSprite;
 	std::unique_ptr<Sprite> nowLoading;
+	std::unique_ptr<Sprite> operation;
 	std::unique_ptr<SpriteBase> spBase;
 
 	std::weak_ptr<SoundData> bgm;
 	std::weak_ptr<SoundData> transitionSe;
 
 	void update_main();
+	void update_operation();
 	void update_end();
 
 	/// @return シーン遷移開始の入力があったかどうか
