@@ -85,5 +85,8 @@ public:
 
 	float getGoalPosX() const { return goalPosX; }
 
+	template<size_t ind = 0u>
+	size_t getMapX() const { return mapAABBs[ind].size(); }
+
 	size_t getMapY()const { return mapAABBs.size(); }
 };

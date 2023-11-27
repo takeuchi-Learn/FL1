@@ -531,8 +531,6 @@ void Player::moveLimit()
 
 	// 操作可能になったタイミングの座標をセット
 	leftScrollEndPos = mapPos.x;
-	// ゴールが中心に表示されたらスクロール停止
-	rightScrollEndPos = goalPosX;
 
 	setMoveLimitFlag = true;
 }

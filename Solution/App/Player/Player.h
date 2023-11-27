@@ -88,8 +88,6 @@ class Player
 	// 上の右版
 	float rightScrollEndPos = 0.f;
 
-	float goalPosX = 0.f;
-
 	bool setMoveLimitFlag = false;
 
 
@@ -167,15 +165,13 @@ public:
 	// 描画
 	void draw();
 
+	inline void setScrollendPosRight(float pos) { rightScrollEndPos = pos; }
+
 	void setMapPos(const DirectX::XMFLOAT2& mapPos);
 
 	/// @brief ゲームオーバー扱いになる座標をセットする関数
 	/// @param posY
 	void setGameOverPos(const float posY) { gameoverPos = posY; }
-
-	/// @brief ゴールの座標をセットする関数(スクロール停止用)
-	/// @param posX 
-	void setGoalPosX(const float posX) { goalPosX = posX; }
 
 	inline const auto& getObj()const { return gameObj->getFrontData(); }
 
