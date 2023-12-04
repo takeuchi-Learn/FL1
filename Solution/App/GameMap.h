@@ -78,7 +78,7 @@ public:
 	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	const CollisionShape::AABB& getGoalAABB()const { return goal->getShape(); }
+	const CollisionShape::AABB& getGoalAABB()const { return goal->getRefAABB(); }
 
 	/// @brief ゲームオーバーになる座標
 	float getGameoverPos() const;

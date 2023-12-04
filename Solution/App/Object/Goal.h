@@ -3,23 +3,19 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
+#include"StageObject.h"
 
 class Light;
 class ObjModel;
 class GameCamera;
 class Billboard;
 
-class Goal
+
+class Goal :public StageObject
 {
 private:
-	// ここBillboardクラスに直す
-	// というかGameMapクラスに内蔵してもいいかも
-	std::unique_ptr<Billboard> gameObj;
-	GameCamera* camera = nullptr;
 
 	bool isGoal = false;
-
-	CollisionShape::AABB aabb{};
 
 private:
 	/// @brief ゴールフラグをtrueにする
@@ -27,13 +23,9 @@ private:
 
 public:
 	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
-	void update();
-	void draw();
+	~Goal() {}
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }
 
-	/// @brief 当たり判定取得
-	/// @return 当たり判定の情報
-	const auto& getShape() const { return aabb; }
 };

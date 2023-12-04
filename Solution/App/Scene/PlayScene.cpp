@@ -63,10 +63,7 @@ void PlayScene::checkCollision()
 	// ゴールとプレイヤーの判定(仮)
 	// 後々他のオブジェクトとまとめます
 	const bool isHitGoal = Collision::CheckHit(player->getShape(), gameMap->getGoalAABB());
-	if (Input::ins()->triggerKey(DIK_H))
-	{
-		int num = 0;
-	}
+
 	if (isHitGoal)
 	{
 		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
