@@ -24,6 +24,8 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	// なにかマップチップで指定してオブジェクトを置く場合はここに処理を追加してください
 
 	// todo switch文を使わない構成が望ましい
+
+	// ここStageObjectのcreate関数で生成する方法に変更し、switchを削除する
 	bool result = true;
 	switch (data)
 	{

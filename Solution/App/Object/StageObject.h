@@ -28,5 +28,7 @@ public:
 
 	const CollisionShape::AABB& getRefAABB()const { return aabb; }
 
+	virtual void create(std::unique_ptr<StageObject>& p, GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
+
 };
 
