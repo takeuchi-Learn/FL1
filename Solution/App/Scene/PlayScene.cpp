@@ -46,21 +46,8 @@ namespace
 
 void PlayScene::checkCollision()
 {
-	//for (auto& y : gameMap->getAABBs())
-	//{
-	//	for (auto& x : y)
-	//	{
-	//		// min、max両方0,0は通路なので確認せずにcontinue
-	//		if (!checkMinMax(x)) { continue; }
-
-	//		if (Collision::CheckHit(player->getShape(), x))
-	//		{
-	//			player->hit(x, typeid(*gameMap).name());
-	//		}
-	//	}
-	//}
-
-	for (auto& aabb : gameMap->getAABBs()) 
+	// 地形判定
+	for (auto& aabb : gameMap->getMapAABBs()) 
 	{
 		if (Collision::CheckHit(player->getShape(), aabb))
 		{
@@ -68,14 +55,17 @@ void PlayScene::checkCollision()
 		}
 	}
 
-	// ゴールとプレイヤーの判定(仮)
-	// 後々他のオブジェクトとまとめます
-	const bool isHitGoal = Collision::CheckHit(player->getShape(), gameMap->getGoalAABB());
-
-	if (isHitGoal)
+	// オブジェクト判定
+	const std::vector<std::unique_ptr<StageObject>>& objs = gameMap->getStageObjects();
+	for (auto& obj : objs)
 	{
-		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
+		const CollisionShape::AABB& aabb = obj->getRefAABB();
+		if(Collision::CheckHit(player->getShape(), aabb))
+		{
+			player->hit(aabb, typeid(*obj).name());
+		}
 	}
+
 }
 
 bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)

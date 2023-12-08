@@ -5,6 +5,8 @@
 using namespace DirectX;
 
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const float scale)
-	:StageObject(camera, pos, scale)
+	:StageObject(camera, pos, scale,L"Resources/Map/Tex/goal.png")
+	
 {
+
 }

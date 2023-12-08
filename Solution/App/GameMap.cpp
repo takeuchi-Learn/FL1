@@ -34,7 +34,7 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	switch (data)
 	{
 	case GameMap::MAPCHIP_GOAL:
-		goal = std::make_unique<Goal>(camera, pos, scale);
+		stageObjects.push_back(std::make_unique<Goal>(camera, pos, scale));
 		goalPosX = pos.x;
 		break;
 
@@ -165,7 +165,11 @@ void GameMap::update()
 	{
 		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
-	goal->update();
+
+	for(auto& obj:stageObjects)
+	{
+		obj->update();
+	}
 }
 
 void GameMap::draw()
@@ -174,11 +178,15 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-	goal->draw();
+	for (auto& obj : stageObjects)
+	{
+		obj->draw();
+	}
 }
 
 float GameMap::getGameoverPos() const
 {
-	//return XMVectorGetY(mapAABBs.back().front().maxPos);
-	return mapAABBs.back().minPos.m128_f32[1];
+	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
+	constexpr float gameOverPosSubNum = 150.f;
+	return mapAABBs.back().minPos.m128_f32[1] - gameOverPosSubNum;
 }

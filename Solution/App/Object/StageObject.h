@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include<string>
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
@@ -20,7 +21,7 @@ protected:
 	CollisionShape::AABB aabb{};
 
 public:
-	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
+	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath);
 	virtual ~StageObject() {}
 
 	virtual void update();

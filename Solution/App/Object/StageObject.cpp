@@ -4,7 +4,9 @@
 #include <3D/Billboard/Billboard.h>
 using namespace DirectX;
 
-StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
+StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath)
+	:gameObj(std::make_unique<Billboard>(texPath.c_str(), camera))
+	,camera(camera)
 {
 	gameObj->add(XMFLOAT3(pos.x, pos.y, 0), scale);
 
