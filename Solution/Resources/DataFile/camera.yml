@@ -3,7 +3,10 @@ angleFilterRaito: 0.4
 
 # JoyShockLibraryのパッドのスティック入力で角度を変えるかどうか
 # trueもしくはTRUEで有効
-isActiveStickControll: false
+isActiveStickControll: true
+
+# スティック入力で動かす大きさ
+stickAngleShiftVal: 8.0
 
 # 静止状態
 angleStopRange: 0.5
