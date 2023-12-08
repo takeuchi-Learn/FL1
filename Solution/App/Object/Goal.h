@@ -5,11 +5,7 @@
 #include <Collision/CollisionShape.h>
 #include"StageObject.h"
 
-class Light;
-class ObjModel;
 class GameCamera;
-class Billboard;
-
 
 class Goal :public StageObject
 {
