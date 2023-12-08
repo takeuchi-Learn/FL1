@@ -32,6 +32,7 @@ StageSelectScene::StageSelectScene() :
 			break;
 		}
 	}
+	currentStage = std::clamp(PlayScene::getStageNum(), 0ui16, stageMaxNum);
 
 	update_proc = std::bind(&StageSelectScene::update_main, this);
 }

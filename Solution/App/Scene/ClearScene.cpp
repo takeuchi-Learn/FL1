@@ -52,7 +52,6 @@ void ClearScene::update_main()
 			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
 		} else
 		{
-			PlayScene::resetStageNum();
 			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<TitleScene>(); });
 		}
 
