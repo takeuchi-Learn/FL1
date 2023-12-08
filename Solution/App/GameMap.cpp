@@ -14,8 +14,13 @@ void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, floa
 	const float harfScale = scale / 2;
 	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
 	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-	mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+
+	CollisionShape::AABB aabb;
+	aabb.minPos = XMLoadFloat2(&minPos);
+	aabb.maxPos = XMLoadFloat2(&maxPos);
+	mapAABBs.push_back(aabb);
+	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
+	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
 }
 
 bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, const size_t y, const XMFLOAT2& pos, const float scale)
@@ -25,7 +30,6 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 
 	// todo switch文を使わない構成が望ましい
 
-	// ここStageObjectのcreate関数で生成する方法に変更し、switchを削除する
 	bool result = true;
 	switch (data)
 	{
@@ -42,13 +46,14 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 		break;
 	}
 
-	// todo 適切でない方法
-	// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
-	if (result)
-	{
-		DirectX::XMFLOAT2 pos(0, 0);
-		mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
-	}
+	//// todo 適切でない方法
+	//// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
+	//if (result)
+	//{
+	//	DirectX::XMFLOAT2 pos(0, 0);
+	//	
+	//	//mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
+	//}
 
 	return result;
 }
@@ -78,11 +83,12 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
-	mapAABBs.resize(csvData.size());
+	mapAABBs.reserve(csvData.size());
+	mapSizeX = static_cast<unsigned int>(csvData[0].size());
+	mapSizeY = static_cast<unsigned int>(csvData.size());
 
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
 	{
-		mapAABBs[y].resize(csvData[y].size());
 
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
@@ -148,6 +154,8 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		}
 	}
 
+	mapAABBs.shrink_to_fit();
+
 	return false;
 }
 
@@ -171,5 +179,6 @@ void GameMap::draw()
 
 float GameMap::getGameoverPos() const
 {
-	return XMVectorGetY(mapAABBs.back().front().maxPos);
+	//return XMVectorGetY(mapAABBs.back().front().maxPos);
+	return mapAABBs.back().minPos.m128_f32[1];
 }

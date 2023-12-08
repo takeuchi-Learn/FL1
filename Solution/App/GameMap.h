@@ -43,7 +43,10 @@ private:
 private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
-	std::vector<std::vector<CollisionShape::AABB>> mapAABBs;
+	std::vector<CollisionShape::AABB> mapAABBs;
+	// 縦横サイズ
+	unsigned int mapSizeX = 0;
+	unsigned int mapSizeY = 0;
 
 	std::unique_ptr<Goal>goal;
 	float goalPosX = 0.f;
@@ -75,7 +78,7 @@ public:
 
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
-	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs() const { return mapAABBs; }
+	const std::vector<CollisionShape::AABB>& getAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
 	const CollisionShape::AABB& getGoalAABB()const { return goal->getRefAABB(); }
@@ -85,8 +88,9 @@ public:
 
 	float getGoalPosX() const { return goalPosX; }
 
-	template<size_t ind = 0u>
-	size_t getMapX() const { return mapAABBs[ind].size(); }
+	/*template<size_t ind = 0u>
+	size_t getMapX() const { return mapAABBs[ind].size(); }*/
+	unsigned int getMapX() const { return mapSizeX; }
 
-	size_t getMapY()const { return mapAABBs.size(); }
+	unsigned int getMapY()const { return mapSizeY; }
 };

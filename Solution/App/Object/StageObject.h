@@ -26,9 +26,12 @@ public:
 	virtual void update();
 	virtual void draw();
 
+	/// @brief 衝突時に呼び出す関数
+	/// @param playerSphere プレイヤーの判定
+	virtual void hit(const CollisionShape::Sphere& playerSphere){}
+
 	const CollisionShape::AABB& getRefAABB()const { return aabb; }
 
-	virtual void create(std::unique_ptr<StageObject>& p, GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
-
+	
 };
 

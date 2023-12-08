@@ -26,8 +26,4 @@ void StageObject::draw()
 	gameObj->draw();
 }
 
-void StageObject::create(std::unique_ptr<StageObject>& p,GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
-{
-	// この関数を継承し、<>の中を各クラスに置き換える
-	//p = std::make_unique<StageObject>(camera, pos, scale);
-}
+

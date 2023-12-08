@@ -46,17 +46,25 @@ namespace
 
 void PlayScene::checkCollision()
 {
-	for (auto& y : gameMap->getAABBs())
-	{
-		for (auto& x : y)
-		{
-			// min、max両方0,0は通路なので確認せずにcontinue
-			if (!checkMinMax(x)) { continue; }
+	//for (auto& y : gameMap->getAABBs())
+	//{
+	//	for (auto& x : y)
+	//	{
+	//		// min、max両方0,0は通路なので確認せずにcontinue
+	//		if (!checkMinMax(x)) { continue; }
 
-			if (Collision::CheckHit(player->getShape(), x))
-			{
-				player->hit(x, typeid(*gameMap).name());
-			}
+	//		if (Collision::CheckHit(player->getShape(), x))
+	//		{
+	//			player->hit(x, typeid(*gameMap).name());
+	//		}
+	//	}
+	//}
+
+	for (auto& aabb : gameMap->getAABBs()) 
+	{
+		if (Collision::CheckHit(player->getShape(), aabb))
+		{
+			player->hit(aabb, typeid(*gameMap).name());
 		}
 	}
 
