@@ -26,6 +26,7 @@ class GameOverScene :
 
 	std::unique_ptr<SpriteBase> spBase;
 	std::unique_ptr<Sprite> sprite;
+	std::unique_ptr<Sprite> spriteBack;
 	std::unique_ptr<Sprite> nowLoading;
 
 	std::weak_ptr<SoundData> bgm;

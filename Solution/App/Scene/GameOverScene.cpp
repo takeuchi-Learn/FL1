@@ -22,7 +22,10 @@ GameOverScene::GameOverScene() :
 	transitionTimer(std::make_unique<Timer>())
 {
 	spBase = std::make_unique<SpriteBase>();
-	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/gameover.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/ゲームオーバー.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	sprite->position.x = 300;
+	sprite->position.y = -650;
+	spriteBack = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/BackSprite.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
 
@@ -106,6 +109,8 @@ void GameOverScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
+	
+	spriteBack->drawWithUpdate(DX12Base::ins(), spBase.get());
 	sprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 
 	if (nowLoading->isInvisible)

@@ -23,7 +23,11 @@ ClearScene::ClearScene() :
 	transitionTimer(std::make_unique<Timer>())
 {
 	updateProc = std::bind(&ClearScene::update_main, this);
-	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/gameclear.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
+	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/ステージクリア.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
+	sprite->position.x = 300;
+	sprite->position.y = -650;
+	spriteBack = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/BackSprite.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
+
 	nowLoading = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/nowLoading.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
 }
@@ -108,8 +112,8 @@ void ClearScene::drawFrontSprite()
 {
 	spriteBase->drawStart(DX12Base::ins()->getCmdList());
 	nowLoading->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+	spriteBack->drawWithUpdate(DX12Base::ins(), spriteBase.get());
 	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
-
 	if (nowLoading->isInvisible)
 	{
 		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);

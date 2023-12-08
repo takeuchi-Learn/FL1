@@ -23,6 +23,7 @@ class ClearScene :
 	// --------------------
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<Sprite> sprite;
+	std::unique_ptr<Sprite> spriteBack;
 	std::unique_ptr<Sprite> nowLoading;
 
 	std::unique_ptr<GameScene> nextScene = nullptr;
