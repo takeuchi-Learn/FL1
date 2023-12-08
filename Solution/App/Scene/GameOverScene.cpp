@@ -1,4 +1,5 @@
 ﻿#include "GameOverScene.h"
+#include "StageSelectScene.h"
 #include <Input/Input.h>
 #include <System/SceneManager.h>
 #include <2D/Sprite.h>
@@ -8,8 +9,6 @@
 #include <Util/Timer.h>
 #include <algorithm>
 #include <Input/PadImu.h>
-
-#include "PlayScene.h"
 
 using namespace DirectX;
 
@@ -30,7 +29,7 @@ GameOverScene::GameOverScene() :
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
 
 	updateProc = std::bind(&GameOverScene::update_main, this);
-	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<StageSelectScene>(); });
 }
 
 GameOverScene::~GameOverScene()
