@@ -11,9 +11,9 @@ class ColorCone :public StageObject
 {
 private:
 	// 吹っ飛び中かどうか
-	bool isBlownAway = true;
+	bool isBlownAway = false;
 	// 回転角度
-	float angle = 0.f;
+	float ragAngle = 0.f;
 	// 吹っ飛び向き
 	bool blownAwayLeft = false;
 

@@ -21,7 +21,7 @@ protected:
 	CollisionShape::AABB aabb{};
 
 protected:
-	float getCameraRot();
+	float getCameraAngleDeg();
 
 public:
 	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath);

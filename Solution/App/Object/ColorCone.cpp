@@ -35,8 +35,8 @@ void ColorCone::blownAway()
 
 
 	// 回転
-	constexpr float frameRotNum = 3.f;
-	angle += frameRotNum;
+	constexpr float frameRotNum = 0.1f;
+	ragAngle += frameRotNum;
 }
 
 void ColorCone::checkDead()
@@ -55,13 +55,18 @@ void ColorCone::update()
 {
 	blownAway();
 	checkDead();
-	gameObj->update(getCameraRot() + angle);
+	gameObj->update(getCameraAngleDeg() + ragAngle);
 }
 
 void ColorCone::hit(const CollisionShape::Sphere & playerSphere)
 {
+	// 吹っ飛んだらreturn
+	if (isBlownAway)return;
+
 	// 吹っ飛ぶ処理有効
 	isBlownAway = true;
+
+	fallStartSpeed = 10.f;
 
 	// 右からぶつかってきたら左に吹っ飛ばす
 	const float playerX = XMVectorGetX(playerSphere.center);

@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 
 #include "Object/Goal.h"
+#include "Object/ColorCone.h"
 #include "GameCamera.h"
 
 using namespace DirectX;
@@ -45,15 +46,6 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 		result = false;
 		break;
 	}
-
-	//// todo 適切でない方法
-	//// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
-	//if (result)
-	//{
-	//	DirectX::XMFLOAT2 pos(0, 0);
-	//	
-	//	//mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
-	//}
 
 	return result;
 }

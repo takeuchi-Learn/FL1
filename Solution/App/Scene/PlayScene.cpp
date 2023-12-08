@@ -59,10 +59,12 @@ void PlayScene::checkCollision()
 	const std::vector<std::unique_ptr<StageObject>>& objs = gameMap->getStageObjects();
 	for (auto& obj : objs)
 	{
+		const CollisionShape::Sphere& sphere = player->getShape();
 		const CollisionShape::AABB& aabb = obj->getRefAABB();
-		if(Collision::CheckHit(player->getShape(), aabb))
+		if(Collision::CheckHit(sphere, aabb))
 		{
 			player->hit(aabb, typeid(*obj).name());
+			obj->hit(sphere);
 		}
 	}
 

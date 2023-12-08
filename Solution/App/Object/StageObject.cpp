@@ -4,7 +4,7 @@
 #include <3D/Billboard/Billboard.h>
 using namespace DirectX;
 
-float StageObject::getCameraRot()
+float StageObject::getCameraAngleDeg()
 {
 	return XMConvertToRadians(-camera->getAngleDeg());
 }
@@ -25,7 +25,7 @@ StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float
 
 void StageObject::update()
 {
-	gameObj->update(getCameraRot());
+	gameObj->update(getCameraAngleDeg());
 }
 
 void StageObject::draw()
