@@ -4,6 +4,11 @@
 #include <3D/Billboard/Billboard.h>
 using namespace DirectX;
 
+float StageObject::getCameraRot()
+{
+	return XMConvertToRadians(-camera->getAngleDeg());
+}
+
 StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath)
 	:gameObj(std::make_unique<Billboard>(texPath.c_str(), camera))
 	,camera(camera)
@@ -20,7 +25,7 @@ StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float
 
 void StageObject::update()
 {
-	gameObj->update(XMConvertToRadians(-camera->getAngleDeg()));
+	gameObj->update(getCameraRot());
 }
 
 void StageObject::draw()

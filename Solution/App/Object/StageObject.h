@@ -13,12 +13,15 @@ class Billboard;
 class StageObject
 {
 private:
-	std::unique_ptr<Billboard> gameObj;
 	GameCamera* camera = nullptr;
 
 protected:
+	std::unique_ptr<Billboard> gameObj;
 	// 当たり判定
 	CollisionShape::AABB aabb{};
+
+protected:
+	float getCameraRot();
 
 public:
 	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath);

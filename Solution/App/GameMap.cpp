@@ -188,5 +188,5 @@ float GameMap::getGameoverPos() const
 {
 	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
 	constexpr float gameOverPosSubNum = 150.f;
-	return mapAABBs.back().minPos.m128_f32[1] - gameOverPosSubNum;
+	return XMVectorGetY(mapAABBs.back().minPos) - gameOverPosSubNum;
 }

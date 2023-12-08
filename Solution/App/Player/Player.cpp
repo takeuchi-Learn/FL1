@@ -7,6 +7,7 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 #include <Input/PadImu.h>
+#include<JumpVectorCalculation.h>
 
 #include <GameMap.h>
 #include <Object/Goal.h>
@@ -241,7 +242,7 @@ void Player::calcJumpPos()
 	++fallTime;
 
 	const float PRE_VEL_Y = currentFallVelovity;
-	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
+	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallTime);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算

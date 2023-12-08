@@ -164,6 +164,7 @@
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Input\PadImu.cpp" />
     <ClCompile Include="App\Object\ObstacleObject.cpp" />
+    <ClCompile Include="App\JumpVectorCalculation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\ColorCone.h" />
@@ -225,6 +226,7 @@
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Input\PadImu.h" />
     <ClInclude Include="App\Object\ObstacleObject.h" />
+    <ClInclude Include="App\JumpVectorCalculation.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
