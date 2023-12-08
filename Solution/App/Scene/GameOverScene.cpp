@@ -23,8 +23,6 @@ GameOverScene::GameOverScene() :
 {
 	spBase = std::make_unique<SpriteBase>();
 	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/ゲームオーバー.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
-	sprite->position.x = 300;
-	sprite->position.y = -650;
 	spriteBack = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/BackSprite.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
@@ -69,6 +67,7 @@ void GameOverScene::update_end()
 
 	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 10.f;
 	sprite->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
+	spriteBack->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
 
 	if (thread->joinable()
 		&& nowTime >= transitionTime)

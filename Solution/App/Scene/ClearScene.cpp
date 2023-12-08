@@ -24,8 +24,6 @@ ClearScene::ClearScene() :
 {
 	updateProc = std::bind(&ClearScene::update_main, this);
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/ステージクリア.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
-	sprite->position.x = 300;
-	sprite->position.y = -650;
 	spriteBack = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/BackSprite.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
 
 	nowLoading = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/nowLoading.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
@@ -99,6 +97,7 @@ void ClearScene::update_end()
 
 	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 10.f;
 	sprite->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
+	spriteBack->position.y = std::lerp(0.f, endPos, Util::easeOutBounce(rate));
 
 	if (thread->joinable()
 		&& nowTime >= transitionTime)
