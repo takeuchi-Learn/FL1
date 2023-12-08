@@ -1,4 +1,5 @@
 ﻿#include "ClearScene.h"
+#include "StageSelectScene.h"
 #include <2D/Sprite.h>
 #include <2D/DebugText.h>
 #include <Input/Input.h>
@@ -7,9 +8,6 @@
 #include <Util/Timer.h>
 #include <Util/Util.h>
 #include <filesystem>
-
-#include "TitleScene.h"
-#include "PlayScene.h"
 
 using namespace DirectX;
 
@@ -44,17 +42,7 @@ void ClearScene::update_main()
 	if (PadImu::ins()->checkInputAccept())
 	{
 		nowLoading->isInvisible = false;
-
-		// 該当ステージがあればそれを始め、無ければタイトルへ戻る
-		const auto mapYamlPath = "Resources/Map/map_" + std::to_string(PlayScene::getStageNum()) + ".yml";
-		if (std::filesystem::exists(mapYamlPath))
-		{
-			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
-		} else
-		{
-			thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<TitleScene>(); });
-		}
-
+		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<StageSelectScene>(); });
 		updateProc = std::bind(&ClearScene::update_end, this);
 		transitionTimer->reset();
 	}

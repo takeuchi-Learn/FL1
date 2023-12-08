@@ -199,7 +199,6 @@ void PlayScene::update_main()
 	{
 		camera->changeStateClear();
 		// クリア演出後シーン切り替え
-		++stageNum;
 		SceneManager::ins()->changeScene<ClearScene>();
 	}
 }
