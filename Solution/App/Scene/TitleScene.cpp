@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "PlayScene.h"
+#include "StageSelectScene.h"
 
 using namespace DirectX;
 
@@ -68,6 +69,12 @@ void TitleScene::update_main()
 			PadImu::ins()->reset();
 
 			PlayScene::resetStageNum();
+		}
+
+		// todo 仮なので変える
+		if (Input::ins()->triggerKey(DIK_P))
+		{
+			SceneManager::ins()->changeScene<StageSelectScene>();
 		}
 	}
 }

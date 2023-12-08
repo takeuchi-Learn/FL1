@@ -28,7 +28,7 @@
 
 using namespace DirectX;
 
-unsigned short PlayScene::stageNum = 0;
+uint16_t PlayScene::stageNum = 0;
 
 namespace
 {

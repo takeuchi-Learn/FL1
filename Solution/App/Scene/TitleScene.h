@@ -4,7 +4,7 @@
  *********************************************************************/
 
 #pragma once
-#include "System/GameScene.h"
+#include <System/GameScene.h>
 #include <memory>
 #include <thread>
 #include <functional>
