@@ -37,9 +37,6 @@ class TitleScene :
 	void update_operation();
 	void update_end();
 
-	/// @return シーン遷移開始の入力があったかどうか
-	bool checkInputOfStartTransition();
-
 public:
 	TitleScene();
 	~TitleScene();

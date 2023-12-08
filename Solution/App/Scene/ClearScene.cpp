@@ -39,36 +39,9 @@ void ClearScene::update()
 	updateProc();
 }
 
-bool ClearScene::checkInputOfStartTransition()
-{
-	constexpr auto useKey = DIK_SPACE;
-	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
-	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
-
-	if (Input::ins()->triggerKey(useKey)) { return true; }
-
-	if (Input::ins()->triggerPadButton(useXInputButton))
-	{
-		return true;
-	}
-
-	if (PadImu::ins()->getDevCount() > 0)
-	{
-		const int preState = PadImu::ins()->getPreStates()[0].buttons;
-		const int state = PadImu::ins()->getStates()[0].buttons;
-
-		const bool pre = PadImu::hitButtons(preState, useJSLMask);
-		const bool current = PadImu::hitButtons(state, useJSLMask);
-
-		if (!pre && current) { return true; }
-	}
-
-	return false;
-}
-
 void ClearScene::update_main()
 {
-	if (checkInputOfStartTransition())
+	if (PadImu::ins()->checkInputAccept())
 	{
 		nowLoading->isInvisible = false;
 

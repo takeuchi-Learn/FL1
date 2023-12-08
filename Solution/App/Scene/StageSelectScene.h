@@ -6,6 +6,11 @@
 #pragma once
 #include <System/GameScene.h>
 #include <memory>
+#include <thread>
+#include <functional>
+#include <string>
+
+class Stopwatch;
 
  /// @brief ステージ選択画面のクラス
 class StageSelectScene :
@@ -13,6 +18,19 @@ class StageSelectScene :
 {
 	uint16_t  currentStage = 0;
 	uint16_t stageMaxNum = 0;
+
+	std::unique_ptr<std::jthread> thread{};
+	std::unique_ptr<GameScene> nextScene = nullptr;
+	std::function<void()> update_proc{};
+
+	std::unique_ptr<Stopwatch> timer;
+
+	// todo デバッグ時の確認用。見た目を作ったら消す。
+	std::string drawText{};
+
+	void update_main();
+	void update_transition();
+
 public:
 	StageSelectScene();
 	~StageSelectScene() = default;
