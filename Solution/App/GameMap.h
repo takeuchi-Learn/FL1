@@ -3,14 +3,19 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include<DirectXMath.h>
 
+#include<Util/Util.h>
 #include <Collision/CollisionShape.h>
+#include <Util/YamlLoader.h>
 #include "Object/Goal.h"
 
 class Billboard;
 class GameCamera;
 class Collision;
 class Goal;
+
+using namespace DirectX;
 
 // マップクラス
 // 動かない地形のみ扱う
@@ -48,6 +53,7 @@ private:
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;
 
+
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	std::unique_ptr<Goal>goal;
 	float goalPosX = 0.f;
@@ -62,8 +68,9 @@ private:
 	/// @param scale 大きさ
 	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
 
-	bool checkTypeAndSetObject(MAPCHIP_DATA data, size_t x, size_t y, const DirectX::XMFLOAT2& pos, float scale);
-
+	void loadStageObject(Yaml::Node& node,float scale);
+	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
+	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
 public:
 	GameMap(GameCamera* camera);
 	~GameMap() = default;
@@ -73,6 +80,9 @@ public:
 	/// @param startPosBuf 開始時のマップ座標を格納する変数
 	/// @return エラーがあるかどうか
 	bool loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf = nullptr);
+
+	
+
 
 	void update();
 	void draw();

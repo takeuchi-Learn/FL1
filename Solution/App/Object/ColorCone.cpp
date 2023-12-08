@@ -46,7 +46,7 @@ void ColorCone::checkDead()
 }
 
 ColorCone::ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
-	:StageObject(camera, pos, scale, L"Resources/Map/Tex/goal.png")
+	:StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
 {
 
 }
