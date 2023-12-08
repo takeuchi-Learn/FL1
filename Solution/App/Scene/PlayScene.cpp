@@ -165,6 +165,8 @@ void PlayScene::update_start()
 
 void PlayScene::update_main()
 {
+#ifdef _DEBUG
+
 	// スペースでシーン切り替え
 	if (Input::ins()->triggerKey(DIK_SPACE))
 	{
@@ -175,6 +177,8 @@ void PlayScene::update_main()
 		SceneManager::ins()->changeScene<TitleScene>();
 		return;
 	}
+
+#endif // _DEBUG
 
 	// ゲームオーバー確認
 	if (player->getIsDead())

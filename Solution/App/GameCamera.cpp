@@ -40,6 +40,7 @@ bool GameCamera::loadYaml()
 	{
 		LoadYamlData(node, angleFilterRaito);
 		LoadYamlData(node, angleStopRange);
+		LoadYamlData(node, stickAngleShiftVal);
 		const auto str = node["isActiveStickControll"].As<std::string>("false");
 		if (str == "true" || str == "TRUE")
 		{
@@ -48,6 +49,33 @@ bool GameCamera::loadYaml()
 		{
 			isActiveStickControll = false;
 		}
+	} catch (...)
+	{
+		return true;
+	}
+
+	if (YamlLoader::LoadYamlFile(node, "Resources/DataFile/stickRange.yml"))
+	{
+		return true;
+	}
+
+	try
+	{
+		auto& root = node["stickRange"];
+		auto& L = root["L"];
+		auto& R = root["R"];
+
+		XMFLOAT2 min{}, max{};
+
+		LoadYamlDataToFloat2(L, min);
+		LoadYamlDataToFloat2(L, max);
+		stickRangeL.min = min;
+		stickRangeL.max = max;
+
+		LoadYamlDataToFloat2(R, min);
+		LoadYamlDataToFloat2(R, max);
+		stickRangeR.min = min;
+		stickRangeR.max = max;
 	} catch (...)
 	{
 		return true;
@@ -198,18 +226,19 @@ void GameCamera::checkSensorInput()
 
 		if (isActiveStickControll)
 		{
-			// angleを動かす大きさ
-			constexpr float shiftVal = 2.f;
-
 			float stick = state.stickRX;
+			auto* range = &stickRangeR;
 
 			if (JS_TYPE_JOYCON_LEFT
 			   == PadImu::ins()->getContollerType(0))
 			{
 				stick = state.stickLX;
+				range = &stickRangeL;
 			}
 
-			angle += stick * shiftVal;
+			stick -= std::lerp(range->min.x, range->max.x, 0.5f);
+
+			angle += stick * stickAngleShiftVal;
 		}
 	}
 
