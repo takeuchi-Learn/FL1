@@ -28,30 +28,17 @@ public:
 private:
 	// todo センサー周りもカメラが持つべきでない。形式を指定して、外部クラスでその形式に変換して扱う方がよい。
 
-	// todo new演算子は「絶対に」使ってはならない
-
-	// todo カルマンフィルターとMadgwickフィルターで使用しているライブラリがGPLなので、使用不可。変更必須。
-
 	// センサー
 	Sensor* sensor = nullptr;
-	// 角度Z
-	float prevAngle = 0.0f;
-	float degree = 0.0f;
 
-	// todo XMFLOAT3等のクラスを使う（JoyShockLibraryのIMU_STATEでも良い）
+	// 角速度
 	DirectX::XMFLOAT3 gyro{};
-	// todo XMFLOAT3等のクラスを使う
-	float prevGyroX = 0.0f;
-	float prevGyroY = 0.0f;
-	float prevGyroZ = 0.0f;
-
-	float accelAngle = 0.0f;
-
-	// todo XMFLOAT3等のクラスを使う
+	// 加速度
 	DirectX::XMFLOAT3 accel{};
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	// todo 変数名にradかdegを付ければ単位がわかる
 	float angle = 20.f;
+	float prevAngle = 0.0f;
 
 	BillboardData* obj = nullptr;
 
@@ -174,8 +161,6 @@ public:
 
 	// センサーのゲッター
 	Sensor* getSensor() { return sensor; }
-
-	void IMUDelete();
 
 	float getGetAccelZ() const { return accel.z; }
 

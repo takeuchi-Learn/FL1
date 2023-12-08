@@ -45,6 +45,8 @@ int Sensor::updateSensor()
 		}
 	}
 
+	if (receivedSize == 0) { isReset = true; } else { isReset = false; }
+
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);
 	contentSize = tailSize;

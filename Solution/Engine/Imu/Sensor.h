@@ -51,12 +51,19 @@ public:
 		return record[5];
 	}
 
+	bool GetReset() const
+	{
+		return isReset;
+	}
+
 private:
 	int updateSensor();
 
 	static constexpr int accelCount = 3;
 	static constexpr int gyroCount = 3;
 	static constexpr int sensorCount = accelCount + gyroCount;
+
+	bool isReset = false;
 
 	std::unique_ptr<Serial> serial;
 	std::array<float, sensorCount> record{};

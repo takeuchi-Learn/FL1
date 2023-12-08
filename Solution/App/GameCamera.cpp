@@ -146,7 +146,8 @@ void GameCamera::checkInput()
 
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
-			padInput)
+			padInput || 
+			sensor->GetReset())
 		{
 			prevAngle = 0.f;
 			angle = 0.f;
@@ -171,6 +172,13 @@ void GameCamera::checkSensorInput()
 	gyro.y = sensor->GetGyroY();
 	gyro.z = sensor->GetGyroZ();
 
+	// 相補フィルターで補正
+	if (!sensor->GetReset())
+	{
+		angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
+			- (1.f - angleFilterRaito) * std::atan2(accel.x, accel.z) - gyro.y;
+	}
+
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
 
 	if (imuPadIsConnected)
@@ -185,11 +193,11 @@ void GameCamera::checkSensorInput()
 		gyro.x = state.gyroX / 131.f;
 		gyro.y = state.gyroY / 131.f;
 		gyro.z = -state.gyroZ / 131.f;
-	}
 
-	// 相補フィルターで補正
-	angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
-		+ (1.f - angleFilterRaito) * std::atan2(accel.x, accel.y) + gyro.z;
+		// 相補フィルターで補正
+		angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
+			+ (1.f - angleFilterRaito) * std::atan2(accel.x, accel.y) + gyro.z;
+	}
 
 	if (imuPadIsConnected)
 	{
@@ -306,9 +314,6 @@ void GameCamera::setFollowFlag(const bool flag)
 		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
 	}
 }
-
-void GameCamera::IMUDelete()
-{}
 
 void GameCamera::gameCameraUpdate()
 {
