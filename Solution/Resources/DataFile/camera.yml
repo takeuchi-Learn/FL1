@@ -1,5 +1,5 @@
 # ジャイロ操作の誤差吸収
-angleFilterRaito: 0.4
+angleFilterRaito: 0.2
 
 # JoyShockLibraryのパッドのスティック入力で角度を変えるかどうか
 # trueもしくはTRUEで有効
