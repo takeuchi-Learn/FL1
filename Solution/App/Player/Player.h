@@ -105,20 +105,7 @@ private:
 
 	void loadSE();
 
-	/// @brief 自由落下(投げ上げ)の速度を計算します。
-	/// @param startVel 初速度
-	/// @param gravAcc 加速度
-	/// @param t 時間
-	/// @return
-	float calcFallVelocity
-	(
-		const float startVel,
-		const float gravAcc,
-		const int t
-	)
-	{
-		return startVel + -gravAcc * static_cast<float>(t);
-	}
+
 
 	/// @brief ジャンプ中の座標更新処理
 	void calcJumpPos();

@@ -114,6 +114,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App\BackGround.cpp" />
+    <ClCompile Include="App\Object\ColorCone.cpp" />
+    <ClCompile Include="App\Object\StageObject.cpp" />
     <ClCompile Include="App\Scene\ClearScene.cpp" />
     <ClCompile Include="App\Scene\GameOverScene.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
@@ -163,10 +165,13 @@
     <ClCompile Include="Engine\Input\PadImu.cpp" />
     <ClCompile Include="App\Object\ObstacleObject.cpp" />
     <ClCompile Include="App\Scene\StageSelectScene.cpp" />
+    <ClCompile Include="App\JumpVectorCalculation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App\Object\ColorCone.h" />
     <ClInclude Include="App\Object\Goal.h" />
     <ClInclude Include="App\BackGround.h" />
+    <ClInclude Include="App\Object\StageObject.h" />
     <ClInclude Include="App\Scene\ClearScene.h" />
     <ClInclude Include="App\Scene\GameOverScene.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
@@ -223,6 +228,7 @@
     <ClInclude Include="Engine\Input\PadImu.h" />
     <ClInclude Include="App\Object\ObstacleObject.h" />
     <ClInclude Include="App\Scene\StageSelectScene.h" />
+    <ClInclude Include="App\JumpVectorCalculation.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

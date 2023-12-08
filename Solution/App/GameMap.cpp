@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 
 #include "Object/Goal.h"
+#include "Object/ColorCone.h"
 #include "GameCamera.h"
 
 using namespace DirectX;
@@ -14,8 +15,13 @@ void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, floa
 	const float harfScale = scale / 2;
 	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
 	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-	mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+
+	CollisionShape::AABB aabb;
+	aabb.minPos = XMLoadFloat2(&minPos);
+	aabb.maxPos = XMLoadFloat2(&maxPos);
+	mapAABBs.push_back(aabb);
+	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
+	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
 }
 
 bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, const size_t y, const XMFLOAT2& pos, const float scale)
@@ -24,11 +30,12 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	// なにかマップチップで指定してオブジェクトを置く場合はここに処理を追加してください
 
 	// todo switch文を使わない構成が望ましい
+
 	bool result = true;
 	switch (data)
 	{
 	case GameMap::MAPCHIP_GOAL:
-		goal = std::make_unique<Goal>(camera, pos, scale);
+		stageObjects.push_back(std::make_unique<Goal>(camera, pos, scale));
 		goalPosX = pos.x;
 		break;
 
@@ -38,14 +45,6 @@ bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, con
 	default:
 		result = false;
 		break;
-	}
-
-	// todo 適切でない方法
-	// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
-	if (result)
-	{
-		DirectX::XMFLOAT2 pos(0, 0);
-		mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
 	}
 
 	return result;
@@ -76,11 +75,12 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
-	mapAABBs.resize(csvData.size());
+	mapAABBs.reserve(csvData.size());
+	mapSizeX = static_cast<unsigned int>(csvData[0].size());
+	mapSizeY = static_cast<unsigned int>(csvData.size());
 
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
 	{
-		mapAABBs[y].resize(csvData[y].size());
 
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
@@ -146,6 +146,8 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		}
 	}
 
+	mapAABBs.shrink_to_fit();
+
 	return false;
 }
 
@@ -155,7 +157,11 @@ void GameMap::update()
 	{
 		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
-	goal->update();
+
+	for(auto& obj:stageObjects)
+	{
+		obj->update();
+	}
 }
 
 void GameMap::draw()
@@ -164,10 +170,15 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-	goal->draw();
+	for (auto& obj : stageObjects)
+	{
+		obj->draw();
+	}
 }
 
 float GameMap::getGameoverPos() const
 {
-	return XMVectorGetY(mapAABBs.back().front().maxPos);
+	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
+	constexpr float gameOverPosSubNum = 150.f;
+	return XMVectorGetY(mapAABBs.back().minPos) - gameOverPosSubNum;
 }

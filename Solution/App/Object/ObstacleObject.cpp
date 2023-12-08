@@ -13,3 +13,4 @@ void ObstacleObject::update()
 
 void ObstacleObject::draw()
 {}
+

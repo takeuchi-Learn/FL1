@@ -5,25 +5,8 @@
 using namespace DirectX;
 
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const float scale)
-	:gameObj(std::make_unique<Billboard>(L"Resources/Map/Tex/goal.png", camera))
-	, camera(camera)
+	:StageObject(camera, pos, scale,L"Resources/Map/Tex/goal.png")
+	
 {
-	gameObj->add(XMFLOAT3(pos.x, pos.y, 0), scale);
 
-	// AABBのサイズ(一辺の長さ)
-	const float harfScale = scale / 2.f;
-	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
-	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-	aabb.minPos = XMLoadFloat2(&minPos);
-	aabb.maxPos = XMLoadFloat2(&maxPos);
-}
-
-void Goal::update()
-{
-	gameObj->update(XMConvertToRadians(-camera->getAngleDeg()));
-}
-
-void Goal::draw()
-{
-	gameObj->draw();
 }
