@@ -41,11 +41,15 @@ void StageSelectScene::update_main()
 {
 	bool inputR = Input::ins()->triggerKey(DIK_RIGHT);
 	inputR |= Input::ins()->triggerPadButton(Input::PAD::PADNUM::RIGHT);
-	inputR |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::RIGHT);
 
 	bool inputL = Input::ins()->triggerKey(DIK_LEFT);
 	inputL |= Input::ins()->triggerPadButton(Input::PAD::PADNUM::LEFT);
-	inputL |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::LEFT);
+
+	if (PadImu::ins()->getDevCount() > 0)
+	{
+		inputR |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::RIGHT);
+		inputL |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::LEFT);
+	}
 
 	if (inputR)
 	{
@@ -85,8 +89,39 @@ void StageSelectScene::update()
 void StageSelectScene::drawFrontSprite()
 {
 	using namespace ImGui;
+	SetNextWindowPos(ImVec2(0, 0));
 	Begin("StageSelectScene::drawFrontSprite", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
 	Text(std::format("currentStage: {}", currentStage).c_str());
 	Text(drawText.c_str());
 	End();
+
+	const auto stageCount = stageMaxNum + 1;
+	for (int i = 0; i < stageCount; ++i)
+	{
+		// todo GameMapのstatic定数にする
+		constexpr float mapSize = 100.f;
+		constexpr float sizeMax = mapSize * 2.f;
+
+		{
+			const float shiftVal = mapSize * 1.5f;
+			constexpr auto posY = static_cast<float>(WinAPI::window_height) / 2.f;
+			constexpr auto posX = static_cast<float>(WinAPI::window_width) / 2.f;
+			SetNextWindowPos(ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY), 0, ImVec2(0.5f, 0.5f));
+		}
+
+		{
+
+			float raito = static_cast<float>(stageCount - std::abs(int(currentStage) - int(i))) / static_cast<float>(stageCount);
+			raito = 1.f - raito;
+			raito = 1.f - raito * raito;
+			raito = std::clamp(raito, 0.f, 1.f);
+
+			const float size = i == currentStage ? sizeMax : sizeMax * std::lerp(0.125f, 0.875f, raito);
+			SetNextWindowSize(ImVec2(size, size));
+		}
+
+		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
+		Text(std::format("{}", i).c_str());
+		End();
+	}
 }

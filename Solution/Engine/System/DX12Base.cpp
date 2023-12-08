@@ -24,6 +24,14 @@ using namespace Microsoft::WRL;
 
 using namespace DirectX;
 
+namespace
+{
+	inline auto POINT2ImVec2(const POINT& v)
+	{
+		return ImVec2(float(v.x), float(v.y));
+	}
+}
+
 #pragma region 角度系関数
 
 float DX12Base::angleRoundRad(float rad)
@@ -581,11 +589,38 @@ void DX12Base::startImGui()
 	// これが無いとフルスクリーン時にずれる
 	ImGui::GetIO().MousePos = ImVec2(Input::ins()->calcMousePosXFromSystem(),
 									 Input::ins()->calcMousePosYFromSystem());
+
+	auto vp = ImGui::GetMainViewport();
+	vp->Pos = ImVec2(0.f, 0.f);
+	vp->Size = ImVec2((float)WinAPI::window_width, (float)WinAPI::window_height);
+	/*vp->WorkPos = ImVec2(0.f, 0.f);
+	vp->WorkSize = vp->Size;*/
+
 }
 
 void DX12Base::endImGui()
 {
 	ImGui::Render();
+	const auto& systemwinsize = POINT2ImVec2(WinAPI::ins()->getSystemWindowSize());
+	const auto& winsize = POINT2ImVec2(WinAPI::ins()->getWindowSize());
+	auto sysWinSize = ImVec2(static_cast<float>(WinAPI::window_width),
+							 static_cast<float>(WinAPI::window_height));
+	sysWinSize.x /= float(WinAPI::ins()->getSystemWindowSize().x);
+	sysWinSize.x *= float(WinAPI::ins()->getWindowSize().x);
+	sysWinSize.y /= float(WinAPI::ins()->getSystemWindowSize().y);
+	sysWinSize.y *= float(WinAPI::ins()->getWindowSize().y);
+
+	auto drawData = ImGui::GetDrawData();
+	drawData->DisplaySize = sysWinSize;
+	// これでやるとテキストの表示がおかしくなる
+	//drawData->ScaleClipRects(ImVec2(winsize.x / systemwinsize.x, winsize.y / systemwinsize.y));
+	drawData->DisplayPos = ImVec2(0.f, 0.f);
+	drawData->OwnerViewport->Pos = {0.f, 0.f};
+	drawData->OwnerViewport->Size = sysWinSize;
+	drawData->OwnerViewport->WorkPos = { 0.f, 0.f };
+	drawData->OwnerViewport->WorkSize = sysWinSize;
+	drawData->FramebufferScale = ImVec2(winsize.x / systemwinsize.x, winsize.y / systemwinsize.y);
+
 	ID3D12DescriptorHeap* ppHeaps[] = { imguiHeap.Get() };
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
