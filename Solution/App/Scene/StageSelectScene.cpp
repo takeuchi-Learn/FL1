@@ -5,12 +5,13 @@
 #include <Input/PadImu.h>
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
+#include <Util/Util.h>
 #include <filesystem>
 #include <format>
 
 namespace
 {
-	constexpr auto transitionTime = Timer::oneSec;
+	constexpr auto transitionTime = Timer::oneSec * 1.5;
 
 	inline bool stageExist(uint16_t stageNum)
 	{
@@ -75,10 +76,13 @@ void StageSelectScene::update_transition()
 	const auto nowTime = timer->getNowTime();
 	if (nowTime >= transitionTime)
 	{
+		transitionRaito = 1.f;
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
 		return;
 	}
+
+	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 }
 
 void StageSelectScene::update()
@@ -110,13 +114,23 @@ void StageSelectScene::drawFrontSprite()
 		}
 
 		{
-
 			float raito = static_cast<float>(stageCount - std::abs(int(currentStage) - int(i))) / static_cast<float>(stageCount);
 			raito = 1.f - raito;
 			raito = 1.f - raito * raito;
 			raito = std::clamp(raito, 0.f, 1.f);
 
-			const float size = i == currentStage ? sizeMax : sizeMax * std::lerp(0.125f, 0.875f, raito);
+			float size = -1.f;
+			if (i == currentStage)
+			{
+				constexpr float transitionEndSize = static_cast<float>(1 + std::max(WinAPI::window_width, WinAPI::window_height));
+				size = std::lerp(sizeMax, transitionEndSize, Util::easeOutBounce(transitionRaito));
+			} else
+			{
+				constexpr auto min = sizeMax * 0.125f;
+				constexpr auto max = sizeMax * 0.875f;
+				size = std::lerp(min, max, raito);
+			}
+
 			SetNextWindowSize(ImVec2(size, size));
 		}
 

@@ -595,7 +595,6 @@ void DX12Base::startImGui()
 	vp->Size = ImVec2((float)WinAPI::window_width, (float)WinAPI::window_height);
 	/*vp->WorkPos = ImVec2(0.f, 0.f);
 	vp->WorkSize = vp->Size;*/
-
 }
 
 void DX12Base::endImGui()
@@ -615,9 +614,9 @@ void DX12Base::endImGui()
 	// これでやるとテキストの表示がおかしくなる
 	//drawData->ScaleClipRects(ImVec2(winsize.x / systemwinsize.x, winsize.y / systemwinsize.y));
 	drawData->DisplayPos = ImVec2(0.f, 0.f);
-	drawData->OwnerViewport->Pos = {0.f, 0.f};
+	drawData->OwnerViewport->Pos = ImVec2(0.f, 0.f);
 	drawData->OwnerViewport->Size = sysWinSize;
-	drawData->OwnerViewport->WorkPos = { 0.f, 0.f };
+	drawData->OwnerViewport->WorkPos = ImVec2(0.f, 0.f);
 	drawData->OwnerViewport->WorkSize = sysWinSize;
 	drawData->FramebufferScale = ImVec2(winsize.x / systemwinsize.x, winsize.y / systemwinsize.y);
 
