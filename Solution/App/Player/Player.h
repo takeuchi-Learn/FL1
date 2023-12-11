@@ -90,6 +90,8 @@ class Player
 
 	bool setMoveLimitFlag = false;
 
+	// コーンのカウント
+	unsigned short coneCount = 0;
 
 #pragma region SE
 	std::weak_ptr<SoundData> jumpSE;
@@ -168,6 +170,8 @@ public:
 	bool getIsClear()const { return isClear; }
 
 	float getStartPosX()const { return leftScrollEndPos; }
+
+	unsigned short getConeCount()const { return coneCount; }
 
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

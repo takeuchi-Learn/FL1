@@ -75,4 +75,10 @@ void ColorCone::hit(const CollisionShape::Sphere & playerSphere)
 	{
 		blownAwayLeft = true;
 	}
+
+	// 判定を無くす(多段カウント防止のため)
+	XMFLOAT2 zero(0, 0);
+	aabb.minPos = XMLoadFloat2(&zero);
+	aabb.maxPos = XMLoadFloat2(&zero);
+
 }

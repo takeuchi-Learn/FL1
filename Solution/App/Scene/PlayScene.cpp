@@ -11,6 +11,7 @@
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
 #include <algorithm>
+#include <Sound/Sound.h>
 
 #include <Player/Player.h>
 #include <Object/Goal.h>
@@ -18,7 +19,7 @@
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
-#include <Sound/Sound.h>
+#include<ConeRecorder.h>
 
 #include <Input/PadImu.h>
 
@@ -191,6 +192,10 @@ void PlayScene::update_main()
 	if (player->getIsClear())
 	{
 		camera->changeStateClear();
+
+		// コーンのカウント記録
+		ConeRecorder::getInstance()->registration(stageNum,player->getConeCount());
+
 		// クリア演出後シーン切り替え
 		++stageNum;
 		SceneManager::ins()->changeScene<ClearScene>();
