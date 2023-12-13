@@ -118,6 +118,7 @@
     <ClCompile Include="App\Object\StageObject.cpp" />
     <ClCompile Include="App\Scene\ClearScene.cpp" />
     <ClCompile Include="App\Scene\GameOverScene.cpp" />
+    <ClCompile Include="App\ConeRecorder.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="App\Object\StageObject.h" />
     <ClInclude Include="App\Scene\ClearScene.h" />
     <ClInclude Include="App\Scene\GameOverScene.h" />
+    <ClInclude Include="App\ConeRecorder.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />
