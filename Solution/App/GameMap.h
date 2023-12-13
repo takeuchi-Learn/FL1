@@ -50,9 +50,8 @@ private:
 	/// @brief 地形のAABB
 	std::vector<CollisionShape::AABB> mapAABBs;
 	// 縦横サイズ
-	unsigned int mapSizeX = 0;
-	unsigned int mapSizeY = 0;
-
+	uint16_t mapSizeX = 0;
+	uint16_t mapSizeY = 0;
 
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	std::unique_ptr<Goal>goal;
@@ -68,7 +67,7 @@ private:
 	/// @param scale 大きさ
 	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
 
-	void loadStageObject(Yaml::Node& node,float scale);
+	void loadStageObject(Yaml::Node& node, float scale);
 	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
 	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
 public:
@@ -81,26 +80,23 @@ public:
 	/// @return エラーがあるかどうか
 	bool loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf = nullptr);
 
-	
-
-
 	void update();
 	void draw();
 
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
-	const std::vector<CollisionShape::AABB>& getMapAABBs() const { return mapAABBs; }
+	inline const auto& getMapAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	//const CollisionShape::AABB& getGoalAABB()const { return goal->getRefAABB(); }
-	const std::vector<std::unique_ptr<StageObject>>& getStageObjects()const { return stageObjects; }
+	//inlnie const auto& getGoalAABB()const { return goal->getRefAABB(); }
 
+	inline const auto& getStageObjects()const { return stageObjects; }
 
 	/// @brief ゲームオーバーになる座標
-	float getGameoverPos() const;
+	float calcGameoverPos() const;
 
-	float getGoalPosX() const { return goalPosX; }
+	inline float getGoalPosX() const { return goalPosX; }
 
-	unsigned int getMapX() const { return mapSizeX; }
-	unsigned int getMapY()const { return mapSizeY; }
+	inline uint16_t getMapX() const { return mapSizeX; }
+	inline uint16_t getMapY() const { return mapSizeY; }
 };

@@ -111,7 +111,7 @@ PlayScene::PlayScene() :
 	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
-	player->setGameOverPos(gameMap->getGameoverPos());
+	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
 	// 開始時は物理挙動をしない

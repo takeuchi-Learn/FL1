@@ -39,7 +39,6 @@ void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, floa
 	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
 }
 
-
 GameMap::GameMap(GameCamera* camera) :
 	camera(camera)
 {}
@@ -68,7 +67,6 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 	mapAABBs.reserve(csvData.size());
 	mapSizeX = static_cast<unsigned int>(csvData[0].size());
 	mapSizeY = static_cast<unsigned int>(csvData.size());
-
 
 	constexpr auto scale = float(WinAPI::window_height) / 10.f;
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
@@ -139,26 +137,26 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 	mapAABBs.shrink_to_fit();
 
-
 	// オブジェクト座標読み込み
 	loadStageObject(root, scale);
 
 	return false;
 }
 
-void GameMap::loadStageObject(Yaml::Node& node,const float scale)
+void GameMap::loadStageObject(Yaml::Node& node, const float scale)
 {
 	std::unordered_map<std::string, std::vector<XMFLOAT2>>stageObjectPos;
 	// 全オブジェクトの座標をu_mapに格納
 	for (auto& name : objectNames)
 	{
-		const std::string& posString = node[name].As<std::string>("NONE");
+		const std::string posString = node[name].As<std::string>("NONE");
+		if (posString == "NONE") { continue; }
 		const auto posStringData = Util::loadCsvFromString(posString);
 		std::vector<XMFLOAT2> objectPos(posStringData.size());
 		loadStageObjectPosition(posStringData, objectPos);
 
 		// スケールをかける
-		for(auto& pos :objectPos)
+		for (auto& pos : objectPos)
 		{
 			pos.x *= scale;
 			pos.y *= -scale;
@@ -168,15 +166,19 @@ void GameMap::loadStageObject(Yaml::Node& node,const float scale)
 	}
 
 	// オブジェクト配置
-	setStageObjects(stageObjectPos,scale);
+	setStageObjects(stageObjectPos, scale);
 }
 
 void GameMap::loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output)
 {
 	for (size_t y = 0u, yLen = posCSV.size(); y < yLen; ++y)
 	{
-		output[y].x = static_cast<float>(std::atof(posCSV[y][0].c_str()));
-		output[y].y = static_cast<float>(std::atof(posCSV[y][1].c_str()));
+		std::from_chars(std::to_address(posCSV[y][0].begin()),
+						std::to_address(posCSV[y][0].end()),
+						output[y].x);
+		std::from_chars(std::to_address(posCSV[y][1].begin()),
+						std::to_address(posCSV[y][1].end()),
+						output[y].y);
 	}
 }
 
@@ -211,7 +213,6 @@ void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<
 	}
 }
 
-
 void GameMap::update()
 {
 	for (auto& i : billboard)
@@ -219,7 +220,7 @@ void GameMap::update()
 		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
 
-	for(auto& obj:stageObjects)
+	for (auto& obj : stageObjects)
 	{
 		obj->update();
 	}
@@ -237,7 +238,7 @@ void GameMap::draw()
 	}
 }
 
-float GameMap::getGameoverPos() const
+float GameMap::calcGameoverPos() const
 {
 	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
 	constexpr float gameOverPosSubNum = 150.f;

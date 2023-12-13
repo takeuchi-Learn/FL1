@@ -2,5 +2,12 @@
 
 void ConeRecorder::registration(const unsigned short stageNum, const unsigned short coneCount)
 {
-	if (coneCount > records.at(stageNum))records[stageNum] = coneCount;
+	try
+	{
+		auto& record = records.at(stageNum);
+		if (coneCount > record) { record = coneCount; }
+	} catch (...)
+	{
+		return;
+	}
 }
