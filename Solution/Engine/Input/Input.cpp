@@ -3,6 +3,7 @@
 #include <dinput.h>
 #include "System/WinAPI.h"
 #include <Input/PadImu.h>
+#include <Imu/Sensor.h>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -55,6 +56,7 @@ void Input::update()
 	updatePad(padNum);
 
 	PadImu::ins()->update();
+	Sensor::ins()->update();
 }
 
 void Input::resetState()

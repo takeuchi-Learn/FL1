@@ -1,6 +1,7 @@
 ﻿#include "GameOverScene.h"
 #include "StageSelectScene.h"
 #include <Input/Input.h>
+#include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <2D/Sprite.h>
 #include <2D/SpriteBase.h>
@@ -47,7 +48,7 @@ void GameOverScene::update()
 
 void GameOverScene::update_main()
 {
-	if (PadImu::ins()->checkInputAccept())
+	if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		nowLoading->isInvisible = false;
 

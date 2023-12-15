@@ -20,12 +20,6 @@ GameCamera::GameCamera(BillboardData* obj)
 	setPerspectiveProjFlag(false);
 
 	loadYaml();
-
-	// センサーの生成
-	if (sensor == nullptr)
-	{
-		sensor = Sensor::ins();
-	}
 }
 
 bool GameCamera::loadYaml()
@@ -174,7 +168,8 @@ void GameCamera::rotation()
 
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
-			padInput)
+			padInput || 
+			Sensor::ins()->CheckButton())
 		{
 			angleDeg = 0.f;
 		}
@@ -185,7 +180,6 @@ void GameCamera::rotation()
 
 void GameCamera::imuInputRotation()
 {
-	sensor->update();
 	// 加速度取得
 	accel.right = -sensor->GetAccelX();
 	accel.up = -sensor->GetAccelZ();
@@ -295,9 +289,6 @@ void GameCamera::setFollowFlag(const bool flag)
 		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
 	}
 }
-
-void GameCamera::IMUDelete()
-{}
 
 void GameCamera::gameCameraUpdate()
 {

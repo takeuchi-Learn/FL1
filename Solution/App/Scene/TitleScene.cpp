@@ -1,5 +1,6 @@
 ﻿#include "TitleScene.h"
 #include <Input/Input.h>
+#include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Util/Timer.h>
 #include <Input/PadImu.h>
@@ -56,7 +57,7 @@ void TitleScene::start()
 
 void TitleScene::update_main()
 {
-	if (PadImu::ins()->checkInputAccept())
+	if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		operation->isInvisible = false;
 		updateProc = std::bind(&TitleScene::update_operation, this);
@@ -79,7 +80,7 @@ void TitleScene::update_operation()
 	constexpr float operSpeed = endPos * 3.f;
 	operation->position.y = std::max(0.f, operation->position.y - operSpeed / DX12Base::ins()->getFPS());
 
-	if (PadImu::ins()->checkInputAccept())
+	if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
