@@ -22,7 +22,7 @@ public:
 	TutorialTexture(GameCamera* camera);
 	~TutorialTexture() {}
 
-	virtual void update();
-	virtual void draw();
+	void update();
+	void draw();
 };
 
