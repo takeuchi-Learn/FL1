@@ -103,9 +103,9 @@ void GameCamera::startAutoRot()
 	// 最後にガクってなるのはカメラの傾きをやめたせい
 
 	// 角度0になったら固定してタイマー加算開始
-	if (angle <= 0)
+	if (angleDeg <= 0)
 	{
-		angle = 0.f;
+		angleDeg = 0.f;
 		addStartTimer = true;
 	} else
 	{
@@ -124,7 +124,7 @@ void GameCamera::startAutoRot()
 		}
 
 		// 少しずつ平行にしていく
-		angle -= startFrameAngle;
+		angleDeg -= startFrameAngle;
 	}
 }
 
@@ -156,13 +156,13 @@ void GameCamera::updateInput()
 {
 	// 入力確認とそれに応じた傾き
 	// ジャイロ導入でここの中身を書き換える
-	checkInput();
+	rotation();
 
 	// 上ベクトル回転
 	upRotate();
 }
 
-void GameCamera::checkInput()
+void GameCamera::rotation()
 {
 	// 指定の入力で角度リセット
 	{
@@ -176,18 +176,14 @@ void GameCamera::checkInput()
 			Input::ins()->hitPadButton(pad_xinput) ||
 			padInput)
 		{
-			prevAngle = 0.f;
-			angle = 0.f;
+			angleDeg = 0.f;
 		}
 	}
 
-	// 前の角度を保存
-	prevAngle = angle;
-
-	checkSensorInput();
+	imuInputRotation();
 }
 
-void GameCamera::checkSensorInput()
+void GameCamera::imuInputRotation()
 {
 	sensor->update();
 	// 加速度取得
@@ -225,13 +221,13 @@ void GameCamera::checkSensorInput()
 		const float invRaito = 1.f - angleFilterRaito;
 		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, -accel.up));
 
-		angle = invRaito * (prevAngle + gyro.roll) + angleFilterRaito * rollAccel;
+		angleDeg = invRaito * (angleDeg + gyro.roll) + angleFilterRaito * rollAccel;
 	}
 
 	// 静止状態を大きめに取る
-	if (angle <= angleStopRange && -angleStopRange <= angle)
+	if (angleDeg <= angleStopRange && -angleStopRange <= angleDeg)
 	{
-		angle = 0.0f;
+		angleDeg = 0.0f;
 	}
 }
 
@@ -258,11 +254,11 @@ void GameCamera::upRotate()
 	constexpr float maxAngle = 35.0f;
 
 	// 制限
-	angle = std::clamp(angle, -maxAngle, maxAngle);
+	angleDeg = std::clamp(angleDeg, -maxAngle, maxAngle);
 
 	// angleを上ベクトルに変換してセット
 	DirectX::XMFLOAT2 upXY{};
-	angleToUp(angle, upXY);
+	angleToUp(angleDeg, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 

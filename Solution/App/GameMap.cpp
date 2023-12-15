@@ -217,7 +217,7 @@ void GameMap::update()
 {
 	for (auto& i : billboard)
 	{
-		i.second->update(XMConvertToRadians(-camera->getAngle()));
+		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
 	}
 
 	for (auto& obj : stageObjects)

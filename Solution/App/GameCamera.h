@@ -65,9 +65,6 @@ private:
 
 	// センサー
 	Sensor* sensor = nullptr;
-	// 角度Z
-	float prevAngle = 0.0f;
-	float degree = 0.0f;
 
 	// 回転の角速度
 	RollPitchYaw gyro{};
@@ -79,8 +76,7 @@ private:
 	/// @brief 加速度
 	AxisVec accel{};
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
-	// todo 変数名にradかdegを付ければ単位がわかる
-	float angle = 20.f;
+	float angleDeg = 20.f;
 
 	BillboardData* obj = nullptr;
 
@@ -134,8 +130,8 @@ private:
 	void updateInput();
 
 	/// @brief 入力確認とそれに応じた角度の加算減算
-	void checkInput();
-	void checkSensorInput();
+	void rotation();
+	void imuInputRotation();
 #pragma endregion
 
 #pragma region CLEAR
@@ -169,7 +165,7 @@ public:
 	inline bool getIsActiveStickControll() const { return isActiveStickControll; }
 
 	/// @brief ジャイロの値のセット。
-	void setGyroValue(float value) { angle = value; }
+	void setGyroValue(float value) { angleDeg = value; }
 
 	/// @brief 追従先オブジェクト
 	/// @param obj
@@ -181,7 +177,7 @@ public:
 
 	/// @brief 角度の取得
 	/// @return 角度
-	float getAngle() const { return angle; }
+	float getAngleDeg() const { return angleDeg; }
 
 	/// @param flag ポーズしてるかどうか
 	void pause(bool flag)

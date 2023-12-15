@@ -2,13 +2,13 @@
 
 #include <GameCamera.h>
 #include <3D/Billboard/Billboard.h>
-#include<JumpVectorCalculation.h>
+#include <JumpVectorCalculation.h>
 
 using namespace DirectX;
 
 void ColorCone::blownAway()
 {
-	if (!isBlownAway)return;
+	if (!isBlownAway) { return; }
 
 	// 移動
 	// プレイヤーの位置に応じて移動方向を変える
@@ -19,11 +19,10 @@ void ColorCone::blownAway()
 
 	XMFLOAT3& refPlayerPos = gameObj->getFrontData()->position;
 	// X方向
-	if(blownAwayLeft)
+	if (blownAwayLeft)
 	{
 		refPlayerPos.x -= frameAddPosX;
-	}
-	else
+	} else
 	{
 		refPlayerPos.x += frameAddPosX;
 	}
@@ -32,7 +31,6 @@ void ColorCone::blownAway()
 	++fallTime;
 	currentFallVector = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallTime);
 	refPlayerPos.y += currentFallVector;
-
 
 	// 回転
 	constexpr float frameRotNum = 0.1f;
@@ -48,17 +46,16 @@ void ColorCone::checkDead()
 ColorCone::ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	:StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
 {
-
 }
 
 void ColorCone::update()
 {
 	blownAway();
 	checkDead();
-	gameObj->update(getCameraAngleDeg() + ragAngle);
+	gameObj->update(calcCameraAngleRad() + ragAngle);
 }
 
-void ColorCone::hit(const CollisionShape::Sphere & playerSphere)
+void ColorCone::hit(const CollisionShape::Sphere& playerSphere)
 {
 	// 吹っ飛んだらreturn
 	if (isBlownAway)return;
@@ -71,7 +68,7 @@ void ColorCone::hit(const CollisionShape::Sphere & playerSphere)
 	// 右からぶつかってきたら左に吹っ飛ばす
 	const float playerX = XMVectorGetX(playerSphere.center);
 	const float myPosX = XMVectorGetX(aabb.minPos);
-	if(playerX > myPosX)
+	if (playerX > myPosX)
 	{
 		blownAwayLeft = true;
 	}
@@ -80,5 +77,4 @@ void ColorCone::hit(const CollisionShape::Sphere & playerSphere)
 	XMFLOAT2 zero(0, 0);
 	aabb.minPos = XMLoadFloat2(&zero);
 	aabb.maxPos = XMLoadFloat2(&zero);
-
 }

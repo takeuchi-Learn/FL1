@@ -475,7 +475,7 @@ void Player::move()
 	if (!isDynamic) { return; }
 
 	// 角度を取得
-	const float angle = camera->getAngle();
+	const float angle = camera->getAngleDeg();
 
 	const float addPos = angle * speedMag;
 
