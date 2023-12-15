@@ -201,6 +201,7 @@ void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<
 			if (posUMap.first == coneStr)
 			{
 				stageObjects[current] = std::make_unique<ColorCone>(camera, pos, scale);
+				++coneMax;
 			}
 			if (posUMap.first == goalStr)
 			{

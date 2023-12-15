@@ -207,6 +207,10 @@ void PlayScene::drawObj3d()
 	backGround->draw();
 	gameMap->draw();
 	player->draw();
+
+	// コーン数の仮表示
+	const unsigned short coneCount = player->getConeCount();
+	const unsigned short coneMax = gameMap->getConeMax();
 }
 
 void PlayScene::drawFrontSprite()

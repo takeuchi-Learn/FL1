@@ -53,10 +53,12 @@ private:
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;
 
-
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	std::unique_ptr<Goal>goal;
 	float goalPosX = 0.f;
+
+	// コーンの最大値
+	unsigned short coneMax = 0;
 
 	GameCamera* camera = nullptr;
 
@@ -81,9 +83,6 @@ public:
 	/// @return エラーがあるかどうか
 	bool loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf = nullptr);
 
-	
-
-
 	void update();
 	void draw();
 
@@ -103,4 +102,7 @@ public:
 
 	unsigned int getMapX() const { return mapSizeX; }
 	unsigned int getMapY()const { return mapSizeY; }
+
+	unsigned short getConeMax()const { return coneMax; }
+
 };
