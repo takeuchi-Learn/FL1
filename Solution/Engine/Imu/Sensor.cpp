@@ -11,6 +11,15 @@ bool Sensor::update()
 	return this->updateSensor() > 0;
 }
 
+bool Sensor::CheckButton() const
+{
+	if (!buttonStatePre && buttonState)
+	{
+		return true;
+	}
+	return false;
+}
+
 int Sensor::updateSensor()
 {
 	if (!this->serial) { return 0; }
@@ -45,7 +54,9 @@ int Sensor::updateSensor()
 		}
 	}
 
-	if (receivedSize == 0) { isButton = true; } else { isButton = false; }
+	buttonStatePre = buttonState;
+	if (receivedSize <= 0) { buttonState = true; }
+	else { buttonState = false; }
 
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);

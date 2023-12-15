@@ -3,6 +3,7 @@
 #include <2D/Sprite.h>
 #include <2D/DebugText.h>
 #include <Input/Input.h>
+#include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Input/PadImu.h>
 #include <Util/Timer.h>
@@ -39,7 +40,7 @@ void ClearScene::update()
 
 void ClearScene::update_main()
 {
-	if (PadImu::ins()->checkInputAccept())
+	if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		nowLoading->isInvisible = false;
 		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<StageSelectScene>(); });

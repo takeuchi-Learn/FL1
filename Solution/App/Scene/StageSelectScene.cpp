@@ -3,6 +3,7 @@
 #include <System/Dx12Base.h>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
+#include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
 #include <Util/Util.h>
@@ -58,7 +59,7 @@ void StageSelectScene::update_main()
 	} else if (inputL)
 	{
 		if (currentStage > 0u) { --currentStage; }
-	} else if (PadImu::ins()->checkInputAccept())
+	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		drawText = "NOW LOADING...";
 		PlayScene::setStageNum(currentStage);
