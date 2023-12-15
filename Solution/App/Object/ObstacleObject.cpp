@@ -9,8 +9,10 @@ ObstacleObject::ObstacleObject(GameCamera* camera, const DirectX::XMFLOAT2& pos,
 }
 
 void ObstacleObject::update()
-{}
+{
+}
 
 void ObstacleObject::draw()
-{}
+{
+}
 

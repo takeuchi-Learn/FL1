@@ -16,6 +16,7 @@
 #include <Player/Player.h>
 #include <Object/Goal.h>
 #include <BackGround.h>
+#include<TutorialTexture.h>
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
@@ -116,6 +117,20 @@ PlayScene::PlayScene() :
 
 	// 開始時は物理挙動をしない
 	player->isDynamic = false;
+
+
+	// チュートリアル関係
+	// もしチュートリアルステージ(_0、_1)だったら画像追加
+	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
+	// 何番ステージまでがチュートリアルかを指定する
+	// 一応_1までチュートリアルと仮定して1に設定
+	constexpr unsigned short tutorialStageMax = 1;
+	
+	// チュートリアルステージだったら画像追加
+	if(stageNum <= tutorialStageMax)
+	{
+		tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), stageNum);
+	}
 }
 
 PlayScene::~PlayScene()
@@ -136,6 +151,8 @@ void PlayScene::update()
 	player->update();
 	backGround->update();
 	gameMap->update();
+
+	if (tutorialTexture)tutorialTexture->update();
 
 	// 衝突確認
 	checkCollision();
@@ -209,7 +226,17 @@ void PlayScene::drawObj3d()
 {
 	backGround->draw();
 	gameMap->draw();
+
+	if (tutorialTexture)tutorialTexture->draw();
+
 	player->draw();
+
+
+	// コーン数の仮表示
+	const unsigned short coneCount = player->getConeCount();
+	const unsigned short coneMax = gameMap->getConeMax();
+
+
 }
 
 void PlayScene::drawFrontSprite()

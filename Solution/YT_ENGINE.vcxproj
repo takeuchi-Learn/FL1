@@ -174,6 +174,7 @@
     <ClCompile Include="lib\imgui\include\imgui_impl_win32.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_widgets.cpp" />
+    <ClCompile Include="App\TutorialTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\ColorCone.h" />
@@ -246,6 +247,7 @@
     <ClInclude Include="lib\imgui\include\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\include\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\include\imstb_truetype.h" />
+    <ClInclude Include="App\TutorialTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

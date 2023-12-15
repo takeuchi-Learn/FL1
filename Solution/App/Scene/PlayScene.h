@@ -16,11 +16,13 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
+class Collision;
+
 class Player;
 class Goal;
 class BackGround;
-class Collision;
 class GameMap;
+class TutorialTexture;
 
 class PlayScene :
 	public GameScene
@@ -37,10 +39,10 @@ private:
 	std::unique_ptr<ParticleMgr> particle;
 
 	std::unique_ptr<Player> player;
-
 	std::unique_ptr<Goal> goal;
 
 	std::unique_ptr<BackGround> backGround;
+	std::unique_ptr<TutorialTexture> tutorialTexture;
 	std::unique_ptr<GameMap> gameMap;
 
 	std::function<void()> updateProc;

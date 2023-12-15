@@ -46,6 +46,10 @@ void ColorCone::checkDead()
 ColorCone::ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	:StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
 {
+	// 当たり判定調整
+	constexpr float judgmentAdjustmentNum = 30.0f;
+	aabb.minPos.m128_f32[0] += judgmentAdjustmentNum;
+	aabb.maxPos.m128_f32[0] -= judgmentAdjustmentNum;
 }
 
 void ColorCone::update()

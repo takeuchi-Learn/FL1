@@ -238,7 +238,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	}
 	else if (hitObjName == typeid(ColorCone).name())
 	{
-		coneCount++;
+		++coneCount;
 	}
 }
 
