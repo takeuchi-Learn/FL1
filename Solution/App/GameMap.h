@@ -48,6 +48,14 @@ private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
 	std::vector<CollisionShape::AABB> mapAABBs;
+
+	// すり抜け床メモ
+	// 地形判定の配列とは別の配列を用意し、すり抜け床だけ隔離する
+	// で、GameMapから取得できるようにし、typeid(GameMap)で地形か確認していた部分を地形とすり抜け床で分ける
+	// ゴールもこれでいいかもしれない
+	std::vector<CollisionShape::AABB> slipthroughFloorAABBs;
+	
+	
 	// 縦横サイズ
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;

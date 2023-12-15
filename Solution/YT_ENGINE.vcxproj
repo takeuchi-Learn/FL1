@@ -167,7 +167,6 @@
     <ClCompile Include="App\Object\ObstacleObject.cpp" />
     <ClCompile Include="App\JumpVectorCalculation.cpp" />
     <ClCompile Include="App\TutorialTexture.cpp" />
-    <ClCompile Include="App\Object\SlipthroughFloor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Object\ColorCone.h" />
@@ -232,7 +231,6 @@
     <ClInclude Include="App\Object\ObstacleObject.h" />
     <ClInclude Include="App\JumpVectorCalculation.h" />
     <ClInclude Include="App\TutorialTexture.h" />
-    <ClInclude Include="App\Object\SlipthroughFloor.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
