@@ -47,14 +47,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble\$(Configuration);$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\JoyShockLibrary-plus-HDRumble\$(Configuration);$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>
@@ -75,7 +75,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>DirectXTex.lib;imgui.lib;Yaml.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;Yaml.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -104,7 +104,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>DirectXTex.lib;imgui.lib;Yaml.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;Yaml.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -114,8 +114,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App\BackGround.cpp" />
+    <ClCompile Include="App\Object\ColorCone.cpp" />
+    <ClCompile Include="App\Object\StageObject.cpp" />
     <ClCompile Include="App\Scene\ClearScene.cpp" />
     <ClCompile Include="App\Scene\GameOverScene.cpp" />
+    <ClCompile Include="App\ConeRecorder.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
@@ -162,12 +165,25 @@
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Input\PadImu.cpp" />
     <ClCompile Include="App\Object\ObstacleObject.cpp" />
+    <ClCompile Include="App\Scene\StageSelectScene.cpp" />
+    <ClCompile Include="App\JumpVectorCalculation.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_impl_dx12.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_impl_win32.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="lib\imgui\include\imgui_widgets.cpp" />
+    <ClCompile Include="App\TutorialTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App\Object\ColorCone.h" />
     <ClInclude Include="App\Object\Goal.h" />
     <ClInclude Include="App\BackGround.h" />
+    <ClInclude Include="App\Object\StageObject.h" />
     <ClInclude Include="App\Scene\ClearScene.h" />
     <ClInclude Include="App\Scene\GameOverScene.h" />
+    <ClInclude Include="App\ConeRecorder.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />
@@ -221,6 +237,17 @@
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Input\PadImu.h" />
     <ClInclude Include="App\Object\ObstacleObject.h" />
+    <ClInclude Include="App\Scene\StageSelectScene.h" />
+    <ClInclude Include="App\JumpVectorCalculation.h" />
+    <ClInclude Include="lib\imgui\include\imconfig.h" />
+    <ClInclude Include="lib\imgui\include\imgui.h" />
+    <ClInclude Include="lib\imgui\include\imgui_impl_dx12.h" />
+    <ClInclude Include="lib\imgui\include\imgui_impl_win32.h" />
+    <ClInclude Include="lib\imgui\include\imgui_internal.h" />
+    <ClInclude Include="lib\imgui\include\imstb_rectpack.h" />
+    <ClInclude Include="lib\imgui\include\imstb_textedit.h" />
+    <ClInclude Include="lib\imgui\include\imstb_truetype.h" />
+    <ClInclude Include="App\TutorialTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

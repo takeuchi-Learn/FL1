@@ -20,12 +20,6 @@ GameCamera::GameCamera(BillboardData* obj)
 	setPerspectiveProjFlag(false);
 
 	loadYaml();
-
-	// センサーの生成
-	if (sensor == nullptr)
-	{
-		sensor = Sensor::ins();
-	}
 }
 
 bool GameCamera::loadYaml()
@@ -103,9 +97,9 @@ void GameCamera::startAutoRot()
 	// 最後にガクってなるのはカメラの傾きをやめたせい
 
 	// 角度0になったら固定してタイマー加算開始
-	if (angle <= 0)
+	if (angleDeg <= 0)
 	{
-		angle = 0.f;
+		angleDeg = 0.f;
 		addStartTimer = true;
 	} else
 	{
@@ -124,7 +118,7 @@ void GameCamera::startAutoRot()
 		}
 
 		// 少しずつ平行にしていく
-		angle -= startFrameAngle;
+		angleDeg -= startFrameAngle;
 	}
 }
 
@@ -156,13 +150,13 @@ void GameCamera::updateInput()
 {
 	// 入力確認とそれに応じた傾き
 	// ジャイロ導入でここの中身を書き換える
-	checkInput();
+	rotation();
 
 	// 上ベクトル回転
 	upRotate();
 }
 
-void GameCamera::checkInput()
+void GameCamera::rotation()
 {
 	// 指定の入力で角度リセット
 	{
@@ -174,30 +168,28 @@ void GameCamera::checkInput()
 
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
-			padInput)
+			padInput ||
+			Sensor::ins()->CheckButton())
 		{
-			prevAngle = 0.f;
-			angle = 0.f;
+			angleDeg = 0.f;
 		}
 	}
 
-	// 使いたいやつに応じてコメントアウトしたり解除したりしてください
-
-	checkKeyInput();
-	checkSensorInput();
+	imuInputRotation();
 }
 
-void GameCamera::checkSensorInput()
+void GameCamera::imuInputRotation()
 {
-	sensor->update();
+	auto* sensor = Sensor::ins();
+
 	// 加速度取得
-	accel.x = sensor->GetAccelX();
-	accel.y = sensor->GetAccelY();
-	accel.z = sensor->GetAccelZ();
+	accel.right = -sensor->GetAccelX();
+	accel.up = -sensor->GetAccelZ();
+	accel.forward = -sensor->GetAccelY();
 	// 角速度取得
-	gyro.x = sensor->GetGyroX();
-	gyro.y = sensor->GetGyroY();
-	gyro.z = sensor->GetGyroZ();
+	gyro.pitch = -sensor->GetGyroX();
+	gyro.yaw = -sensor->GetGyroZ();
+	gyro.roll = -sensor->GetGyroY();
 
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
 
@@ -206,68 +198,32 @@ void GameCamera::checkSensorInput()
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
 		// 加速度取得
-		accel.x = -state.accelX / 16384.f;
-		accel.y = state.accelY / 16384.f;
-		accel.z = state.accelZ / 16384.f;
+		accel.right = -state.accelX;
+		accel.up = -state.accelY;
+		accel.forward = state.accelZ;
 		// 角速度取得
-		gyro.x = state.gyroX / 131.f;
-		gyro.y = state.gyroY / 131.f;
-		gyro.z = -state.gyroZ / 131.f;
+		gyro.pitch = -state.gyroX;
+		gyro.yaw = -state.gyroY;
+		gyro.roll = -state.gyroZ;
 	}
+	// 単位がDegree/Secなので、1フレームでの値に変換する
+	gyro.pitch /= DX12Base::ins()->getFPS();
+	gyro.yaw /= DX12Base::ins()->getFPS();
+	gyro.roll /= DX12Base::ins()->getFPS();
 
 	// 相補フィルターで補正
-	angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
-		+ (1.f - angleFilterRaito) * std::atan2(accel.x, accel.y) + gyro.z;
-
-	if (imuPadIsConnected)
 	{
-		const auto& state = PadImu::ins()->getStates()[0];
-		const auto& preState = PadImu::ins()->getPreStates()[0];
+		// 調整項目
+		const float invRaito = 1.f - angleFilterRaito;
+		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, -accel.up));
 
-		if (isActiveStickControll)
-		{
-			float stick = state.stickRX;
-			auto* range = &stickRangeR;
-
-			if (JS_TYPE_JOYCON_LEFT
-			   == PadImu::ins()->getContollerType(0))
-			{
-				stick = state.stickLX;
-				range = &stickRangeL;
-			}
-
-			stick -= std::lerp(range->min.x, range->max.x, 0.5f);
-
-			angle += stick * stickAngleShiftVal;
-		}
+		angleDeg = angleFilterRaito * (angleDeg + gyro.roll) + invRaito * rollAccel;
 	}
 
 	// 静止状態を大きめに取る
-	if (angle <= angleStopRange && -angleStopRange <= angle)
+	if (angleDeg <= angleStopRange && -angleStopRange <= angleDeg)
 	{
-		angle = 0.0f;
-	}
-
-	// 前の角度を保存
-	prevAngle = angle;
-}
-
-// todo 関数名とやっていることが違う（checkではなく角度変更をしている）
-void GameCamera::checkKeyInput()
-{
-	// 1フレームの回転量(多分ジャイロから受け取るようにしたら消す)
-	constexpr float frameAngle = 3.0f;
-
-	// 入力確認してカメラを傾ける
-	// ジャイロ使用時は直接角度を代入するためこちらも消す
-	if (Input::ins()->hitKey(DIK_LEFT) ||
-		Input::ins()->hitPadButton(XINPUT_GAMEPAD_DPAD_LEFT))
-	{
-		angle -= frameAngle;
-	} else if (Input::ins()->hitKey(DIK_RIGHT) ||
-			   Input::ins()->hitPadButton(XINPUT_GAMEPAD_DPAD_RIGHT))
-	{
-		angle += frameAngle;
+		angleDeg = 0.0f;
 	}
 }
 
@@ -294,11 +250,11 @@ void GameCamera::upRotate()
 	constexpr float maxAngle = 35.0f;
 
 	// 制限
-	angle = std::clamp(angle, -maxAngle, maxAngle);
+	angleDeg = std::clamp(angleDeg, -maxAngle, maxAngle);
 
 	// angleを上ベクトルに変換してセット
 	DirectX::XMFLOAT2 upXY{};
-	angleToUp(angle, upXY);
+	angleToUp(angleDeg, upXY);
 	setUp(DirectX::XMFLOAT3(upXY.x, upXY.y, 0));
 }
 
@@ -335,9 +291,6 @@ void GameCamera::setFollowFlag(const bool flag)
 		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
 	}
 }
-
-void GameCamera::IMUDelete()
-{}
 
 void GameCamera::gameCameraUpdate()
 {

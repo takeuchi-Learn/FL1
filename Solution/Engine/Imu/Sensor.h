@@ -51,12 +51,19 @@ public:
 		return record[5];
 	}
 
+	inline bool GetButton() const { return buttonState; }
+	inline bool GetPreButton() const { return buttonStatePre; }
+	inline bool CheckButton() const { return !buttonStatePre && buttonState; }
+
 private:
 	int updateSensor();
 
 	static constexpr int accelCount = 3;
 	static constexpr int gyroCount = 3;
 	static constexpr int sensorCount = accelCount + gyroCount;
+
+	bool buttonState = false;
+	bool buttonStatePre = false;
 
 	std::unique_ptr<Serial> serial;
 	std::array<float, sensorCount> record{};

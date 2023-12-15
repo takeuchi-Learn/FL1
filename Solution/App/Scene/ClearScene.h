@@ -31,8 +31,6 @@ class ClearScene :
 	std::function<void()> updateProc{};
 	std::unique_ptr<Timer> transitionTimer;
 
-	bool checkInputOfStartTransition();
-
 	void update_main();
 	void update_end();
 

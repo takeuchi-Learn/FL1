@@ -39,11 +39,15 @@ int Sensor::updateSensor()
 
 		for (int i = 0; i < Sensor::sensorCount; i++, p += sizeof(int16_t))
 		{
-			constexpr float accelSensitivity_16g = 16384.f;
-			constexpr float gyroSensitivity_2kdps = 131.f;
+			const float accelSensitivity_16g = 2048.f;
+			const float gyroSensitivity_2kdps = 16.4f;
 			record[i] = *((const int16_t*)p) / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
 		}
 	}
+
+	buttonStatePre = buttonState;
+	if (receivedSize <= 0) { buttonState = true; }
+	else { buttonState = false; }
 
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);

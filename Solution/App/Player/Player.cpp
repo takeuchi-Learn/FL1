@@ -7,10 +7,13 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 #include <Input/PadImu.h>
+#include<JumpVectorCalculation.h>
+#include<Sound/SoundData.h>
 
 #include <GameMap.h>
 #include <Object/Goal.h>
-#include<Sound/SoundData.h>
+#include<Object/ColorCone.h>
+
 
 using namespace DirectX;
 
@@ -130,7 +133,8 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 		camera->changeStateClear();
 		isClear = true;
-	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
+	} 
+	else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
 	{
 		enum class HIT_AREA : uint8_t
 		{
@@ -232,6 +236,10 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			gameObj->update(XMConvertToRadians(getObj()->rotation));
 		}
 	}
+	else if (hitObjName == typeid(ColorCone).name())
+	{
+		++coneCount;
+	}
 }
 
 void Player::calcJumpPos()
@@ -241,7 +249,7 @@ void Player::calcJumpPos()
 	++fallTime;
 
 	const float PRE_VEL_Y = currentFallVelovity;
-	currentFallVelovity = calcFallVelocity(fallStartSpeed, gAcc, fallTime);
+	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallTime);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
@@ -251,7 +259,7 @@ void Player::calcJumpPos()
 void Player::jump()
 {
 	// センサーの値
-	float sensorValue = camera->getGetAccelZ();
+	float sensorValue = camera->getGetAccelUp();
 	if (PadImu::ins()->getDevCount() > 0)
 	{
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
@@ -467,7 +475,7 @@ void Player::move()
 	if (!isDynamic) { return; }
 
 	// 角度を取得
-	const float angle = camera->getAngle();
+	const float angle = camera->getAngleDeg();
 
 	const float addPos = angle * speedMag;
 

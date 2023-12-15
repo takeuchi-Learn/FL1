@@ -11,14 +11,16 @@
 #include <Sound/SoundData.h>
 #include <3D/ParticleMgr.h>
 #include <algorithm>
+#include <Sound/Sound.h>
 
 #include <Player/Player.h>
 #include <Object/Goal.h>
 #include <BackGround.h>
+#include<TutorialTexture.h>
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
-#include <Sound/Sound.h>
+#include<ConeRecorder.h>
 
 #include <Input/PadImu.h>
 
@@ -28,7 +30,7 @@
 
 using namespace DirectX;
 
-unsigned short PlayScene::stageNum = 0;
+uint16_t PlayScene::stageNum = 0;
 
 namespace
 {
@@ -46,30 +48,26 @@ namespace
 
 void PlayScene::checkCollision()
 {
-	for (auto& y : gameMap->getAABBs())
+	// 地形判定
+	for (auto& aabb : gameMap->getMapAABBs())
 	{
-		for (auto& x : y)
+		if (Collision::CheckHit(player->getShape(), aabb))
 		{
-			// min、max両方0,0は通路なので確認せずにcontinue
-			if (!checkMinMax(x)) { continue; }
-
-			if (Collision::CheckHit(player->getShape(), x))
-			{
-				player->hit(x, typeid(*gameMap).name());
-			}
+			player->hit(aabb, typeid(*gameMap).name());
 		}
 	}
 
-	// ゴールとプレイヤーの判定(仮)
-	// 後々他のオブジェクトとまとめます
-	const bool isHitGoal = Collision::CheckHit(player->getShape(), gameMap->getGoalAABB());
-	if (Input::ins()->triggerKey(DIK_H))
+	// オブジェクト判定
+	const std::vector<std::unique_ptr<StageObject>>& objs = gameMap->getStageObjects();
+	for (auto& obj : objs)
 	{
-		int num = 0;
-	}
-	if (isHitGoal)
-	{
-		player->hit(gameMap->getGoalAABB(), typeid(Goal).name());
+		const CollisionShape::Sphere& sphere = player->getShape();
+		const CollisionShape::AABB& aabb = obj->getRefAABB();
+		if (Collision::CheckHit(sphere, aabb))
+		{
+			player->hit(aabb, typeid(*obj).name());
+			obj->hit(sphere);
+		}
 	}
 }
 
@@ -113,11 +111,24 @@ PlayScene::PlayScene() :
 	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
 
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
-	player->setGameOverPos(gameMap->getGameoverPos());
+	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
 	// 開始時は物理挙動をしない
 	player->isDynamic = false;
+
+	// チュートリアル関係
+	// もしチュートリアルステージ(_0、_1)だったら画像追加
+	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
+	// 何番ステージまでがチュートリアルかを指定する
+	// 一応_1までチュートリアルと仮定して1に設定
+	constexpr unsigned short tutorialStageMax = 1;
+
+	// チュートリアルステージだったら画像追加
+	if (stageNum <= tutorialStageMax)
+	{
+		tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), stageNum);
+	}
 }
 
 PlayScene::~PlayScene()
@@ -138,6 +149,8 @@ void PlayScene::update()
 	player->update();
 	backGround->update();
 	gameMap->update();
+
+	if (tutorialTexture)tutorialTexture->update();
 
 	// 衝突確認
 	checkCollision();
@@ -198,8 +211,11 @@ void PlayScene::update_main()
 	if (player->getIsClear())
 	{
 		camera->changeStateClear();
+
+		// コーンのカウント記録
+		ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
+
 		// クリア演出後シーン切り替え
-		++stageNum;
 		SceneManager::ins()->changeScene<ClearScene>();
 	}
 }
@@ -208,6 +224,9 @@ void PlayScene::drawObj3d()
 {
 	backGround->draw();
 	gameMap->draw();
+
+	if (tutorialTexture) { tutorialTexture->draw(); }
+
 	player->draw();
 }
 

@@ -34,9 +34,6 @@ class GameOverScene :
 	void update_main();
 	void update_end();
 
-	/// @return シーン遷移開始の入力があったかどうか
-	bool checkInputOfStartTransition();
-
 public:
 	GameOverScene();
 	~GameOverScene();

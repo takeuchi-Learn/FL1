@@ -146,12 +146,6 @@ LRESULT WinAPI::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam); // 標準の処理を行う
 }
 
-WinAPI* WinAPI::getInstance()
-{
-	static WinAPI winApi{};
-	return &winApi;
-}
-
 HWND WinAPI::getHwnd() { return hwnd; }
 WNDCLASSEX WinAPI::getW() { return w; }
 

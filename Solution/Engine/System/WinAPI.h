@@ -38,7 +38,15 @@ public:
 	inline const POINT& getWindowSize() const { return windowSize; }
 	inline const POINT& getSystemWindowSize() const { return systemWindowSize; }
 
-	static WinAPI* getInstance();
+	static WinAPI* getInstance()
+	{
+		static WinAPI winApi{};
+		return &winApi;
+	}
+	inline static WinAPI* ins()
+	{
+		return getInstance();
+	}
 
 	HWND getHwnd();
 	WNDCLASSEX getW();

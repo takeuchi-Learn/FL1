@@ -1,13 +1,13 @@
 ﻿#include "Input.h"
-
 #include <cmath>
-
 #include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 #include "System/WinAPI.h"
 #include <Input/PadImu.h>
+#include <Imu/Sensor.h>
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Xinput.lib")
 
 Input::Input()
 {
@@ -56,6 +56,7 @@ void Input::update()
 	updatePad(padNum);
 
 	PadImu::ins()->update();
+	Sensor::ins()->update();
 }
 
 void Input::resetState()

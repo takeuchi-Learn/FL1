@@ -16,11 +16,13 @@ class Sprite;
 class SpriteBase;
 class SoundData;
 class ParticleMgr;
+class Collision;
+
 class Player;
 class Goal;
 class BackGround;
-class Collision;
 class GameMap;
+class TutorialTexture;
 
 class PlayScene :
 	public GameScene
@@ -37,10 +39,10 @@ private:
 	std::unique_ptr<ParticleMgr> particle;
 
 	std::unique_ptr<Player> player;
-
 	std::unique_ptr<Goal> goal;
 
 	std::unique_ptr<BackGround> backGround;
+	std::unique_ptr<TutorialTexture> tutorialTexture;
 	std::unique_ptr<GameMap> gameMap;
 
 	std::function<void()> updateProc;
@@ -48,7 +50,7 @@ private:
 
 	std::weak_ptr<SoundData> bgm;
 
-	static unsigned short stageNum;
+	static uint16_t stageNum;
 
 #pragma region ゲームオーバー関係
 	int gameOverTimer = 0;
@@ -73,5 +75,6 @@ public:
 	void drawFrontSprite() override;
 
 	static inline void resetStageNum() { stageNum = 0; }
-	static inline unsigned short getStageNum() { return stageNum; }
+	static inline void setStageNum(uint16_t num) { stageNum = num; }
+	static inline uint16_t getStageNum() { return stageNum; }
 };

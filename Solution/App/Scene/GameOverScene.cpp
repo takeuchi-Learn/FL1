@@ -1,5 +1,7 @@
 ﻿#include "GameOverScene.h"
+#include "StageSelectScene.h"
 #include <Input/Input.h>
+#include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <2D/Sprite.h>
 #include <2D/SpriteBase.h>
@@ -8,8 +10,6 @@
 #include <Util/Timer.h>
 #include <algorithm>
 #include <Input/PadImu.h>
-
-#include "PlayScene.h"
 
 using namespace DirectX;
 
@@ -30,7 +30,7 @@ GameOverScene::GameOverScene() :
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");
 
 	updateProc = std::bind(&GameOverScene::update_main, this);
-	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+	thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<StageSelectScene>(); });
 }
 
 GameOverScene::~GameOverScene()
@@ -48,7 +48,7 @@ void GameOverScene::update()
 
 void GameOverScene::update_main()
 {
-	if (checkInputOfStartTransition())
+	if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		nowLoading->isInvisible = false;
 
@@ -75,45 +75,9 @@ void GameOverScene::update_end()
 	}
 }
 
-bool GameOverScene::checkInputOfStartTransition()
-{
-	constexpr auto useKey = DIK_SPACE;
-	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
-	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
-
-	if (Input::ins()->triggerKey(useKey)) { return true; }
-
-	if (Input::ins()->triggerPadButton(useXInputButton))
-	{
-		return true;
-	}
-
-	if (PadImu::ins()->getDevCount() > 0)
-	{
-		const int preState = PadImu::ins()->getPreStates()[0].buttons;
-		const int state = PadImu::ins()->getStates()[0].buttons;
-
-		const bool pre = PadImu::hitButtons(preState, useJSLMask);
-		const bool current = PadImu::hitButtons(state, useJSLMask);
-
-		if (!pre && current) { return true; }
-	}
-
-	return false;
-}
-
 void GameOverScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	nowLoading->drawWithUpdate(DX12Base::ins(), spBase.get());
 	sprite->drawWithUpdate(DX12Base::ins(), spBase.get());
-
-	if (nowLoading->isInvisible)
-	{
-		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-		ImGui::PushFont(DX12Base::ins()->getBigImFont());
-		ImGui::Text("Press Space...");
-		ImGui::PopFont();
-		ImGui::End();
-	}
 }

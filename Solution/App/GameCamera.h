@@ -37,6 +37,25 @@ public:
 		OTHER, //その他(何も更新しないとき)
 	};
 
+	struct AxisVec
+	{
+		/// @brief 右
+		float right = 0.f;
+		/// @brief 天
+		float up = 0.f;
+		/// @brief 奥
+		float forward = 0.f;
+	};
+	struct RollPitchYaw
+	{
+		/// @brief 奥行き軸回転
+		float roll = 0.f;
+		/// @brief 左右軸回転
+		float pitch = 0.f;
+		/// @brief 天地軸回転
+		float yaw = 0.f;
+	};
+
 private:
 	// todo センサー周りもカメラが持つべきでない。形式を指定して、外部クラスでその形式に変換して扱う方がよい。
 
@@ -44,26 +63,17 @@ private:
 
 	// todo カルマンフィルターとMadgwickフィルターで使用しているライブラリがGPLなので、使用不可。変更必須。
 
-	// センサー
-	Sensor* sensor = nullptr;
-	// 角度Z
-	float prevAngle = 0.0f;
-	float degree = 0.0f;
-
-	// todo XMFLOAT3等のクラスを使う（JoyShockLibraryのIMU_STATEでも良い）
-	DirectX::XMFLOAT3 gyro{};
-	// todo XMFLOAT3等のクラスを使う
-	float prevGyroX = 0.0f;
-	float prevGyroY = 0.0f;
-	float prevGyroZ = 0.0f;
+	// 回転の角速度
+	RollPitchYaw gyro{};
+	// 前回の角速度
+	RollPitchYaw prevGyro{};
 
 	float accelAngle = 0.0f;
 
-	// todo XMFLOAT3等のクラスを使う
-	DirectX::XMFLOAT3 accel{};
+	/// @brief 加速度
+	AxisVec accel{};
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
-	// todo 変数名にradかdegを付ければ単位がわかる
-	float angle = 20.f;
+	float angleDeg = 20.f;
 
 	BillboardData* obj = nullptr;
 
@@ -117,9 +127,8 @@ private:
 	void updateInput();
 
 	/// @brief 入力確認とそれに応じた角度の加算減算
-	void checkInput();
-	void checkSensorInput();
-	void checkKeyInput();
+	void rotation();
+	void imuInputRotation();
 #pragma endregion
 
 #pragma region CLEAR
@@ -150,12 +159,10 @@ public:
 
 	bool loadYaml();
 
-	inline float getAngleDeg() const { return angle; }
-
 	inline bool getIsActiveStickControll() const { return isActiveStickControll; }
 
 	/// @brief ジャイロの値のセット。
-	void setGyroValue(float value) { angle = value; }
+	void setGyroValue(float value) { angleDeg = value; }
 
 	/// @brief 追従先オブジェクト
 	/// @param obj
@@ -167,14 +174,12 @@ public:
 
 	/// @brief 角度の取得
 	/// @return 角度
-	float getAngle()const { return angle; }
+	float getAngleDeg() const { return angleDeg; }
 
 	/// @param flag ポーズしてるかどうか
 	void pause(bool flag)
 	{
-		cameraState = flag ?
-			cameraState = CameraState::OTHER :
-			cameraState = CameraState::INPUT;
+		cameraState = flag ? CameraState::OTHER : CameraState::INPUT;
 	}
 
 	// クリア状態に変更
@@ -184,12 +189,10 @@ public:
 	/// @brief 追従のオンオフ
 	void setFollowFlag(const bool flag);
 
-	// センサーのゲッター
-	Sensor* getSensor() { return sensor; }
-
-	void IMUDelete();
-
-	float getGetAccelZ() const { return accel.z; }
+	float getGetAccelUp() const { return accel.up; }
 
 	CameraState getCameraState() const { return cameraState; }
+
+	inline const auto& getGyro() const { return gyro; }
+	inline const auto& getAccel() const { return accel; }
 };
