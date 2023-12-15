@@ -51,16 +51,16 @@ private:
 	private:
 		bool downMove = false;
 
-		// 上げ用
-		float easeOutQuint(const float x)
+		// 上げ用 easeOutQuint
+		float easingUp(const float x)
 		{
 			const float value = 1 - x;
 			const float valuePow5 = value * value * value * value * value;
 			return 1 - valuePow5;
 		}
 
-		// 下げ用
-		float easeInOutSine(const float x)
+		// 下げ用 easeInOutSine
+		float easingDown(const float x)
 		{
 			return -(std::cos(3.14f * x) - 1) / 2;
 		}

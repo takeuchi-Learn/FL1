@@ -108,11 +108,11 @@ void TutorialTexture::Jump::jump()
 	constexpr float mag = 200.f;
 	if (downMove)
 	{
-		posY = START_POS_Y + easeInOutSine(1.f - x) * mag;
+		posY = START_POS_Y + easingDown(1.f - x) * mag;
 	}
 	else
 	{
-		posY = START_POS_Y + easeOutQuint(x) * mag;
+		posY = START_POS_Y + easingUp(x) * mag;
 	}
 
 	if (x < 1.f)
