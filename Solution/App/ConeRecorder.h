@@ -25,7 +25,7 @@ public:
 	/// @brief クリアした時に自己ベストだったら記録登録する関数
 	void registration(const unsigned short stageNum,const unsigned short coneCount);
 
-	const unsigned shortgetRecord(const unsigned short stageNum) { return records.at(stageNum); }
+	const unsigned short getRecord(const unsigned short stageNum) { return records.at(stageNum); }
 	const std::unordered_map<unsigned short, unsigned short>& getRecords()const { return records; }
 
 };
