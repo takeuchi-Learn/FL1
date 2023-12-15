@@ -151,6 +151,7 @@ void GameCamera::checkInput()
 		{
 			prevAngle = 0.f;
 			angle = 0.f;
+			gyro_angle = 0.f;
 		}
 	}
 
@@ -169,14 +170,22 @@ void GameCamera::checkSensorInput()
 	accel.z = sensor->GetAccelZ();
 	// 角速度取得
 	gyro.x = sensor->GetGyroX();
-	gyro.y = sensor->GetGyroY();
+	gyro.y = -sensor->GetGyroY();
 	gyro.z = sensor->GetGyroZ();
 
-	// 相補フィルターで補正
+	float fps = DX12Base::ins()->getFPS();
+
 	if (!sensor->GetReset())
 	{
-		angle += angleFilterRaito * (accel.x / DX12Base::ins()->getFPS())
-			- (1.f - angleFilterRaito) * std::atan2(accel.x, accel.z) - gyro.y;
+		// ジャイロのYの値のズレ修正用
+		float offsetY = 0.15f;
+		//加速度センサーから角度を算出
+		float acc_angle = XMConvertToDegrees(atan2(accel.x, accel.z + abs(accel.y)));
+		//数値積分
+		gyro_angle += (gyro.y - offsetY) * (fps * 0.001f);
+
+		// 相補フィルターで補正
+		angle = (0.8f * gyro_angle) + (0.2f * acc_angle);
 	}
 
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
@@ -229,6 +238,7 @@ void GameCamera::checkSensorInput()
 
 	// 前の角度を保存
 	prevAngle = angle;
+	prevGyroY = gyro.y;
 }
 
 // todo 関数名とやっていることが違う（checkではなく角度変更をしている）

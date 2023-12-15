@@ -39,6 +39,8 @@ private:
 	// todo 変数名にradかdegを付ければ単位がわかる
 	float angle = 20.f;
 	float prevAngle = 0.0f;
+	float prevGyroY = 0.0f; 
+	float gyro_angle = 0.0f;
 
 	BillboardData* obj = nullptr;
 
