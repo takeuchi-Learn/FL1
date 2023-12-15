@@ -13,7 +13,6 @@
 class Billboard;
 class GameCamera;
 class Collision;
-class Goal;
 
 using namespace DirectX;
 
@@ -53,9 +52,10 @@ private:
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;
 
+	// ステージの配置物
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
-	std::unique_ptr<Goal>goal;
 	float goalPosX = 0.f;
+	
 
 	// コーンの最大値
 	unsigned short coneMax = 0;
