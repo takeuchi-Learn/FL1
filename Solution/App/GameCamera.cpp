@@ -175,7 +175,7 @@ void GameCamera::checkInput()
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
 			padInput || 
-			sensor->GetReset())
+			sensor->GetButton())
 		{
 			prevAngle = 0.f;
 			angle = 0.f;
@@ -203,7 +203,7 @@ void GameCamera::checkSensorInput()
 
 	float fps = DX12Base::ins()->getFPS();
 
-	if (!sensor->GetReset())
+	if (!sensor->GetButton())
 	{
 		// ジャイロのYの値のズレ修正用
 		float offsetY = 0.15f;

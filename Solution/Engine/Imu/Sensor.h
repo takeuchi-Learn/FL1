@@ -51,9 +51,9 @@ public:
 		return record[5];
 	}
 
-	bool GetReset() const
+	bool GetButton() const
 	{
-		return isReset;
+		return isButton;
 	}
 
 private:
@@ -63,7 +63,7 @@ private:
 	static constexpr int gyroCount = 3;
 	static constexpr int sensorCount = accelCount + gyroCount;
 
-	bool isReset = false;
+	bool isButton = false;
 
 	std::unique_ptr<Serial> serial;
 	std::array<float, sensorCount> record{};
