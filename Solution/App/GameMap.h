@@ -3,14 +3,19 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include<DirectXMath.h>
 
+#include<Util/Util.h>
 #include <Collision/CollisionShape.h>
+#include <Util/YamlLoader.h>
 #include "Object/Goal.h"
 
 class Billboard;
 class GameCamera;
 class Collision;
 class Goal;
+
+using namespace DirectX;
 
 // マップクラス
 // 動かない地形のみ扱う
@@ -43,8 +48,12 @@ private:
 private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
-	std::vector<std::vector<CollisionShape::AABB>> mapAABBs;
+	std::vector<CollisionShape::AABB> mapAABBs;
+	// 縦横サイズ
+	uint16_t mapSizeX = 0;
+	uint16_t mapSizeY = 0;
 
+	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	std::unique_ptr<Goal>goal;
 	float goalPosX = 0.f;
 
@@ -58,8 +67,9 @@ private:
 	/// @param scale 大きさ
 	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
 
-	bool checkTypeAndSetObject(MAPCHIP_DATA data, size_t x, size_t y, const DirectX::XMFLOAT2& pos, float scale);
-
+	void loadStageObject(Yaml::Node& node, float scale);
+	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
+	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
 public:
 	GameMap(GameCamera* camera);
 	~GameMap() = default;
@@ -75,18 +85,18 @@ public:
 
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
-	const std::vector<std::vector<CollisionShape::AABB>>& getAABBs() const { return mapAABBs; }
+	inline const auto& getMapAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	const CollisionShape::AABB& getGoalAABB()const { return goal->getShape(); }
+	//inlnie const auto& getGoalAABB()const { return goal->getRefAABB(); }
+
+	inline const auto& getStageObjects()const { return stageObjects; }
 
 	/// @brief ゲームオーバーになる座標
-	float getGameoverPos() const;
+	float calcGameoverPos() const;
 
-	float getGoalPosX() const { return goalPosX; }
+	inline float getGoalPosX() const { return goalPosX; }
 
-	template<size_t ind = 0u>
-	size_t getMapX() const { return mapAABBs[ind].size(); }
-
-	size_t getMapY()const { return mapAABBs.size(); }
+	inline uint16_t getMapX() const { return mapSizeX; }
+	inline uint16_t getMapY() const { return mapSizeY; }
 };

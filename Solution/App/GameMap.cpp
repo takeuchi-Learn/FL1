@@ -5,50 +5,38 @@
 #include <DirectXMath.h>
 
 #include "Object/Goal.h"
+#include "Object/ColorCone.h"
 #include "GameCamera.h"
 
+#include<sstream>
+
 using namespace DirectX;
+
+namespace
+{
+	constexpr char* coneStr = "cone";
+	constexpr char* goalStr = "goal";
+
+	// オブジェクト一覧
+	const std::vector<char*>objectNames =
+	{
+		coneStr,
+		goalStr,
+	};
+}
 
 void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
 {
 	const float harfScale = scale / 2;
 	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
 	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-	mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
-}
 
-bool GameMap::checkTypeAndSetObject(const MAPCHIP_DATA data, const size_t x, const size_t y, const XMFLOAT2& pos, const float scale)
-{
-	// ここでTypeに応じてオブジェクトを配置
-	// なにかマップチップで指定してオブジェクトを置く場合はここに処理を追加してください
-
-	// todo switch文を使わない構成が望ましい
-	bool result = true;
-	switch (data)
-	{
-	case GameMap::MAPCHIP_GOAL:
-		goal = std::make_unique<Goal>(camera, pos, scale);
-		goalPosX = pos.x;
-		break;
-
-		// 処理無いけど消さないでね
-	case GameMap::MAPCHIP_ROAD:
-		break;
-	default:
-		result = false;
-		break;
-	}
-
-	// todo 適切でない方法
-	// defaultに当てはまらなかったらmaxPosに0をセット(判定を無くす)
-	if (result)
-	{
-		DirectX::XMFLOAT2 pos(0, 0);
-		mapAABBs[y][x].maxPos = XMLoadFloat2(&pos);
-	}
-
-	return result;
+	CollisionShape::AABB aabb;
+	aabb.minPos = XMLoadFloat2(&minPos);
+	aabb.maxPos = XMLoadFloat2(&maxPos);
+	mapAABBs.push_back(aabb);
+	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
+	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
 }
 
 GameMap::GameMap(GameCamera* camera) :
@@ -76,12 +64,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 	const auto csvData = Util::loadCsvFromString(csv);
 
-	mapAABBs.resize(csvData.size());
+	mapAABBs.reserve(csvData.size());
+	mapSizeX = static_cast<unsigned int>(csvData[0].size());
+	mapSizeY = static_cast<unsigned int>(csvData.size());
 
+	constexpr auto scale = float(WinAPI::window_height) / 10.f;
 	for (size_t y = 0u, yLen = csvData.size(); y < yLen; ++y)
 	{
-		mapAABBs[y].resize(csvData[y].size());
-
 		for (size_t x = 0u, xLen = csvData[y].size(); x < xLen; ++x)
 		{
 			const auto& cellStr = csvData[y][x];
@@ -103,13 +92,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 				return true;
 			}
 
-			constexpr auto scale = float(WinAPI::window_height) / 10.f;
 			const auto pos = XMFLOAT3(float(x) * scale,
 									  -float(y) * scale,
 									  0);
 
-			// 地形以外ならcontinueする
-			if (checkTypeAndSetObject(MAPCHIP_DATA(n), x, y, XMFLOAT2(pos.x, pos.y), scale))continue;
+			// 通れる道ならcontinueする
+			// 一旦GOALもcontinue
+			if (n == GameMap::MAPCHIP_ROAD || n == GameMap::MAPCHIP_GOAL)continue;
 
 			std::wstring wTexPath{};
 
@@ -146,7 +135,82 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		}
 	}
 
+	mapAABBs.shrink_to_fit();
+
+	// オブジェクト座標読み込み
+	loadStageObject(root, scale);
+
 	return false;
+}
+
+void GameMap::loadStageObject(Yaml::Node& node, const float scale)
+{
+	std::unordered_map<std::string, std::vector<XMFLOAT2>>stageObjectPos;
+	// 全オブジェクトの座標をu_mapに格納
+	for (auto& name : objectNames)
+	{
+		const std::string posString = node[name].As<std::string>("NONE");
+		if (posString == "NONE") { continue; }
+		const auto posStringData = Util::loadCsvFromString(posString);
+		std::vector<XMFLOAT2> objectPos(posStringData.size());
+		loadStageObjectPosition(posStringData, objectPos);
+
+		// スケールをかける
+		for (auto& pos : objectPos)
+		{
+			pos.x *= scale;
+			pos.y *= -scale;
+		}
+
+		stageObjectPos.emplace(name, objectPos);
+	}
+
+	// オブジェクト配置
+	setStageObjects(stageObjectPos, scale);
+}
+
+void GameMap::loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output)
+{
+	for (size_t y = 0u, yLen = posCSV.size(); y < yLen; ++y)
+	{
+		std::from_chars(std::to_address(posCSV[y][0].begin()),
+						std::to_address(posCSV[y][0].end()),
+						output[y].x);
+		std::from_chars(std::to_address(posCSV[y][1].begin()),
+						std::to_address(posCSV[y][1].end()),
+						output[y].y);
+	}
+}
+
+void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale)
+{
+	// リサイズ
+	size_t sizeNum = 0;
+	for (auto& posUMap : stageObjectPos)
+	{
+		for (auto& pos : posUMap.second)
+		{
+			++sizeNum;
+		}
+	}
+	stageObjects.resize(sizeNum);
+
+	size_t current = 0;
+	for (auto& posUMap : stageObjectPos)
+	{
+		for (auto& pos : posUMap.second)
+		{
+			if (posUMap.first == coneStr)
+			{
+				stageObjects[current] = std::make_unique<ColorCone>(camera, pos, scale);
+			}
+			if (posUMap.first == goalStr)
+			{
+				stageObjects[current] = std::make_unique<Goal>(camera, pos, scale);
+			}
+			++current;
+		}
+	}
 }
 
 void GameMap::update()
@@ -155,7 +219,11 @@ void GameMap::update()
 	{
 		i.second->update(XMConvertToRadians(-camera->getAngle()));
 	}
-	goal->update();
+
+	for (auto& obj : stageObjects)
+	{
+		obj->update();
+	}
 }
 
 void GameMap::draw()
@@ -164,10 +232,15 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-	goal->draw();
+	for (auto& obj : stageObjects)
+	{
+		obj->draw();
+	}
 }
 
-float GameMap::getGameoverPos() const
+float GameMap::calcGameoverPos() const
 {
-	return XMVectorGetY(mapAABBs.back().front().maxPos);
+	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
+	constexpr float gameOverPosSubNum = 150.f;
+	return XMVectorGetY(mapAABBs.back().minPos) - gameOverPosSubNum;
 }

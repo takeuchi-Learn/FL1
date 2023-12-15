@@ -48,7 +48,7 @@ private:
 
 	std::weak_ptr<SoundData> bgm;
 
-	static unsigned short stageNum;
+	static uint16_t stageNum;
 
 #pragma region ゲームオーバー関係
 	int gameOverTimer = 0;
@@ -73,5 +73,6 @@ public:
 	void drawFrontSprite() override;
 
 	static inline void resetStageNum() { stageNum = 0; }
-	static inline unsigned short getStageNum() { return stageNum; }
+	static inline void setStageNum(uint16_t num) { stageNum = num; }
+	static inline uint16_t getStageNum() { return stageNum; }
 };

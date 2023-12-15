@@ -12,6 +12,18 @@
 class GameCamera :
 	public Camera
 {
+private:
+	template <class T>
+	struct MinMax
+	{
+		T min;
+		T max;
+	};
+
+	MinMax<DirectX::XMFLOAT2> stickRangeL{};
+	MinMax<DirectX::XMFLOAT2> stickRangeR{};
+	float stickAngleShiftVal = 2.f;
+
 public:
 	// todo カメラが持つべきでない。（カメラを構成する要素ではないため。）switch文ではなくstateパターンやビヘイビアツリーを使うこと。
 	// カメラ内部の要素と、カメラを操作する者の状態は、まったくの別物。これは後者。

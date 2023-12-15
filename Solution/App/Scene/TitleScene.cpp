@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "PlayScene.h"
+#include "StageSelectScene.h"
 
 using namespace DirectX;
 
@@ -55,7 +56,7 @@ void TitleScene::start()
 
 void TitleScene::update_main()
 {
-	if (checkInputOfStartTransition())
+	if (PadImu::ins()->checkInputAccept())
 	{
 		operation->isInvisible = false;
 		updateProc = std::bind(&TitleScene::update_operation, this);
@@ -78,13 +79,13 @@ void TitleScene::update_operation()
 	constexpr float operSpeed = endPos * 3.f;
 	operation->position.y = std::max(0.f, operation->position.y - operSpeed / DX12Base::ins()->getFPS());
 
-	if (checkInputOfStartTransition())
+	if (PadImu::ins()->checkInputAccept())
 	{
 		Sound::stopWave(bgm);
 		Sound::playWave(transitionSe, 0u, 0.2f);
 
 		nowLoading->isInvisible = false;
-		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<PlayScene>(); });
+		thread = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<StageSelectScene>(); });
 		updateProc = std::bind(&TitleScene::update_end, this);
 
 		transitionTimer->reset();
@@ -113,33 +114,6 @@ void TitleScene::update_end()
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
 	}
-}
-
-bool TitleScene::checkInputOfStartTransition()
-{
-	constexpr auto useKey = DIK_SPACE;
-	constexpr auto useXInputButton = XINPUT_GAMEPAD_A | XINPUT_GAMEPAD_B;
-	constexpr auto useJSLMask = JSMASK_E | JSMASK_S;
-
-	if (Input::ins()->triggerKey(useKey)) { return true; }
-
-	if (Input::ins()->triggerPadButton(useXInputButton))
-	{
-		return true;
-	}
-
-	if (PadImu::ins()->getDevCount() > 0)
-	{
-		const int preState = PadImu::ins()->getPreStates()[0].buttons;
-		const int state = PadImu::ins()->getStates()[0].buttons;
-
-		const bool pre = PadImu::hitButtons(preState, useJSLMask);
-		const bool current = PadImu::hitButtons(state, useJSLMask);
-
-		if (!pre && current) { return true; }
-	}
-
-	return false;
 }
 
 void TitleScene::update()

@@ -5,6 +5,17 @@
 
 class PadImu
 {
+public:
+	struct DIRECTION
+	{
+		enum DIRECTION_ENUM : uint8_t
+		{
+			UP = JSMASK_UP,
+			RIGHT = JSMASK_RIGHT,
+			DOWN = JSMASK_DOWN,
+			LEFT = JSMASK_LEFT
+		};
+	};
 private:
 	PadImu(const PadImu&) = delete;
 	PadImu& operator=(const PadImu&) = delete;
@@ -29,6 +40,14 @@ public:
 	void reset();
 
 	void update();
+
+	bool checkInputAccept() const;
+
+	bool checkInputDPAD(size_t arrayNum,
+						int direction);
+
+	bool checkTriggerInputDPAD(size_t arrayNum,
+							   int direction);
 
 	inline const auto& getHandles() const { return devHandles; }
 	inline int getDevCount() const { return devCount; }

@@ -4,7 +4,7 @@
  *********************************************************************/
 
 #pragma once
-#include "System/GameScene.h"
+#include <System/GameScene.h>
 #include <memory>
 #include <thread>
 #include <functional>
@@ -36,9 +36,6 @@ class TitleScene :
 	void update_main();
 	void update_operation();
 	void update_end();
-
-	/// @return シーン遷移開始の入力があったかどうか
-	bool checkInputOfStartTransition();
 
 public:
 	TitleScene();

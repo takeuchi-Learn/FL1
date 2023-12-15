@@ -1,13 +1,12 @@
 ﻿#include "Input.h"
-
 #include <cmath>
-
 #include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 #include "System/WinAPI.h"
 #include <Input/PadImu.h>
+
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Xinput.lib")
 
 Input::Input()
 {
