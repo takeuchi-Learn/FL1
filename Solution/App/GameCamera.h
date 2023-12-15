@@ -63,9 +63,6 @@ private:
 
 	// todo カルマンフィルターとMadgwickフィルターで使用しているライブラリがGPLなので、使用不可。変更必須。
 
-	// センサー
-	Sensor* sensor = nullptr;
-
 	// 回転の角速度
 	RollPitchYaw gyro{};
 	// 前回の角速度
@@ -191,9 +188,6 @@ public:
 
 	/// @brief 追従のオンオフ
 	void setFollowFlag(const bool flag);
-
-	// センサーのゲッター
-	Sensor* getSensor() { return sensor; }
 
 	void IMUDelete();
 

@@ -180,6 +180,8 @@ void GameCamera::rotation()
 
 void GameCamera::imuInputRotation()
 {
+	auto* sensor = Sensor::ins();
+
 	// 加速度取得
 	accel.right = -sensor->GetAccelX();
 	accel.up = -sensor->GetAccelZ();
