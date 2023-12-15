@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include<memory>
+#include<cmath>
 
 class Billboard;
 class GameCamera;
@@ -11,8 +12,6 @@ class GameCamera;
 
 // アニメーションさせるために複数画像用意するの大変だと思うので、プログラムで回転させたり上下に動かしたほうがよさそう
 
-
-
 // チュートリアル画像
 class TutorialTexture
 {
@@ -20,13 +19,13 @@ private:
 	class State
 	{
 	private:
-		unsigned int time = 0;
 		const unsigned int TIME_MAX;
-
+		unsigned int time = 0;
 	protected:
 		Billboard* gameObj = nullptr;
 		GameCamera* camera = nullptr;
 
+		float x = 0.f;
 	public:
 		State(Billboard* gameObj, GameCamera* camera, const unsigned int timeMax) 
 			:gameObj(gameObj), camera(camera), TIME_MAX(timeMax){}
@@ -35,12 +34,13 @@ private:
 		void addTime() { ++time; }
 
 		bool loopEnd();
+
+		unsigned int getTime()const { return time; }
 	};
 
 	class Move :public State
 	{
 	private:
-		float x = 0.f;
 	public:
 		Move(Billboard* gameObj, GameCamera* camera) :State(gameObj, camera,static_cast<unsigned int>(60.f * 4)) {}
 		void update()override;
@@ -48,8 +48,30 @@ private:
 
 	class Jump :public State
 	{
+	private:
+		bool downMove = false;
+
+		// 上げ用
+		float easeOutQuint(const float x)
+		{
+			const float value = 1 - x;
+			const float valuePow5 = value * value * value * value * value;
+			return 1 - valuePow5;
+		}
+
+		// 下げ用
+		float easeInOutSine(const float x)
+		{
+			return -(std::cos(3.14f * x) - 1) / 2;
+		}
+
+		// 初期位置
+		const float START_POS_Y;
+
+	private:
+		void jump();
 	public:
-		Jump(Billboard* gameObj, GameCamera* camera) :State(gameObj, camera, static_cast<unsigned int>(60.f * 2)) {}
+		Jump(Billboard* gameObj, GameCamera* camera);
 		void update()override;
 	};
 

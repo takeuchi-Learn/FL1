@@ -57,7 +57,8 @@ void TutorialTexture::Move::update()
 	constexpr float piMag2 = 3.14f * 2;
 	if (x < piMag2)
 	{
-		x += 0.05f;
+		constexpr float frameAddNum = 0.05f;
+		x += frameAddNum;
 	}
 	else
 	{
@@ -69,33 +70,68 @@ void TutorialTexture::Move::update()
 	angleDeg *= mag;
 	gameObj->getFrontData()->rotation = angleDeg;
 
-
-
 	gameObj->update(XMConvertToRadians(-camera->getAngleDeg() + angleDeg));
 	
-	// 終了処理
+	// 終了処理 何かしらあったら記述
 	if(loopEnd())
 	{
-		x = 0;
 	}
 
 }
 
+TutorialTexture::Jump::Jump(Billboard* gameObj, GameCamera* camera)
+	:State(gameObj, camera, static_cast<unsigned int>(60.f * 2.5f))
+	, START_POS_Y(gameObj->getFrontData()->position.y)
+{
+}
+
 void TutorialTexture::Jump::update()
 {
-
-	// 思いっきり振り上げ、ゆっくり下に戻す処理
-
-
+	constexpr unsigned int startTime = static_cast<unsigned int>(60.f * 1.f);
+	if (getTime() >= startTime)jump();
 
 	gameObj->update(XMConvertToRadians(-camera->getAngleDeg()));
 
 	// 終了処理
 	if (loopEnd())
 	{
-
+		gameObj->getFrontData()->position.y = START_POS_Y; 
+		downMove = false;
 	}
 
+}
+
+void TutorialTexture::Jump::jump()
+{
+	float& posY = gameObj->getFrontData()->position.y;
+
+	constexpr float mag = 200.f;
+	if (downMove)
+	{
+		posY = START_POS_Y + easeInOutSine(1.f - x) * mag;
+	}
+	else
+	{
+		posY = START_POS_Y + easeOutQuint(x) * mag;
+	}
+
+	if (x < 1.f)
+	{
+		constexpr float frameAddNum = 0.04f;
+		x += frameAddNum;
+	}
+	else
+	{
+		if (!downMove)
+		{
+			x = 0.f;
+			downMove = true;
+		} 
+		else
+		{
+			x = 1.f;
+		}
+	}
 }
 
 bool TutorialTexture::State::loopEnd()
@@ -103,6 +139,7 @@ bool TutorialTexture::State::loopEnd()
 	if(time == TIME_MAX)
 	{
 		time = 0;
+		x = 0;
 		return true;
 	}
 	return false;
