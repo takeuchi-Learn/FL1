@@ -20,12 +20,6 @@ GameCamera::GameCamera(BillboardData* obj)
 	setPerspectiveProjFlag(false);
 
 	loadYaml();
-
-	// センサーの生成
-	if (sensor == nullptr)
-	{
-		sensor = Sensor::ins();
-	}
 }
 
 bool GameCamera::loadYaml()
@@ -175,7 +169,7 @@ void GameCamera::checkInput()
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
 			padInput || 
-			sensor->GetButton())
+			Sensor::ins()->GetButton())
 		{
 			prevAngle = 0.f;
 			angle = 0.f;
@@ -191,19 +185,18 @@ void GameCamera::checkInput()
 
 void GameCamera::checkSensorInput()
 {
-	sensor->update();
 	// 加速度取得
-	accel.x = sensor->GetAccelX();
-	accel.y = sensor->GetAccelY();
-	accel.z = sensor->GetAccelZ();
+	accel.x = Sensor::ins()->GetAccelX();
+	accel.y = Sensor::ins()->GetAccelY();
+	accel.z = Sensor::ins()->GetAccelZ();
 	// 角速度取得
-	gyro.x = sensor->GetGyroX();
-	gyro.y = -sensor->GetGyroY();
-	gyro.z = sensor->GetGyroZ();
+	gyro.x = Sensor::ins()->GetGyroX();
+	gyro.y = -Sensor::ins()->GetGyroY();
+	gyro.z = Sensor::ins()->GetGyroZ();
 
 	float fps = DX12Base::ins()->getFPS();
 
-	if (!sensor->GetButton())
+	if (!Sensor::ins()->GetButton())
 	{
 		// ジャイロのYの値のズレ修正用
 		float offsetY = 0.15f;
@@ -213,7 +206,7 @@ void GameCamera::checkSensorInput()
 		gyro_angle += (gyro.y - offsetY) * (fps * 0.001f);
 
 		// 相補フィルターで補正
-		angle = (0.8f * gyro_angle) + (0.2f * acc_angle);
+		angle = ((1.f - angleFilterRaito) * gyro_angle) + (angleFilterRaito * acc_angle);
 	}
 
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;

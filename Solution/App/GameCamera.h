@@ -40,9 +40,6 @@ public:
 private:
 	// todo センサー周りもカメラが持つべきでない。形式を指定して、外部クラスでその形式に変換して扱う方がよい。
 
-	// センサー
-	Sensor* sensor = nullptr;
-
 	// 角速度
 	DirectX::XMFLOAT3 gyro{};
 	// 加速度
@@ -174,8 +171,6 @@ public:
 	void setFollowFlag(const bool flag);
 
 	// センサーのゲッター
-	Sensor* getSensor() { return sensor; }
-
 	float getGetAccelZ() const { return accel.z; }
 
 	CameraState getCameraState() const { return cameraState; }
