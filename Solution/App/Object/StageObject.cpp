@@ -6,7 +6,7 @@ using namespace DirectX;
 
 float StageObject::getCameraAngleDeg()
 {
-	return XMConvertToRadians(-camera->getAngleDeg());
+	return XMConvertToRadians(-camera->getAngle());
 }
 
 StageObject::StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath)

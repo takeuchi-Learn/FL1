@@ -48,7 +48,7 @@ namespace
 void PlayScene::checkCollision()
 {
 	// 地形判定
-	for (auto& aabb : gameMap->getMapAABBs()) 
+	for (auto& aabb : gameMap->getMapAABBs())
 	{
 		if (Collision::CheckHit(player->getShape(), aabb))
 		{
@@ -62,7 +62,7 @@ void PlayScene::checkCollision()
 	{
 		const CollisionShape::Sphere& sphere = player->getShape();
 		const CollisionShape::AABB& aabb = obj->getRefAABB();
-		if(Collision::CheckHit(sphere, aabb))
+		if (Collision::CheckHit(sphere, aabb))
 		{
 			player->hit(aabb, typeid(*obj).name());
 			obj->hit(sphere);
@@ -198,7 +198,7 @@ void PlayScene::update_main()
 		camera->changeStateClear();
 
 		// コーンのカウント記録
-		ConeRecorder::getInstance()->registration(stageNum,player->getConeCount());
+		ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
 
 		// クリア演出後シーン切り替え
 		SceneManager::ins()->changeScene<ClearScene>();

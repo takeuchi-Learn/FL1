@@ -259,7 +259,7 @@ void Player::calcJumpPos()
 void Player::jump()
 {
 	// センサーの値
-	float sensorValue = camera->getGetAccelZ();
+	float sensorValue = camera->getGetAccelUp();
 	if (PadImu::ins()->getDevCount() > 0)
 	{
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
