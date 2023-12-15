@@ -152,8 +152,13 @@ void GameMap::loadStageObject(Yaml::Node& node,const float scale)
 	// 全オブジェクトの座標をu_mapに格納
 	for (auto& name : objectNames)
 	{
-		const std::string& posString = node[name].As<std::string>("NONE");
+		constexpr char* noneString = "NONE";
+		const std::string& posString = node[name].As<std::string>(noneString);
 		const auto posStringData = Util::loadCsvFromString(posString);
+
+		// 存在しなかったらcontinue
+		if (posStringData[0][0] == noneString)continue;
+
 		std::vector<XMFLOAT2> objectPos(posStringData.size());
 		loadStageObjectPosition(posStringData, objectPos);
 
