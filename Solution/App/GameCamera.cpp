@@ -168,7 +168,7 @@ void GameCamera::rotation()
 
 		if (Input::ins()->hitKey(key) ||
 			Input::ins()->hitPadButton(pad_xinput) ||
-			padInput || 
+			padInput ||
 			Sensor::ins()->CheckButton())
 		{
 			angleDeg = 0.f;

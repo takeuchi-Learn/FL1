@@ -189,8 +189,6 @@ public:
 	/// @brief 追従のオンオフ
 	void setFollowFlag(const bool flag);
 
-	void IMUDelete();
-
 	float getGetAccelUp() const { return accel.up; }
 
 	CameraState getCameraState() const { return cameraState; }
