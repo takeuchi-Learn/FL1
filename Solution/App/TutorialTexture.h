@@ -19,24 +19,37 @@ class TutorialTexture
 private:
 	class State
 	{
+	private:
+		unsigned int time = 0;
+		const unsigned int TIME_MAX;
+
 	protected:
 		Billboard* gameObj = nullptr;
+		GameCamera* camera = nullptr;
+
 	public:
-		State(Billboard* gameObj) :gameObj(gameObj) {}
+		State(Billboard* gameObj, GameCamera* camera, const unsigned int timeMax) 
+			:gameObj(gameObj), camera(camera), TIME_MAX(timeMax){}
+
 		virtual void update() {}
+		void addTime() { ++time; }
+
+		bool loopEnd();
 	};
 
 	class Move :public State
 	{
+	private:
+		float x = 0.f;
 	public:
-		Move(Billboard* gameObj):State(gameObj){}
+		Move(Billboard* gameObj, GameCamera* camera) :State(gameObj, camera,static_cast<unsigned int>(60.f * 4)) {}
 		void update()override;
 	};
 
 	class Jump :public State
 	{
 	public:
-		Jump(Billboard* gameObj) :State(gameObj) {}
+		Jump(Billboard* gameObj, GameCamera* camera) :State(gameObj, camera, static_cast<unsigned int>(60.f * 2)) {}
 		void update()override;
 	};
 
