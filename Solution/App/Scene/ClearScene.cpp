@@ -70,13 +70,4 @@ void ClearScene::drawFrontSprite()
 	spriteBase->drawStart(DX12Base::ins()->getCmdList());
 	nowLoading->drawWithUpdate(DX12Base::ins(), spriteBase.get());
 	sprite->drawWithUpdate(DX12Base::ins(), spriteBase.get());
-
-	if (nowLoading->isInvisible)
-	{
-		ImGui::Begin("pressSpace", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-		ImGui::PushFont(DX12Base::ins()->getBigImFont());
-		ImGui::Text("Press Space...");
-		ImGui::PopFont();
-		ImGui::End();
-	}
 }
