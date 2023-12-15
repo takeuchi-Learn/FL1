@@ -129,7 +129,7 @@ PlayScene::PlayScene() :
 	// チュートリアルステージだったら画像追加
 	if(stageNum <= tutorialStageMax)
 	{
-		tutorialTexture = std::make_unique<TutorialTexture>(camera.get());
+		tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), stageNum);
 	}
 }
 

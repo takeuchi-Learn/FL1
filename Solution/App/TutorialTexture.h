@@ -11,15 +11,46 @@ class GameCamera;
 
 // アニメーションさせるために複数画像用意するの大変だと思うので、プログラムで回転させたり上下に動かしたほうがよさそう
 
+
+
 // チュートリアル画像
 class TutorialTexture
 {
 private:
+	class State
+	{
+	protected:
+		Billboard* gameObj = nullptr;
+	public:
+		State(Billboard* gameObj) :gameObj(gameObj) {}
+		virtual void update() {}
+	};
+
+	class Move :public State
+	{
+	public:
+		Move(Billboard* gameObj):State(gameObj){}
+		void update()override;
+	};
+
+	class Jump :public State
+	{
+	public:
+		Jump(Billboard* gameObj) :State(gameObj) {}
+		void update()override;
+	};
+
+	std::unique_ptr<State> state;
+	const unsigned short STAGE_NUM;
+private:
 	std::unique_ptr<Billboard> gameObj;
 	GameCamera* camera = nullptr;
 
+private:
+	void createState();
+
 public:
-	TutorialTexture(GameCamera* camera);
+	TutorialTexture(GameCamera* camera,unsigned short stageNum);
 	~TutorialTexture() {}
 
 	void update();
