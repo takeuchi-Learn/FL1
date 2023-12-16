@@ -72,6 +72,8 @@ private:
 
 	/// @brief 加速度
 	AxisVec accel{};
+
+	float dInputAngleDeg = 0.f;
 	// 角度Z(最初に斜めの状態で開始するため、20,fをセット)
 	float angleDeg = 20.f;
 
@@ -128,6 +130,7 @@ private:
 
 	/// @brief 入力確認とそれに応じた角度の加算減算
 	void rotation();
+	void directionalInputRotation();
 	void imuInputRotation();
 #pragma endregion
 

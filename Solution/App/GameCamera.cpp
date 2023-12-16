@@ -175,7 +175,31 @@ void GameCamera::rotation()
 		}
 	}
 
+	directionalInputRotation();
 	imuInputRotation();
+}
+
+void GameCamera::directionalInputRotation()
+{
+	const bool hitRight = Input::ins()->hitKey(DIK_RIGHT);
+	const bool hitLeft = Input::ins()->hitKey(DIK_LEFT);
+
+	if (hitRight || hitLeft)
+	{
+		constexpr float speed = 360.f;
+		const float val = speed / DX12Base::ins()->getFPS();
+
+		if (hitRight)
+		{
+			dInputAngleDeg += val;
+		}
+		if (hitLeft)
+		{
+			dInputAngleDeg -= val;
+		}
+	}
+
+	angleDeg += dInputAngleDeg;
 }
 
 void GameCamera::imuInputRotation()
