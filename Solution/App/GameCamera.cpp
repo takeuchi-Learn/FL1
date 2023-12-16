@@ -181,24 +181,36 @@ void GameCamera::rotation()
 
 void GameCamera::directionalInputRotation()
 {
-	const bool hitRight = Input::ins()->hitKey(DIK_RIGHT);
-	const bool hitLeft = Input::ins()->hitKey(DIK_LEFT);
+	constexpr float speed = 360.f;
+	float val = 0.f;
 
-	if (hitRight || hitLeft)
+	if (PadImu::ins()->getDevCount() > 0)
 	{
-		constexpr float speed = 360.f;
-		const float val = speed / DX12Base::ins()->getFPS();
-
-		if (hitRight)
+		const auto& state = PadImu::ins()->getStates().front();
+		if (PadImu::ins()->getContollerType(0) == JS_TYPE_JOYCON_LEFT)
 		{
-			dInputAngleDeg += val;
-		}
-		if (hitLeft)
+			val = state.stickLX;
+		} else
 		{
-			dInputAngleDeg -= val;
+			val = state.stickRX;
 		}
 	}
 
+	if (Input::ins()->isVaildPadRStickX())
+	{
+		val = Input::ins()->hitPadRStickRaito().x;
+	}
+
+	if (Input::ins()->hitKey(DIK_RIGHT))
+	{
+		val += 1.f;
+	}
+	if (Input::ins()->hitKey(DIK_LEFT))
+	{
+		val -= 1.f;
+	}
+
+	dInputAngleDeg += speed * val / DX12Base::ins()->getFPS();
 	angleDeg += dInputAngleDeg;
 }
 
