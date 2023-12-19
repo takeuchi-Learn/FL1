@@ -91,6 +91,7 @@ PlayScene::PlayScene() :
 	timer(std::make_unique<Stopwatch>())
 {
 	updateProc = std::bind(&PlayScene::update_start, this);
+	updateCinemaScopeProc = [] {};
 
 	bgm = Sound::ins()->loadWave(bgmPath);
 
@@ -109,9 +110,11 @@ PlayScene::PlayScene() :
 	camera->setTarget(XMFLOAT3(0, 0, 0));
 	camera->setPerspectiveProjFlag(false);
 	camera->setAngleDeg(cameraAngleDef);
+	camera->allowInput = false;
 
 	player = std::make_unique<Player>(camera.get());
 	player->allowInput = false;
+	player->isDynamic = false;
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
@@ -127,9 +130,6 @@ PlayScene::PlayScene() :
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
-
-	// 開始時は物理挙動をしない
-	player->isDynamic = false;
 
 	// チュートリアル関係
 	// もしチュートリアルステージ(_0、_1)だったら画像追加
@@ -174,7 +174,10 @@ void PlayScene::update_start()
 {
 	if (timer->getNowTime() > transitionTime)
 	{
+		// 自機は物理挙動する
+		// 演出中に動くのが嫌なら`update_approach`関数の`allowInput=true`があるところに移動する
 		player->isDynamic = true;
+
 		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
 		PostEffect::ins()->setAlpha(1.f);
 		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
@@ -195,11 +198,32 @@ void PlayScene::update_approach()
 	const auto now = timer->getNowTime();
 	if (now > approachTime)
 	{
-		for (auto& i : cinemaScope)
-		{
-			i->isInvisible = true;
-		}
+		// シネスコをだんだん消す
+		updateCinemaScopeProc = [&]
+			{
+				constexpr auto maxTime = Timer::oneSec / 2;
+				constexpr float maxTimeF = static_cast<float>(maxTime);
+				const auto now = timer->getNowTime();
+				if (now >= maxTime)
+				{
+					// 終わったらシネスコは非表示に、シネスコ更新関数は空にする。
+					for (auto& i : cinemaScope)
+					{
+						i->isInvisible = true;
+					}
+					updateCinemaScopeProc = [] {};
+					return;
+				}
+				const auto raito = static_cast<float>(now) / maxTimeF;
+				const float height = std::lerp(csHeight, 0.f, raito);
+				for (auto& i : cinemaScope)
+				{
+					i->setSize(XMFLOAT2(winWidth, height));
+				}
+			};
+
 		camera->setAngleDeg(0.f);
+		camera->allowInput = true;
 		player->allowInput = true;
 		updateProc = std::bind(&PlayScene::update_main, this);
 		timer->reset();
@@ -207,11 +231,6 @@ void PlayScene::update_approach()
 	}
 	const auto raito = static_cast<float>(now) / static_cast<float>(approachTime);
 	camera->setAngleDeg(std::lerp(cameraAngleDef, 0.f, raito));
-	const float height = std::lerp(csHeight, 0.f, raito);
-	for (auto& i : cinemaScope)
-	{
-		i->setSize(XMFLOAT2(winWidth, height));
-	}
 }
 
 void PlayScene::update_main()
@@ -230,6 +249,9 @@ void PlayScene::update_main()
 	}
 
 #endif // _DEBUG
+
+	// シネスコ更新関数
+	updateCinemaScopeProc();
 
 	// ゲームオーバー確認
 	if (player->getIsDead())

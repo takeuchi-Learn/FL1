@@ -97,6 +97,9 @@ void GameCamera::updateInput()
 
 void GameCamera::rotation()
 {
+	// 入力無効なら何もしない
+	if (!allowInput) { return; }
+
 	// 指定の入力で角度リセット
 	{
 		constexpr BYTE key = DIK_R;

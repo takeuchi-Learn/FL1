@@ -109,6 +109,11 @@ private:
 
 #pragma endregion
 
+public:
+	/// @brief 入力を許可するか
+	/// todo 仮実装。操作を別クラスに分けたら消す
+	bool allowInput = true;
+
 private:
 #pragma region INPUT
 
@@ -152,15 +157,15 @@ public:
 	inline bool getIsActiveStickControll() const { return isActiveStickControll; }
 
 	/// @brief ジャイロの値のセット。
-	void setGyroValue(float value) { angleDeg = value; }
+	inline void setGyroValue(float value) { angleDeg = value; }
 
 	/// @brief 追従先オブジェクト
 	/// @param obj
-	void setParentObj(BillboardData* obj) { this->obj = obj; }
+	inline void setParentObj(BillboardData* obj) { this->obj = obj; }
 
 	/// @brief Z座標
 	/// @param z
-	void setEyeZ(float z) { setEye(DirectX::XMFLOAT3(0, 0, z)); }
+	inline void setEyeZ(float z) { setEye(DirectX::XMFLOAT3(0, 0, z)); }
 
 	/// @brief 角度の取得
 	/// @return 角度
@@ -168,21 +173,21 @@ public:
 	inline void setAngleDeg(float deg) { angleDeg = deg; }
 
 	/// @param flag ポーズしてるかどうか
-	void pause(bool flag)
+	inline void pause(bool flag)
 	{
 		cameraState = flag ? CameraState::OTHER : CameraState::INPUT;
 	}
 
 	// クリア状態に変更
-	void changeStateClear() { cameraState = CameraState::CLEAR; }
-	void changeStateGameover() { cameraState = CameraState::OTHER; }
+	inline void changeStateClear() { cameraState = CameraState::CLEAR; }
+	inline void changeStateGameover() { cameraState = CameraState::OTHER; }
 
 	/// @brief 追従のオンオフ
 	void setFollowFlag(const bool flag);
 
-	float getGetAccelUp() const { return accel.up; }
+	inline float getGetAccelUp() const { return accel.up; }
 
-	CameraState getCameraState() const { return cameraState; }
+	inline CameraState getCameraState() const { return cameraState; }
 
 	inline const auto& getGyro() const { return gyro; }
 	inline const auto& getAccel() const { return accel; }

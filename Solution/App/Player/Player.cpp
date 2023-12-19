@@ -14,7 +14,6 @@
 #include <Object/Goal.h>
 #include<Object/ColorCone.h>
 
-
 using namespace DirectX;
 
 namespace
@@ -61,8 +60,8 @@ void Player::loadSE()
 	boundYSE = Sound::ins()->loadWave(boundYSEPath);
 }
 
-Player::Player(GameCamera* camera) :
-	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
+Player::Player(GameCamera* camera)
+	: gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
 {
 	constexpr float scale = mapSize * 0.9f;
@@ -134,8 +133,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 		camera->changeStateClear();
 		isClear = true;
-	} 
-	else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
+	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
 	{
 		enum class HIT_AREA : uint8_t
 		{
@@ -236,8 +234,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 			gameObj->update(XMConvertToRadians(getObj()->rotation));
 		}
-	}
-	else if (hitObjName == typeid(ColorCone).name())
+	} else if (hitObjName == typeid(ColorCone).name())
 	{
 		++coneCount;
 	}

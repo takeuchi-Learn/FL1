@@ -46,8 +46,10 @@ private:
 	std::unique_ptr<TutorialTexture> tutorialTexture;
 	std::unique_ptr<GameMap> gameMap;
 
-	std::function<void()> updateProc;
 	std::unique_ptr<Stopwatch> timer;
+	
+	std::function<void()> updateProc;
+	std::function<void()> updateCinemaScopeProc;
 
 	std::weak_ptr<SoundData> bgm;
 
