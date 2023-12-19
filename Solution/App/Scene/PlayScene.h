@@ -4,6 +4,7 @@
 #include <Util/Stopwatch.h>
 #include <memory>
 #include <functional>
+#include <array>
 
 #include "../GameCamera.h"
 
@@ -34,7 +35,7 @@ private:
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
-	std::unique_ptr<Sprite> sprite;
+	std::array<std::unique_ptr<Sprite>, 2u> cinemaScope;
 
 	std::unique_ptr<ParticleMgr> particle;
 

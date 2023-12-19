@@ -88,10 +88,19 @@ PlayScene::PlayScene() :
 	bgm = Sound::ins()->loadWave(bgmPath);
 
 	spriteBase = std::make_unique<SpriteBase>();
-	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
-									  spriteBase.get(),
-									  XMFLOAT2(0.5f, 0.5f));
-	sprite->color.w = 0.5f;
+	const auto blackTexNum = spriteBase->loadTexture(L"Resources/black.bmp");
+	for (auto& i : cinemaScope)
+	{
+		constexpr float winWidth = static_cast<float>(WinAPI::window_width);
+		constexpr float winHeight = static_cast<float>(WinAPI::window_height);
+		constexpr float csHeight = (winHeight - (winWidth / 2.35f)) / 2.f;
+
+		i = std::make_unique<Sprite>(blackTexNum, spriteBase.get(), XMFLOAT2(0.f, 0.f));
+		i->setSize(XMFLOAT2(winWidth, csHeight));
+	}
+	cinemaScope.back()->setAnchorPoint(XMFLOAT2(0.f, 1.f));
+	constexpr float bottomY = static_cast<float>(WinAPI::window_height - 1);
+	cinemaScope.back()->position.y = bottomY;
 
 	camera->setEye(XMFLOAT3(0, 0, -5));
 	camera->setTarget(XMFLOAT3(0, 0, 0));
@@ -231,4 +240,10 @@ void PlayScene::drawObj3d()
 }
 
 void PlayScene::drawFrontSprite()
-{}
+{
+	spriteBase->drawStart(DX12Base::ins()->getCmdList());
+	for (auto& i : cinemaScope)
+	{
+		i->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+	}
+}
