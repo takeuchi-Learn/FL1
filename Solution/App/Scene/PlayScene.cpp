@@ -39,7 +39,7 @@ namespace
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
 
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
-	constexpr Timer::timeType approachTime = Timer::oneSec * 2;
+	constexpr Timer::timeType appearanceTime = Timer::oneSec * 2;
 
 	constexpr float cameraAngleDef = 30.f;
 
@@ -175,13 +175,13 @@ void PlayScene::update_start()
 	if (timer->getNowTime() > transitionTime)
 	{
 		// 自機は物理挙動する
-		// 演出中に動くのが嫌なら`update_approach`関数の`allowInput=true`があるところに移動する
+		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
 		player->isDynamic = true;
 
 		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
 		PostEffect::ins()->setAlpha(1.f);
 		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
-		updateProc = std::bind(&PlayScene::update_approach, this);
+		updateProc = std::bind(&PlayScene::update_appearance, this);
 		timer->reset();
 	} else
 	{
@@ -193,10 +193,10 @@ void PlayScene::update_start()
 	}
 }
 
-void PlayScene::update_approach()
+void PlayScene::update_appearance()
 {
 	const auto now = timer->getNowTime();
-	if (now > approachTime)
+	if (now > appearanceTime)
 	{
 		// シネスコをだんだん消す
 		updateCinemaScopeProc = [&]
@@ -229,7 +229,7 @@ void PlayScene::update_approach()
 		timer->reset();
 		return;
 	}
-	const auto raito = static_cast<float>(now) / static_cast<float>(approachTime);
+	const auto raito = static_cast<float>(now) / static_cast<float>(appearanceTime);
 	camera->setAngleDeg(std::lerp(cameraAngleDef, 0.f, raito));
 }
 
