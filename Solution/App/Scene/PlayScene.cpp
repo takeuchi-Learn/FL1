@@ -39,6 +39,11 @@ namespace
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
 
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
+	constexpr Timer::timeType approachTime = Timer::oneSec * 2;
+
+	constexpr float winWidth = static_cast<float>(WinAPI::window_width);
+	constexpr float winHeight = static_cast<float>(WinAPI::window_height);
+	constexpr float csHeight = (winHeight - (winWidth / 2.35f)) / 2.f;
 
 	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
 	{
@@ -91,10 +96,6 @@ PlayScene::PlayScene() :
 	const auto blackTexNum = spriteBase->loadTexture(L"Resources/black.bmp");
 	for (auto& i : cinemaScope)
 	{
-		constexpr float winWidth = static_cast<float>(WinAPI::window_width);
-		constexpr float winHeight = static_cast<float>(WinAPI::window_height);
-		constexpr float csHeight = (winHeight - (winWidth / 2.35f)) / 2.f;
-
 		i = std::make_unique<Sprite>(blackTexNum, spriteBase.get(), XMFLOAT2(0.f, 0.f));
 		i->setSize(XMFLOAT2(winWidth, csHeight));
 	}
@@ -173,7 +174,7 @@ void PlayScene::update_start()
 		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
 		PostEffect::ins()->setAlpha(1.f);
 		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
-		updateProc = std::bind(&PlayScene::update_main, this);
+		updateProc = std::bind(&PlayScene::update_approach, this);
 		timer->reset();
 	} else
 	{
@@ -182,6 +183,29 @@ void PlayScene::update_start()
 		//raito *= raito * raito * raito * raito;
 		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * float(WinAPI::window_width),
 												 raito * float(WinAPI::window_height)));
+	}
+}
+
+void PlayScene::update_approach()
+{
+	const auto now = timer->getNowTime();
+	if (now > approachTime)
+	{
+		for (auto& i : cinemaScope)
+		{
+			i->isInvisible = true;
+		}
+		camera->setAngleDeg(0.f);
+		updateProc = std::bind(&PlayScene::update_main, this);
+		timer->reset();
+		return;
+	}
+	const auto raito = static_cast<float>(now) / static_cast<float>(approachTime);
+	camera->setAngleDeg(std::lerp(30.f, 0.f, raito));
+	const float height = std::lerp(csHeight, 0.f, raito);
+	for (auto& i : cinemaScope)
+	{
+		i->setSize(XMFLOAT2(winWidth, height));
 	}
 }
 

@@ -64,6 +64,7 @@ private:
 	bool checkMinMax(const CollisionShape::AABB& aabb);
 
 	void update_start();
+	void update_approach();
 	void update_main();
 
 public:

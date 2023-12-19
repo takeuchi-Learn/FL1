@@ -30,7 +30,6 @@ public:
 	/// @brief カメラの状態列挙
 	enum class CameraState
 	{
-		START,// 開始
 		INPUT,// 入力受付
 		FOLLOW_OFF,// 入力受付 追従オフ(画面端用)
 		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
@@ -81,7 +80,7 @@ private:
 
 	// todo カメラが持つべきでない（カメラの状態は、カメラの構成要素ではない。）
 	// カメラの状態
-	CameraState cameraState = CameraState::START;
+	CameraState cameraState = CameraState::INPUT;
 
 	// todo pragma reginで分けられるならクラスごと分けること
 #pragma region START
@@ -111,18 +110,6 @@ private:
 #pragma endregion
 
 private:
-#pragma region START
-	/// @brief CameraState::STARTのupdate
-	void updateStart();
-
-	/// @brief Start時の移動
-	void startAutoRot();
-
-	/// @brief 変数 startTimer の加算処理
-	void updateStartTimer();
-
-#pragma endregion
-
 #pragma region INPUT
 
 	/// @brief CameraState::INPUTの時のupdate
@@ -177,7 +164,8 @@ public:
 
 	/// @brief 角度の取得
 	/// @return 角度
-	float getAngleDeg() const { return angleDeg; }
+	inline float getAngleDeg() const { return angleDeg; }
+	inline void setAngleDeg(float deg) { angleDeg = deg; }
 
 	/// @param flag ポーズしてるかどうか
 	void pause(bool flag)

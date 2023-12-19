@@ -78,71 +78,10 @@ bool GameCamera::loadYaml()
 	return false;
 }
 
-#pragma region START
-
-void GameCamera::updateStart()
-{
-	// 開始時の自動移動
-	startAutoRot();
-	// 上ベクトル回転
-	upRotate();
-	// スタートタイマー更新
-	updateStartTimer();
-}
-
-void GameCamera::startAutoRot()
-{
-	// 開始時にプレイヤーのアングルが0の方が見た目いいかもしれない
-	// 実装した
-	// 最後にガクってなるのはカメラの傾きをやめたせい
-
-	// 角度0になったら固定してタイマー加算開始
-	if (angleDeg <= 0)
-	{
-		angleDeg = 0.f;
-		addStartTimer = true;
-	} else
-	{
-		// 傾きの最低値
-		constexpr float startFrameAngleMin = 0.1f;
-		// 最低値を下回ったら固定
-		if (startFrameAngle <= startFrameAngleMin)
-		{
-			startFrameAngle = startFrameAngleMin;
-		} else
-		{
-			// 1フレームに減算する量
-			constexpr float subStartFrameAngle = 0.25f;
-			// 段々遅くするために少しずつ減らす
-			startFrameAngle -= subStartFrameAngle;
-		}
-
-		// 少しずつ平行にしていく
-		angleDeg -= startFrameAngle;
-	}
-}
-
-void GameCamera::updateStartTimer()
-{
-	if (!addStartTimer) { return; }
-	++startTimer;
-
-	// タイマーの最大値
-	// 自動傾き終了後にタイマーが起動し、以下の時間を上回ったら入力受付開始となる
-	// todo シーン側で行うべき要素
-	constexpr unsigned short startTimeMax = 0;
-	if (startTimer >= startTimeMax)
-	{
-		cameraState = CameraState::INPUT;
-	}
-}
-
 void GameCamera::preUpdate()
 {
 	gameCameraUpdate();
 }
-
-#pragma endregion
 
 #pragma region INPUT
 
@@ -334,9 +273,6 @@ void GameCamera::gameCameraUpdate()
 
 	switch (cameraState)
 	{
-	case GameCamera::CameraState::START:
-		updateStart();
-		break;
 	case GameCamera::CameraState::INPUT:
 	case GameCamera::CameraState::FOLLOW_OFF:
 		updateInput();

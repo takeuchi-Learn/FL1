@@ -14,7 +14,6 @@
 #include <Object/Goal.h>
 #include<Object/ColorCone.h>
 
-
 using namespace DirectX;
 
 namespace
@@ -85,14 +84,10 @@ void Player::update()
 	move();
 	rot();
 
-	// スタート時はジャンプしないように
-	if (camera->getCameraState() != GameCamera::CameraState::START)
-	{
-		moveLimit();
+	moveLimit();
 
-		jump();
-		rebound();
-	}
+	jump();
+	rebound();
 
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 	// todo 本来下のようであるべき（mapPosはマップチップでの座標であってワールド座標ではない）
@@ -133,8 +128,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 		camera->changeStateClear();
 		isClear = true;
-	} 
-	else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
+	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
 	{
 		enum class HIT_AREA : uint8_t
 		{
@@ -235,8 +229,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 			gameObj->update(XMConvertToRadians(getObj()->rotation));
 		}
-	}
-	else if (hitObjName == typeid(ColorCone).name())
+	} else if (hitObjName == typeid(ColorCone).name())
 	{
 		++coneCount;
 	}
