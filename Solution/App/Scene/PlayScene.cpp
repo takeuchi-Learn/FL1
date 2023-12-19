@@ -41,6 +41,8 @@ namespace
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
 	constexpr Timer::timeType approachTime = Timer::oneSec * 2;
 
+	constexpr float cameraAngleDef = 30.f;
+
 	constexpr float winWidth = static_cast<float>(WinAPI::window_width);
 	constexpr float winHeight = static_cast<float>(WinAPI::window_height);
 	constexpr float csHeight = (winHeight - (winWidth / 2.35f)) / 2.f;
@@ -106,8 +108,10 @@ PlayScene::PlayScene() :
 	camera->setEye(XMFLOAT3(0, 0, -5));
 	camera->setTarget(XMFLOAT3(0, 0, 0));
 	camera->setPerspectiveProjFlag(false);
+	camera->setAngleDeg(cameraAngleDef);
 
 	player = std::make_unique<Player>(camera.get());
+	player->allowInput = false;
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
@@ -196,12 +200,13 @@ void PlayScene::update_approach()
 			i->isInvisible = true;
 		}
 		camera->setAngleDeg(0.f);
+		player->allowInput = true;
 		updateProc = std::bind(&PlayScene::update_main, this);
 		timer->reset();
 		return;
 	}
 	const auto raito = static_cast<float>(now) / static_cast<float>(approachTime);
-	camera->setAngleDeg(std::lerp(30.f, 0.f, raito));
+	camera->setAngleDeg(std::lerp(cameraAngleDef, 0.f, raito));
 	const float height = std::lerp(csHeight, 0.f, raito);
 	for (auto& i : cinemaScope)
 	{
