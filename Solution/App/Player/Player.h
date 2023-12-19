@@ -107,8 +107,6 @@ private:
 
 	void loadSE();
 
-
-
 	/// @brief ジャンプ中の座標更新処理
 	void calcJumpPos();
 	// ジャンプ
@@ -174,7 +172,7 @@ public:
 	bool getIsClear()const { return isClear; }
 
 	float getStartPosX()const { return leftScrollEndPos; }
-	
+
 	unsigned short getConeCount()const { return coneCount; }
 
 	/// @brief 衝突時に呼び出す関数

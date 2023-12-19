@@ -43,9 +43,8 @@ namespace
 
 	constexpr float cameraAngleDef = 30.f;
 
-	constexpr float winWidth = static_cast<float>(WinAPI::window_width);
-	constexpr float winHeight = static_cast<float>(WinAPI::window_height);
-	constexpr float csHeight = (winHeight - (winWidth / 2.35f)) / 2.f;
+	constexpr auto winSize = XMFLOAT2(static_cast<float>(WinAPI::window_width), static_cast<float>(WinAPI::window_height));
+	constexpr float csHeight = (winSize.y - (winSize.x / 2.35f)) / 2.f;
 
 	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
 	{
@@ -100,7 +99,7 @@ PlayScene::PlayScene() :
 	for (auto& i : cinemaScope)
 	{
 		i = std::make_unique<Sprite>(blackTexNum, spriteBase.get(), XMFLOAT2(0.f, 0.f));
-		i->setSize(XMFLOAT2(winWidth, csHeight));
+		i->setSize(XMFLOAT2(winSize.x, csHeight));
 	}
 	cinemaScope.back()->setAnchorPoint(XMFLOAT2(0.f, 1.f));
 	constexpr float bottomY = static_cast<float>(WinAPI::window_height - 1);
@@ -178,7 +177,7 @@ void PlayScene::update_start()
 		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
 		player->isDynamic = true;
 
-		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+		PostEffect::ins()->setMosaicNum(winSize);
 		PostEffect::ins()->setAlpha(1.f);
 		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
 		updateProc = std::bind(&PlayScene::update_appearance, this);
@@ -188,8 +187,8 @@ void PlayScene::update_start()
 		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
 		//PostEffect::ins()->setAlpha(raito);
 		//raito *= raito * raito * raito * raito;
-		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * float(WinAPI::window_width),
-												 raito * float(WinAPI::window_height)));
+		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * winSize.x,
+												 raito * winSize.y));
 	}
 }
 
@@ -218,7 +217,7 @@ void PlayScene::update_appearance()
 				const float height = std::lerp(csHeight, 0.f, raito);
 				for (auto& i : cinemaScope)
 				{
-					i->setSize(XMFLOAT2(winWidth, height));
+					i->setSize(XMFLOAT2(winSize.x, height));
 				}
 			};
 

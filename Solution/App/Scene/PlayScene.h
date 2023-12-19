@@ -47,7 +47,7 @@ private:
 	std::unique_ptr<GameMap> gameMap;
 
 	std::unique_ptr<Stopwatch> timer;
-	
+
 	std::function<void()> updateProc;
 	std::function<void()> updateCinemaScopeProc;
 
