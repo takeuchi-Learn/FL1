@@ -2,14 +2,17 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
-#include"StageObject.h"
+#include "StageObject.h"
 
 class GameCamera;
+class SoundData;
 
 // カラーコーンクラス コインの代わりにするかもしれないし、しれないかもしれない
 class ColorCone :public StageObject
 {
 private:
+	std::weak_ptr<SoundData> se;
+
 	// 吹っ飛び中かどうか
 	bool isBlownAway = false;
 	// 回転角度

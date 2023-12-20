@@ -1,5 +1,5 @@
 ﻿#include "ColorCone.h"
-
+#include <Sound/SoundData.h>
 #include <GameCamera.h>
 #include <3D/Billboard/Billboard.h>
 #include <JumpVectorCalculation.h>
@@ -44,7 +44,8 @@ void ColorCone::checkDead()
 }
 
 ColorCone::ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
-	:StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
+	: StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
+	, se(Sound::ins()->loadWave("Resources/SE/Sys_Set03-click.wav"))
 {
 	// 当たり判定調整
 	constexpr float judgmentAdjustmentNum = 30.0f;
@@ -62,7 +63,9 @@ void ColorCone::update()
 void ColorCone::hit(const CollisionShape::Sphere& playerSphere)
 {
 	// 吹っ飛んだらreturn
-	if (isBlownAway)return;
+	if (isBlownAway) { return; }
+
+	Sound::playWave(se, 0ui32, 0.2f);
 
 	// 吹っ飛ぶ処理有効
 	isBlownAway = true;
