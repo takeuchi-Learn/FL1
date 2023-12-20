@@ -152,6 +152,7 @@ void GameMap::loadStageObject(Yaml::Node& node, const float scale)
 		const std::string posString = node[name].As<std::string>("NONE");
 		if (posString == "NONE") { continue; }
 		const auto posStringData = Util::loadCsvFromString(posString);
+
 		std::vector<XMFLOAT2> objectPos(posStringData.size());
 		loadStageObjectPosition(posStringData, objectPos);
 
