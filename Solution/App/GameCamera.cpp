@@ -113,6 +113,7 @@ void GameCamera::rotation()
 			padInput ||
 			Sensor::ins()->CheckButton())
 		{
+			dInputAngleDeg -= angleDeg * 2.f;
 			angleDeg = 0.f;
 		}
 	}
@@ -128,14 +129,21 @@ void GameCamera::directionalInputRotation()
 
 	if (PadImu::ins()->getDevCount() > 0)
 	{
+		auto* range = &stickRangeR;
 		const auto& state = PadImu::ins()->getStates().front();
 		if (PadImu::ins()->getContollerType(0) == JS_TYPE_JOYCON_LEFT)
 		{
 			val = state.stickLX;
+			stickRangeL;
 		} else
 		{
 			val = state.stickRX;
 		}
+
+		// R = a + t * (b - a)
+		// t = (R - a) / (b - a)
+		val = (val - range->min.x) / (range->max.x - range->min.x);
+		val = std::lerp(-1.f, 1.f, val);
 	}
 
 	if (Input::ins()->isVaildPadRStickX())

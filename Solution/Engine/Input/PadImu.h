@@ -43,8 +43,7 @@ public:
 
 	bool checkInputAccept() const;
 
-	bool checkInputDPAD(size_t arrayNum,
-						int direction);
+	bool checkInputDPAD(size_t arrayNum, int direction);
 
 	bool checkTriggerInputDPAD(size_t arrayNum,
 							   int direction);

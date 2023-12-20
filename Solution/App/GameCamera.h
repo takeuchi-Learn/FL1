@@ -56,12 +56,6 @@ public:
 	};
 
 private:
-	// todo センサー周りもカメラが持つべきでない。形式を指定して、外部クラスでその形式に変換して扱う方がよい。
-
-	// todo new演算子は「絶対に」使ってはならない
-
-	// todo カルマンフィルターとMadgwickフィルターで使用しているライブラリがGPLなので、使用不可。変更必須。
-
 	// 回転の角速度
 	RollPitchYaw gyro{};
 	// 前回の角速度
@@ -82,32 +76,11 @@ private:
 	// カメラの状態
 	CameraState cameraState = CameraState::INPUT;
 
-	// todo pragma reginで分けられるならクラスごと分けること
-#pragma region START
-	// todo 時間（time）ではなくフレーム（frame、count）
-
-	// スタートするまでの時間
-	// todo uint16_tとするべき
-	unsigned short startTimer = 0;
-
-	// todo 変数名が嘘をついている（タイマーとフラグは別の概念）
-	// 上記関数の起動フラグ
-	bool addStartTimer = false;
-
-	// 1フレームの傾き(スタート時)。動的に変えるため、変数にしている
-	float startFrameAngle = 1.5f;
-
-	// todo 不適切な命名＆フラグを使うべきではない。最低でもstd::function等で振る舞いを変更する。
-	// スタート演出の補間処理
-	bool startLerp = false;
-
 	// スティックを使用するかどうか
 	bool isActiveStickControll = false;
 
 	float angleFilterRaito{};
 	float angleStopRange{};
-
-#pragma endregion
 
 public:
 	/// @brief 入力を許可するか
@@ -115,6 +88,7 @@ public:
 	bool allowInput = true;
 
 private:
+	// todo pragma reginで分けられるならクラスごと分けること
 #pragma region INPUT
 
 	/// @brief CameraState::INPUTの時のupdate

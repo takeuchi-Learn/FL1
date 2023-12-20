@@ -8,7 +8,7 @@
 #include "Object/ColorCone.h"
 #include "GameCamera.h"
 
-#include<sstream>
+#include <sstream>
 
 using namespace DirectX;
 
@@ -18,7 +18,7 @@ namespace
 	constexpr char* goalStr = "goal";
 
 	// オブジェクト一覧
-	const std::vector<char*>objectNames =
+	const std::vector<char*> objectNames =
 	{
 		coneStr,
 		goalStr,
@@ -27,20 +27,16 @@ namespace
 
 void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
 {
-	const float harfScale = scale / 2;
-	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
-	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
+	const float harfScale = scale / 2.f;
+	const XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
+	const XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
 
-	CollisionShape::AABB aabb;
-	aabb.minPos = XMLoadFloat2(&minPos);
-	aabb.maxPos = XMLoadFloat2(&maxPos);
-	mapAABBs.push_back(aabb);
-	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
+	mapAABBs.emplace_back(XMLoadFloat2(&minPos),
+						  XMLoadFloat2(&maxPos));
 }
 
-GameMap::GameMap(GameCamera* camera) :
-	camera(camera)
+GameMap::GameMap(GameCamera* camera)
+	: camera(camera)
 {}
 
 bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf)

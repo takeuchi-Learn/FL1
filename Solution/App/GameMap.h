@@ -14,8 +14,6 @@ class Billboard;
 class GameCamera;
 class Collision;
 
-using namespace DirectX;
-
 // マップクラス
 // 動かない地形のみ扱う
 class GameMap
@@ -54,8 +52,7 @@ private:
 	// で、GameMapから取得できるようにし、typeid(GameMap)で地形か確認していた部分を地形とすり抜け床で分ける
 	// ゴールもこれでいいかもしれない
 	std::vector<CollisionShape::AABB> slipthroughFloorAABBs;
-	
-	
+
 	// 縦横サイズ
 	uint16_t mapSizeX = 0;
 	uint16_t mapSizeY = 0;
@@ -63,7 +60,6 @@ private:
 	// ステージの配置物
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	float goalPosX = 0.f;
-	
 
 	// コーンの最大値
 	uint16_t coneMax = 0;
@@ -79,8 +75,9 @@ private:
 	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
 
 	void loadStageObject(Yaml::Node& node, float scale);
-	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
-	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
+	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<DirectX::XMFLOAT2>& output);
+	void setStageObjects(const std::unordered_map<std::string, std::vector<DirectX::XMFLOAT2>>& stageObjectPos, float scale);
+
 public:
 	GameMap(GameCamera* camera);
 	~GameMap() = default;

@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include<string>
+#include <string>
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
-
-class Light;
+\
 class GameCamera;
 class Billboard;
 
@@ -32,10 +31,7 @@ public:
 
 	/// @brief 衝突時に呼び出す関数
 	/// @param playerSphere プレイヤーの判定
-	virtual void hit(const CollisionShape::Sphere& playerSphere){}
+	virtual void hit(const CollisionShape::Sphere& playerSphere) {}
 
 	const CollisionShape::AABB& getRefAABB()const { return aabb; }
-
-	
 };
-

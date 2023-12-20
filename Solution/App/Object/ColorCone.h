@@ -26,17 +26,18 @@ private:
 	float currentFallVector = 0.0f;
 	// 重力加速度(一旦ここに宣言)
 	const float gAcc = 0.35f;
-private:
 
+private:
 	// 吹っ飛び更新
 	void blownAway();
 
 	// 死亡確認
 	void checkDead();
+
 public:
 	ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
-	~ColorCone(){}
+	~ColorCone() {}
+
 	void update();
 	void hit(const CollisionShape::Sphere& playerSphere);
 };
-

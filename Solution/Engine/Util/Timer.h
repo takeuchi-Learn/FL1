@@ -30,6 +30,9 @@ public:
 	/// @brief 一秒float型
 	static constexpr float oneSecF = static_cast<float>(oneSec);
 
+	/// @brief 一ミリ秒
+	static constexpr timeType oneMS = std::chrono::duration_cast<timeUnit>(std::chrono::milliseconds(1)).count();
+
 	static constexpr timeType oneMin = oneSec * static_cast<timeType>(60);
 	static constexpr float oneMinF = static_cast<float>(oneMin);
 

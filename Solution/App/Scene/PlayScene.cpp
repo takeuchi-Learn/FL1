@@ -20,7 +20,7 @@
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
-#include<ConeRecorder.h>
+#include <ConeRecorder.h>
 
 #include <Input/PadImu.h>
 

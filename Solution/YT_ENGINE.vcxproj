@@ -164,9 +164,7 @@
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Input\PadImu.cpp" />
-    <ClCompile Include="App\Object\ObstacleObject.cpp" />
     <ClCompile Include="App\Scene\StageSelectScene.cpp" />
-    <ClCompile Include="App\JumpVectorCalculation.cpp" />
     <ClCompile Include="lib\imgui\include\imgui.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_demo.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_draw.cpp" />
@@ -236,7 +234,6 @@
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Input\PadImu.h" />
-    <ClInclude Include="App\Object\ObstacleObject.h" />
     <ClInclude Include="App\Scene\StageSelectScene.h" />
     <ClInclude Include="App\JumpVectorCalculation.h" />
     <ClInclude Include="lib\imgui\include\imconfig.h" />

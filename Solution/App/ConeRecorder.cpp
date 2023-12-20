@@ -1,6 +1,6 @@
 ﻿#include "ConeRecorder.h"
 
-void ConeRecorder::registration(const unsigned short stageNum, const unsigned short coneCount)
+bool ConeRecorder::registration(const uint16_t stageNum, const uint16_t coneCount)
 {
 	try
 	{
@@ -8,6 +8,8 @@ void ConeRecorder::registration(const unsigned short stageNum, const unsigned sh
 		if (coneCount > record) { record = coneCount; }
 	} catch (...)
 	{
-		return;
+		return true;
 	}
+
+	return false;
 }

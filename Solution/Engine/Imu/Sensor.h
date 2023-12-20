@@ -6,11 +6,12 @@
 class Sensor
 {
 private:
+	// シングルトン
 	Sensor(const Sensor&) = delete;
 	Sensor& operator=(const Sensor&) = delete;
 	Sensor();
-public:
 
+public:
 	inline static Sensor* ins()
 	{
 		static Sensor sensor{};
@@ -21,32 +22,32 @@ public:
 	bool update();
 
 	// 加速度X(傾き)
-	float GetAccelX()
+	inline float GetAccelX() const
 	{
 		return record[0];
 	}
 	// 加速度Y
-	float GetAccelY()
+	inline float GetAccelY() const
 	{
 		return record[1];
 	}
 	// 加速度Z(ジャンプ)
-	float GetAccelZ()
+	inline float GetAccelZ() const
 	{
 		return record[2];
 	}
 	// 角速度X
-	float GetGyroX()
+	inline float GetGyroX() const
 	{
 		return record[3];
 	}
 	// 角速度Y
-	float GetGyroY()
+	inline float GetGyroY() const
 	{
 		return record[4];
 	}
 	// 角速度XZ
-	float GetGyroZ()
+	inline float GetGyroZ() const
 	{
 		return record[5];
 	}

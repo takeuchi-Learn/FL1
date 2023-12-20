@@ -61,8 +61,7 @@ bool PadImu::checkInputAccept() const
 	return false;
 }
 
-bool PadImu::checkInputDPAD(size_t arrayNum,
-							int direction)
+bool PadImu::checkInputDPAD(size_t arrayNum, int direction)
 {
 	return hitButtons(joyShockStates[arrayNum].buttons, direction);
 }
