@@ -13,6 +13,7 @@ public:
 	DirectX::XMFLOAT3 position{};
 	float scale = 1.f;
 	DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
+	float gaugeRaito = 0.25f;
 };
 
 class CircularGauge
@@ -44,6 +45,7 @@ public:
 		XMFLOAT3 pos;
 		float scale;
 		XMFLOAT4 color;
+		float gaugeRaito;
 	};
 
 	// 定数バッファ用データ構造体
