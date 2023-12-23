@@ -36,6 +36,7 @@ void CircularGauge::update()
 			vertMap->pos = i->position;
 			vertMap->color = i->color;
 			vertMap->scale = i->scale;
+			vertMap->holeSize = i->holeSize;
 			vertMap->gaugeRaito = i->gaugeRaito;
 			vertMap++;
 			if (++vertCount >= vertexCount)
@@ -206,6 +207,11 @@ void CircularGauge::initGraphPipeline()
 		},
 		{ // 色
 			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ // 穴の大きさ
+			"HOLE_SIZE", 0, DXGI_FORMAT_R32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

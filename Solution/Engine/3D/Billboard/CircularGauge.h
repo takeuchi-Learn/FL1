@@ -13,6 +13,7 @@ public:
 	DirectX::XMFLOAT3 position{};
 	float scale = 1.f;
 	DirectX::XMFLOAT4 color{ 1, 1, 1, 1 };
+	float holeSize = 0.75f;
 	float gaugeRaito = 0.25f;
 };
 
@@ -45,6 +46,7 @@ public:
 		XMFLOAT3 pos;
 		float scale;
 		XMFLOAT4 color;
+		float holeSize = 0.25f;
 		float gaugeRaito;
 	};
 
