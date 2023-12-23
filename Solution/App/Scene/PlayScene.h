@@ -9,6 +9,9 @@
 #include "../GameCamera.h"
 
 #include <Collision/CollisionShape.h>
+
+#include <3D/Billboard/CircularGauge.h>
+
 class Camera;
 class Light;
 class ObjModel;
@@ -29,6 +32,8 @@ class PlayScene :
 	public GameScene
 {
 private:
+	std::unique_ptr<CircularGauge> gauge;
+	std::weak_ptr<CircularGaugeData> gaugeData;
 
 	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<Light> light;

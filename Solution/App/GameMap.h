@@ -96,9 +96,9 @@ public:
 	inline const auto& getMapAABBs() const { return mapAABBs; }
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	//inlnie const auto& getGoalAABB()const { return goal->getRefAABB(); }
+	//inlnie const auto& getGoalAABB() const { return goal->getRefAABB(); }
 
-	inline const auto& getStageObjects()const { return stageObjects; }
+	inline const auto& getStageObjects() const { return stageObjects; }
 
 	/// @brief ゲームオーバーになる座標
 	float calcGameoverPos() const;

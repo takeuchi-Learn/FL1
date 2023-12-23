@@ -52,42 +52,10 @@ namespace
 	}
 }
 
-void PlayScene::checkCollision()
-{
-	// 地形判定
-	for (auto& aabb : gameMap->getMapAABBs())
-	{
-		if (Collision::CheckHit(player->getShape(), aabb))
-		{
-			player->hit(aabb, typeid(*gameMap).name());
-		}
-	}
-
-	// オブジェクト判定
-	const std::vector<std::unique_ptr<StageObject>>& objs = gameMap->getStageObjects();
-	for (auto& obj : objs)
-	{
-		const CollisionShape::Sphere& sphere = player->getShape();
-		const CollisionShape::AABB& aabb = obj->getRefAABB();
-		if (Collision::CheckHit(sphere, aabb))
-		{
-			player->hit(aabb, typeid(*obj).name());
-			obj->hit(sphere);
-		}
-	}
-}
-
-bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
-{
-	return !(XMVectorGetX(aabb.minPos) == 0.f &&
-			 XMVectorGetY(aabb.minPos) == 0.f &&
-			 XMVectorGetX(aabb.maxPos) == 0.f &&
-			 XMVectorGetY(aabb.maxPos) == 0.f);
-}
-
 PlayScene::PlayScene() :
 	camera(std::make_unique<GameCamera>()),
-	timer(std::make_unique<Stopwatch>())
+	timer(std::make_unique<Stopwatch>()),
+	gauge(std::make_unique<CircularGauge>())
 {
 	updateProc = std::bind(&PlayScene::update_start, this);
 	updateCinemaScopeProc = [] {};
@@ -130,12 +98,15 @@ PlayScene::PlayScene() :
 	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
+	gauge->setCamera(camera.get());
+	gaugeData = gauge->add({}, 100.f, XMFLOAT4(0.f, 1.f, 1.f, 1.f));
+
 	// チュートリアル関係
 	// もしチュートリアルステージ(_0、_1)だったら画像追加
 	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
 	// 何番ステージまでがチュートリアルかを指定する
 	// 一応_1までチュートリアルと仮定して1に設定
-	constexpr unsigned short tutorialStageMax = 1;
+	constexpr uint16_t tutorialStageMax = 1;
 
 	// チュートリアルステージだったら画像追加
 	if (stageNum <= tutorialStageMax)
@@ -154,6 +125,38 @@ void PlayScene::start()
 	timer->reset();
 }
 
+void PlayScene::checkCollision()
+{
+	// 地形判定
+	for (auto& aabb : gameMap->getMapAABBs())
+	{
+		if (Collision::CheckHit(player->getShape(), aabb))
+		{
+			player->hit(aabb, typeid(*gameMap).name());
+		}
+	}
+
+	// オブジェクト判定
+	for (auto& obj : gameMap->getStageObjects())
+	{
+		const CollisionShape::Sphere& sphere = player->getShape();
+		const CollisionShape::AABB& aabb = obj->getRefAABB();
+		if (Collision::CheckHit(sphere, aabb))
+		{
+			player->hit(aabb, typeid(*obj).name());
+			obj->hit(sphere);
+		}
+	}
+}
+
+bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
+{
+	return !(XMVectorGetX(aabb.minPos) == 0.f &&
+			 XMVectorGetY(aabb.minPos) == 0.f &&
+			 XMVectorGetX(aabb.maxPos) == 0.f &&
+			 XMVectorGetY(aabb.maxPos) == 0.f);
+}
+
 void PlayScene::update()
 {
 	updateProc();
@@ -164,6 +167,15 @@ void PlayScene::update()
 	gameMap->update();
 
 	if (tutorialTexture)tutorialTexture->update();
+
+	if (auto i = gaugeData.lock(); i)
+	{
+		i->position = player->getObj()->position;
+		i->position.z -= 0.1f;
+		// 大きさは自機
+		i->scale = player->getObj()->scale;
+	}
+	gauge->update();
 
 	// 衝突確認
 	checkCollision();
@@ -287,6 +299,8 @@ void PlayScene::drawObj3d()
 	if (tutorialTexture) { tutorialTexture->draw(); }
 
 	player->draw();
+
+	gauge->draw();
 }
 
 void PlayScene::drawFrontSprite()

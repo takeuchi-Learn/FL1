@@ -294,12 +294,6 @@
     <ClCompile Include="Engine\Input\PadImu.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="App\Object\ObstacleObject.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="App\JumpVectorCalculation.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="App\ConeRecorder.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -307,6 +301,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui\include\imgui_widgets.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\3D\Billboard\CircularGauge.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -521,9 +518,6 @@
     <ClInclude Include="Engine\Input\PadImu.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="App\Object\ObstacleObject.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="App\JumpVectorCalculation.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -534,6 +528,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="App\TutorialTexture.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3D\Billboard\CircularGauge.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -577,6 +574,9 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PbrObjPS.hlsl" />
     <FxCompile Include="Resources\Shaders\PbrObjVS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CircularGaugeGS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CircularGaugePS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CircularGaugeVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Basic.hlsli">
@@ -599,5 +599,6 @@
       <Filter>シェーダーファイル\Basic</Filter>
     </None>
     <None Include="Resources\Shaders\PbrObj.hlsli" />
+    <None Include="Resources\Shaders\CircularGauge.hlsli" />
   </ItemGroup>
 </Project>
