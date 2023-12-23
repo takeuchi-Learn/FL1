@@ -99,7 +99,7 @@ PlayScene::PlayScene() :
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
 	gauge->setCamera(camera.get());
-	gaugeData = gauge->add({}, 100.f, XMFLOAT4(0.f, 1.f, 1.f, 1.f));
+	gaugeData = gauge->add({}, 1.f, XMFLOAT4(0.f, 1.f, 1.f, 1.f));
 
 	// チュートリアル関係
 	// もしチュートリアルステージ(_0、_1)だったら画像追加
@@ -175,9 +175,10 @@ void PlayScene::update()
 	{
 		i->position = player->getObj()->position;
 		i->position.z -= 0.1f;
-		// 大きさは自機
-		i->scale = player->getObj()->scale;
-
+		// 大きさは自機基準
+		i->scale = player->getObj()->scale * 1.5f;
+		i->holeSize = 0.5f;
+		i->color = XMFLOAT4(0.75f, 0.25f, 0.75f, 0.75f);
 		i->gaugeRaito = std::fmod(i->gaugeRaito + 0.02f, 1.f);
 	}
 	gauge->update();
