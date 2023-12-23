@@ -168,17 +168,19 @@ void PlayScene::update()
 
 	if (tutorialTexture)tutorialTexture->update();
 
+	// 衝突確認
+	checkCollision();
+
 	if (auto i = gaugeData.lock(); i)
 	{
 		i->position = player->getObj()->position;
 		i->position.z -= 0.1f;
 		// 大きさは自機
 		i->scale = player->getObj()->scale;
+
+		i->gaugeRaito = std::fmod(i->gaugeRaito + 0.02f, 1.f);
 	}
 	gauge->update();
-
-	// 衝突確認
-	checkCollision();
 }
 
 void PlayScene::update_start()
