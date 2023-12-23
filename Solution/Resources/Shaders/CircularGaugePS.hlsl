@@ -4,12 +4,6 @@
 #define PI2 (6.283185307179586476925286766559f)
 #define PI_DIV2 (1.5707963267948966192313216916398f)
 
-// 中心の穴の大きさ
-#define holeSize (0.25f)
-
-// ゲージの割合
-#define gaugeRaito (0.25f)
-
 // ディザリング抜き
 void ScreenDoor(float2 screenPos, float alpha)
 {
@@ -45,7 +39,7 @@ PSOutput main(GSOutput input)
 	pos = input.uv - float2(0.5f, 0.5f);
 	distance2Pos = dot(pos, pos) * 4.f;
 	val = 1.f - circle(pos, 1.f, 0.005f, distance2Pos);
-	val *= circle(pos, holeSize, 0.005f, distance2Pos);
+	val *= circle(pos, input.holeSize, 0.005f, distance2Pos);
 	
 	// 角度[Rad]を取得
 	angle01 = atan2(pos.y, pos.x);
@@ -54,7 +48,7 @@ PSOutput main(GSOutput input)
 	// 始点を上にする（左→上）
 	angle01 = frac(angle01 + 0.75f);
 	// 値を反映させる
-	val *= step(angle01, gaugeRaito);
+	val *= step(angle01, input.gaugeRaito);
 	
 	ScreenDoor(input.svpos.xy, val * input.color.a);
 	

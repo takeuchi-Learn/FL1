@@ -45,6 +45,8 @@ void main(
 		//element.uv = float2(0.5f, 0.5f);
 		element.uv = uv_array[i];
 		element.color = input[0].color;
+		element.holeSize = input[0].holeSize;
+		element.gaugeRaito = input[0].gaugeRaito;
 		output.Append(element);
 	}
 }
