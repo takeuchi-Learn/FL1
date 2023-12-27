@@ -19,31 +19,7 @@ class Collision;
 class GameMap
 {
 private:
-	enum MAPCHIP_DATA : uint8_t
-	{
-		/// @brief 未定義
-		MAPCHIP_UNDEF = 0U,
-		/// @brief 壁
-		MAPCHIP_WALL,
-		/// @brief 道
-		MAPCHIP_ROAD,
-		/// @brief ゴール
-		MAPCHIP_GOAL,
-		/// @brief 道路
-		MAPCHIP_PLAIN_ROAD,
-		/// @brief 障害物
-		MAPCHIP_OBSTACLE_OBJECT,
-		/// @brief ステージ外進行防止の透明な壁
-		MAPCHIP_TRANSPARENT_BLOCK,
-		/// @brief ただのブロック
-		MAPCHIP_BLOCK,
-
-		/// @brief 最後の要素
-		MAPCHIP_ALLNUM
-	};
-
-private:
-	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
+	std::unordered_map<uint8_t, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
 	std::vector<CollisionShape::AABB> mapAABBs;
 

@@ -72,7 +72,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			const auto& cellStr = csvData[y][x];
 
 			constexpr int base = 10;
-			uint8_t n = MAPCHIP_UNDEF;
+			uint8_t n = 0ui8;
 			const auto ret = std::from_chars(std::to_address(cellStr.begin()),
 											 std::to_address(cellStr.end()),
 											 n,
@@ -81,8 +81,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			// 未定義の値なら
 			if (ret.ec == std::errc::invalid_argument ||
 				ret.ec == std::errc::result_out_of_range ||
-				n == MAPCHIP_UNDEF ||
-				n >= MAPCHIP_ALLNUM)
+				n == 0ui8)
 			{
 				assert(0);
 				return true;
@@ -93,9 +92,10 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 									  0.f);
 
 			// 通れる道ならcontinueする
-			// 一旦GOALもcontinue
 			// 判定作成
-			if (n != GameMap::MAPCHIP_ROAD || n == GameMap::MAPCHIP_GOAL)
+			// todo 決め打ちではなく、YAML側で衝突判定の向きをビットフラグで指定し、一方向でも判定が有れば、判定作成というようにする。
+			// todo コライダー情報に向きを追加する（[上下左右]から衝突された場合に衝突判定をするかどうか）
+			if (n != 2ui8)
 			{
 				setAABBData(x, y, pos, scale);
 			}
@@ -121,7 +121,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 				// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
 				// YAML内の画像ファイルパスを反映させる
 				// 新たに挿入されたら addRet.second == true
-				const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
+				const auto addRet = billboard.try_emplace(n, std::make_unique<Billboard>(wTexPath.c_str(), camera));
 				auto& data = addRet.first->second;
 				data->setCamera(camera);
 				data->add(pos, scale);
