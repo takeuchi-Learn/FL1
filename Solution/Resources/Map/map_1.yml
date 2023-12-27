@@ -10,7 +10,7 @@ startPos:
 # 数字は下のcsvに対応している
 texFileName:
   1: wall.png
-  2: road.png
+  2: /INVISIBLE/
   3: goal.png
   4: PlainRoad.png
   5: blockobj.png

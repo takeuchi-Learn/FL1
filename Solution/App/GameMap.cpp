@@ -90,44 +90,45 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 			const auto pos = XMFLOAT3(float(x) * scale,
 									  -float(y) * scale,
-									  0);
+									  0.f);
 
 			// 通れる道ならcontinueする
 			// 一旦GOALもcontinue
-			if (n == GameMap::MAPCHIP_ROAD || n == GameMap::MAPCHIP_GOAL)continue;
-
-			std::wstring wTexPath{};
+			// 判定作成
+			if (n != GameMap::MAPCHIP_ROAD || n == GameMap::MAPCHIP_GOAL)
+			{
+				setAABBData(x, y, pos, scale);
+			}
 
 			// パスをstringからwstringに変換
 			try
 			{
+				constexpr const char defStr[] = "/INVISIBLE/";
+				std::string texPath = texFileNameNode[cellStr].As<std::string>(defStr);
+				if (texPath == defStr || texPath == "") { continue; }
+
 				// string型のパス
-				const std::string texPath = texFolderPath + texFileNameNode[cellStr].As<std::string>();
+				texPath = texFolderPath + texPath;
+
 				// 長さを取得
 				const auto len = MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, (wchar_t*)NULL, 0);
 				std::vector<wchar_t> buf(len);
 
 				//string -> wstring
 				MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, buf.data(), len);
-				wTexPath = std::wstring(buf.data(), buf.data() + len - 1);
+				std::wstring wTexPath = std::wstring(buf.data(), buf.data() + len - 1);
+
+				// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
+				// YAML内の画像ファイルパスを反映させる
+				// 新たに挿入されたら addRet.second == true
+				const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
+				auto& data = addRet.first->second;
+				data->setCamera(camera);
+				data->add(pos, scale);
 			} catch (...)
 			{
-				assert(0);
-				return true;
+				continue;
 			}
-
-			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
-			// YAML内の画像ファイルパスを反映させる
-			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
-			auto& data = addRet.first->second;
-			data->setCamera(camera);
-
-			// 新たに挿入されたら addRet.second == true
-
-			data->add(pos, scale);
-
-			// 判定作成
-			setAABBData(x, y, pos, scale);
 		}
 	}
 
