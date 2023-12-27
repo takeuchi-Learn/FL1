@@ -120,9 +120,10 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 				// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
 				// YAML内の画像ファイルパスを反映させる
-				// 新たに挿入されたら addRet.second == true
-				const auto addRet = billboard.try_emplace(n, std::make_unique<Billboard>(wTexPath.c_str(), camera));
+				const auto addRet = billboard.try_emplace(n, nullptr);
 				auto& data = addRet.first->second;
+				// 新たに挿入されたら addRet.second == true
+				if (addRet.second) { data = std::make_unique<Billboard>(wTexPath.c_str(), camera); }
 				data->setCamera(camera);
 				data->add(pos, scale);
 			} catch (...)
