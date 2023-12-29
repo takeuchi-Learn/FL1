@@ -2,15 +2,11 @@
 
 #include <System/GameScene.h>
 #include <Util/Stopwatch.h>
+#include <GameCamera.h>
+#include <Collision/CollisionShape.h>
 #include <memory>
 #include <functional>
 #include <array>
-
-#include "../GameCamera.h"
-
-#include <Collision/CollisionShape.h>
-
-#include <3D/Billboard/CircularGauge.h>
 
 class Camera;
 class Light;
@@ -21,7 +17,6 @@ class SpriteBase;
 class SoundData;
 class ParticleMgr;
 class Collision;
-
 class Player;
 class Goal;
 class BackGround;
@@ -32,8 +27,6 @@ class PlayScene :
 	public GameScene
 {
 private:
-	std::unique_ptr<CircularGauge> gauge;
-	std::weak_ptr<CircularGaugeData> gaugeData;
 
 	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<Light> light;
@@ -60,10 +53,8 @@ private:
 
 	static uint16_t stageNum;
 
-#pragma region ゲームオーバー関係
-	int gameOverTimer = 0;
-	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
-#pragma endregion
+	uint16_t gameOverDelayFrame = 0ui16;
+	static constexpr uint16_t GAME_OVER_DELAY_FRAME = 60ui16;
 
 private:
 	/// @brief 衝突確認関数

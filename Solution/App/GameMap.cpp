@@ -103,29 +103,22 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 									  -float(y) * scale,
 									  0.f);
 
-			// 通れる道ならcontinueする
-			// 判定作成
-			// todo 決め打ちではなく、YAML側で衝突判定の向きをビットフラグで指定し、一方向でも判定が有れば、判定作成というようにする。
-			// todo コライダー情報に向きを追加する（[上下左右]から衝突された場合に衝突判定をするかどうか）
-			/*if (n != 2ui8)
 			{
-				setAABBData(x, y, pos, scale);
-			}*/
+				// コリジョンデータが未指定なら全方向判定を取る
+				uint8_t currentCollisionData = 0b1111ui8;
 
-			// コリジョンデータが未指定なら全方向判定を取る
-			uint8_t currentCollisionData = 0b1111ui8;
+				// コリジョンデータがあればそれを使う
+				if (auto it = collisionDataList.find(cellStr);
+					it != collisionDataList.end())
+				{
+					currentCollisionData = it->second;
+				}
 
-			// コリジョンデータがあればそれを使う
-			if (auto it = collisionDataList.find(cellStr);
-				it != collisionDataList.end())
-			{
-				currentCollisionData = it->second;
-			}
-
-			// コリジョンデータに一方向でも判定が有ればコライダーを追加
-			if (currentCollisionData & 0b1111ui8)
-			{
-				setAABBData(x, y, pos, scale);
+				// コリジョンデータに一方向でも判定が有ればコライダーを追加
+				if (currentCollisionData & 0b1111ui8)
+				{
+					setAABBData(x, y, pos, scale);
+				}
 			}
 
 			// パスをstringからwstringに変換
