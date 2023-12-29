@@ -59,7 +59,7 @@ void PlayScene::checkCollision()
 	{
 		if (Collision::CheckHit(player->getShape(), aabb.aabb))
 		{
-			player->hit(aabb.aabb, typeid(*gameMap).name());
+			player->hit(aabb.aabb, typeid(*gameMap).name(), 0b1111ui8 & aabb.collisionDirectionBitFlag);
 		}
 	}
 

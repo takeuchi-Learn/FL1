@@ -70,7 +70,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			const auto& key = (*i).first;
 			const auto& node = (*i).second;
 
-			collisionDataList[key] = node.As<uint8_t>(0b1111'1111ui8);
+			const auto str = node.As<std::string>("1111");
+
+			constexpr int base = 2;
+			std::from_chars(std::to_address(str.begin()),
+							std::to_address(str.end()),
+							collisionDataList[key],
+							base);
 		}
 	}
 

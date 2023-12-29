@@ -127,12 +127,15 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
 }
 
-void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName)
+void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName, uint8_t validCollisionDir)
 {
 	if (hitObjName == typeid(Goal).name()) // ゴール衝突
 	{
 		camera->changeStateClear();
 		isClear = true;
+	} else if (hitObjName == typeid(ColorCone).name())
+	{
+		++coneCount;
 	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
 	{
 		enum class HIT_AREA : uint8_t
@@ -195,6 +198,9 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		{
 			using enum HIT_AREA;
 		case TOP:
+			// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
+			if (!(validCollisionDir & 0b1000ui8)) { break; }
+
 			// 地面衝突
 			if (!pushJumpKeyFrame || !reboundYFrame)
 			{
@@ -210,19 +216,25 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 
 		case BOTTOM:
+			if (!(validCollisionDir & 0b0100ui8)) { break; }
+
 			// 下方向に落下
 			fallStartSpeed = -0.2f;
 			fallTime = 0;
 			break;
 
-		case RIGHT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
-			break;
-
 		case LEFT:
+			if (!(validCollisionDir & 0b0010ui8)) { break; }
+
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
+			break;
+
+		case RIGHT:
+			if (!(validCollisionDir & 0b0001ui8)) { break; }
+
+			// 横のバウンド開始
+			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
 			break;
 
 		default:
@@ -234,9 +246,6 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
 			gameObj->update(XMConvertToRadians(getObj()->rotation));
 		}
-	} else if (hitObjName == typeid(ColorCone).name())
-	{
-		++coneCount;
 	}
 }
 

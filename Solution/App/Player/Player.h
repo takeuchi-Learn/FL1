@@ -178,7 +178,7 @@ public:
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定
 	/// @param hitObjName 相手のクラス名(typeid.name()で取得する)や識別名("map"など)
-	void hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName = "");
+	void hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName = "", uint8_t validCollisionDir = 0b1111ui8);
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報
