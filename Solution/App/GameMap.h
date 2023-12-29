@@ -4,7 +4,6 @@
 #include <string>
 #include <unordered_map>
 #include <DirectXMath.h>
-
 #include <Util/Util.h>
 #include <Collision/CollisionShape.h>
 #include <Util/YamlLoader.h>
@@ -18,19 +17,36 @@ class Collision;
 // 動かない地形のみ扱う
 class GameMap
 {
+public:
+	class Collider
+	{
+	public:
+		CollisionShape::AABB aabb;
+		uint8_t collisionDirectionBitFlag;
+
+		Collider(const DirectX::XMFLOAT2& minPos,
+				 const DirectX::XMFLOAT2& maxPos,
+				 uint8_t collisionBitFlag);
+
+		Collider(const DirectX::XMFLOAT2& minPos,
+				 const DirectX::XMFLOAT2& maxPos)
+			: Collider(minPos, maxPos, 0b1111ui8)
+		{}
+	};
+
 private:
 	std::unordered_map<std::string, uint8_t> collisionDataList;
 
 	std::unordered_map<uint8_t, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
-	std::vector<CollisionShape::AABB> mapAABBs;
+	std::vector<Collider> mapAABBs;
 
 	// 縦横サイズ
 	uint16_t mapSizeX = 0;
 	uint16_t mapSizeY = 0;
 
 	// ステージの配置物
-	std::vector<std::unique_ptr<StageObject>>stageObjects;
+	std::vector<std::unique_ptr<StageObject>> stageObjects;
 	float goalPosX = 0.f;
 
 	// コーンの最大値
@@ -44,7 +60,7 @@ private:
 	/// @param y 配列の添え字
 	/// @param pos 座標
 	/// @param scale 大きさ
-	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
+	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale, uint8_t collisionBitFlag = 0b1111ui8);
 
 	void loadStageObject(Yaml::Node& node, float scale);
 	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<DirectX::XMFLOAT2>& output);

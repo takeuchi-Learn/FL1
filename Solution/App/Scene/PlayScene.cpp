@@ -57,9 +57,9 @@ void PlayScene::checkCollision()
 	// 地形判定
 	for (auto& aabb : gameMap->getMapAABBs())
 	{
-		if (Collision::CheckHit(player->getShape(), aabb))
+		if (Collision::CheckHit(player->getShape(), aabb.aabb))
 		{
-			player->hit(aabb, typeid(*gameMap).name());
+			player->hit(aabb.aabb, typeid(*gameMap).name());
 		}
 	}
 

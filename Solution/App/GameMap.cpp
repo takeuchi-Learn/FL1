@@ -25,14 +25,23 @@ namespace
 	};
 }
 
-void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
+GameMap::Collider::Collider(const DirectX::XMFLOAT2& minPos,
+							const DirectX::XMFLOAT2& maxPos,
+							uint8_t collisionBitFlag)
+	: aabb({ XMLoadFloat2(&minPos), XMLoadFloat2(&maxPos) }),
+	collisionDirectionBitFlag(collisionBitFlag)
+{}
+
+void GameMap::setAABBData(size_t x, size_t y,
+						  const DirectX::XMFLOAT3& pos,
+						  float scale,
+						  uint8_t collisionBitFlag)
 {
 	const float harfScale = scale / 2.f;
 	const XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
 	const XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
 
-	mapAABBs.emplace_back(XMLoadFloat2(&minPos),
-						  XMLoadFloat2(&maxPos));
+	mapAABBs.emplace_back(minPos, maxPos, collisionBitFlag);
 }
 
 GameMap::GameMap(GameCamera* camera)
@@ -115,9 +124,10 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 				}
 
 				// コリジョンデータに一方向でも判定が有ればコライダーを追加
-				if (currentCollisionData & 0b1111ui8)
+				if (const uint8_t flags = currentCollisionData & 0b1111ui8;
+					flags)
 				{
-					setAABBData(x, y, pos, scale);
+					setAABBData(x, y, pos, scale, flags);
 				}
 			}
 
@@ -263,5 +273,5 @@ float GameMap::calcGameoverPos() const
 {
 	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
 	constexpr float gameOverPosSubNum = 150.f;
-	return XMVectorGetY(mapAABBs.back().minPos) - gameOverPosSubNum;
+	return XMVectorGetY(mapAABBs.back().aabb.minPos) - gameOverPosSubNum;
 }
