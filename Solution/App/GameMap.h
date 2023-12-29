@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include<DirectXMath.h>
+#include <DirectXMath.h>
 
-#include<Util/Util.h>
+#include <Util/Util.h>
 #include <Collision/CollisionShape.h>
 #include <Util/YamlLoader.h>
 #include "Object/Goal.h"
@@ -19,6 +19,8 @@ class Collision;
 class GameMap
 {
 private:
+	std::unordered_map<std::string, uint8_t> collisionDataList;
+
 	std::unordered_map<uint8_t, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
 	std::vector<CollisionShape::AABB> mapAABBs;

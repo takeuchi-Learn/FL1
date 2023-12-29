@@ -18,7 +18,7 @@ namespace
 	constexpr char* goalStr = "goal";
 
 	// オブジェクト一覧
-	const std::vector<char*> objectNames =
+	constexpr std::array<char*, 2> objectNames =
 	{
 		coneStr,
 		goalStr,
@@ -51,6 +51,18 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 	{
 		XMFLOAT2& startPos = *startPosBuf;
 		LoadYamlDataToFloat2(root, startPos);
+	}
+
+	if (auto& collisionNode = root["collisionBitFlag"];
+		collisionNode.Size() > 0)
+	{
+		for (auto i = collisionNode.Begin(); i != collisionNode.End(); i++)
+		{
+			const auto& key = (*i).first;
+			const auto& node = (*i).second;
+
+			collisionDataList[key] = node.As<uint8_t>(0b1111'1111ui8);
+		}
 	}
 
 	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
@@ -95,7 +107,23 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			// 判定作成
 			// todo 決め打ちではなく、YAML側で衝突判定の向きをビットフラグで指定し、一方向でも判定が有れば、判定作成というようにする。
 			// todo コライダー情報に向きを追加する（[上下左右]から衝突された場合に衝突判定をするかどうか）
-			if (n != 2ui8)
+			/*if (n != 2ui8)
+			{
+				setAABBData(x, y, pos, scale);
+			}*/
+
+			// コリジョンデータが未指定なら全方向判定を取る
+			uint8_t currentCollisionData = 0b1111ui8;
+
+			// コリジョンデータがあればそれを使う
+			if (auto it = collisionDataList.find(cellStr);
+				it != collisionDataList.end())
+			{
+				currentCollisionData = it->second;
+			}
+
+			// コリジョンデータに一方向でも判定が有ればコライダーを追加
+			if (currentCollisionData & 0b1111ui8)
 			{
 				setAABBData(x, y, pos, scale);
 			}
