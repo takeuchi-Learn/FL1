@@ -26,6 +26,53 @@ namespace
 	constexpr auto boundYSEPath = "Resources/SE/Player/boundY.wav";
 
 	constexpr float defaultJumpPower = 15.f;
+
+	enum class HIT_AREA : uint8_t
+	{
+		NONE = 0,
+		LEFT = 1 << 0,
+		RIGHT = 1 << 1,
+		BOTTOM = 1 << 2,
+		TOP = 1 << 3,
+	};
+
+	inline HIT_AREA calcCollisionVec(const CollisionShape::AABB& aabb,
+									 const CollisionShape::Sphere& sphere)
+	{
+		XMFLOAT3 boxCenter2Sphere{};
+		{
+			const auto boxSizeVec = aabb.maxPos - aabb.minPos;
+			const auto boxCenterVec = aabb.maxPos - (boxSizeVec / 2.f);
+			XMStoreFloat3(&boxCenter2Sphere, sphere.center - boxCenterVec);
+		}
+
+		// 衝突した辺を四方向でとる
+		// 上下と左右どちらかだけにする
+		if (std::abs(boxCenter2Sphere.x) >=
+			std::abs(boxCenter2Sphere.y))
+		{
+			// x > yならx方向のみ判定
+			if (0.f <= boxCenter2Sphere.x)
+			{
+				return HIT_AREA::RIGHT;
+			} else
+			{
+				return HIT_AREA::LEFT;
+			}
+		} else
+		{
+			// y > xならy方向のみ判定
+			if (0.f < boxCenter2Sphere.y)
+			{
+				return HIT_AREA::TOP;
+			} else
+			{
+				return HIT_AREA::BOTTOM;
+			}
+		}
+
+		return HIT_AREA::NONE;
+	}
 }
 
 bool Player::loadYamlFile()
@@ -138,68 +185,20 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		++coneCount;
 	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
 	{
-		enum class HIT_AREA : uint8_t
-		{
-			NONE = 0,
-			TOP = 1 << 0,
-			BOTTOM = 1 << 1,
-			RIGHT = 1 << 2,
-			LEFT = 1 << 3,
-		};
-		HIT_AREA activeDir = HIT_AREA::NONE;
+		// 衝突位置確認
+		const HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
 
-#pragma region 衝突位置確認
+		if (activeDir == HIT_AREA::NONE) { return; }
 
-		// todo XVectorGetX等を使う
-		const XMFLOAT3 boxSize(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0],
-							   hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1],
-							   hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2]);
-		const XMFLOAT3 boxCenter(hitAABB.maxPos.m128_f32[0] - boxSize.x / 2.f,
-								 hitAABB.maxPos.m128_f32[1] - boxSize.y / 2.f,
-								 hitAABB.maxPos.m128_f32[2] - boxSize.z / 2.f);
-
-		XMFLOAT3 spherePos{};
-		XMStoreFloat3(&spherePos, sphere.center);
-
-		const auto boxCenter2Sphere =
-			XMFLOAT3(spherePos.x - boxCenter.x,
-					 spherePos.y - boxCenter.y,
-					 spherePos.z - boxCenter.z);
-
-		// 衝突した辺を四方向でとる
-		// 上下と左右どちらかだけにする
-		if (std::abs(boxCenter2Sphere.x) >=
-			std::abs(boxCenter2Sphere.y))
-		{
-			// x > yならx方向のみ判定
-			if (0.f <= boxCenter2Sphere.x)
-			{
-				activeDir = HIT_AREA::RIGHT;
-			} else if (boxCenter2Sphere.x <= -0.f)
-			{
-				activeDir = HIT_AREA::LEFT;
-			}
-		} else
-		{
-			// y > xならy方向のみ判定
-			if (0.f < boxCenter2Sphere.y)
-			{
-				activeDir = HIT_AREA::TOP;
-			} else if (boxCenter2Sphere.y <= 0.f)
-			{
-				activeDir = HIT_AREA::BOTTOM;
-			}
-		}
-
-#pragma endregion 衝突位置確認ここまで
+		// 衝突無効面と当たっていたら終了
+		// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
+		if (!(validCollisionDir & uint8_t(activeDir))) { return; }
 
 		// 方向ごとに分岐
 		switch (activeDir)
 		{
 			using enum HIT_AREA;
 		case TOP:
-			// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
-			if (!(validCollisionDir & 0b1000ui8)) { break; }
 
 			// 地面衝突
 			if (!pushJumpKeyFrame || !reboundYFrame)
@@ -216,23 +215,17 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 
 		case BOTTOM:
-			if (!(validCollisionDir & 0b0100ui8)) { break; }
-
 			// 下方向に落下
 			fallStartSpeed = -0.2f;
 			fallTime = 0;
 			break;
 
 		case LEFT:
-			if (!(validCollisionDir & 0b0010ui8)) { break; }
-
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
 			break;
 
 		case RIGHT:
-			if (!(validCollisionDir & 0b0001ui8)) { break; }
-
 			// 横のバウンド開始
 			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
 			break;
@@ -241,11 +234,8 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			break;
 		}
 
-		if (activeDir != HIT_AREA::NONE)
-		{
-			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-			gameObj->update(XMConvertToRadians(getObj()->rotation));
-		}
+		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+		gameObj->update(XMConvertToRadians(getObj()->rotation));
 	}
 }
 
