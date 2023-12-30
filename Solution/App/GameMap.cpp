@@ -3,11 +3,9 @@
 #include <Util/YamlLoader.h>
 #include <Util/Util.h>
 #include <DirectXMath.h>
-
-#include "Object/Goal.h"
-#include "Object/ColorCone.h"
+#include <Object/Goal.h>
+#include <Object/ColorCone.h>
 #include "GameCamera.h"
-
 #include <sstream>
 
 using namespace DirectX;
@@ -23,6 +21,22 @@ namespace
 		coneStr,
 		goalStr,
 	};
+
+	template <std::integral Ty, int base = 10>
+	std::from_chars_result fromStr(std::string_view str, Ty& ret)
+	{
+		return std::from_chars(std::to_address(str.begin()),
+							   std::to_address(str.end()),
+							   ret, base);
+	}
+
+	template <std::floating_point Ty>
+	std::from_chars_result fromStr(std::string_view str, Ty& ret)
+	{
+		return std::from_chars(std::to_address(str.begin()),
+							   std::to_address(str.end()),
+							   ret);
+	}
 }
 
 GameMap::Collider::Collider(const DirectX::XMFLOAT2& minPos,
@@ -47,6 +61,28 @@ void GameMap::setAABBData(size_t x, size_t y,
 GameMap::GameMap(GameCamera* camera)
 	: camera(camera)
 {}
+
+void GameMap::loadStageObjList(const std::string& csvStr, float scale, const std::function<void(const DirectX::XMFLOAT2&)> insertFunc)
+{
+	auto csv = Util::loadCsvFromString(csvStr);
+
+	float posBuf[2]{};
+
+	for (auto& y : csv)
+	{
+		const auto yLen = y.size();
+		if (yLen < 2) { continue; }
+
+		for (uint8_t i = 0ui8; i < 2ui8; ++i)
+		{
+			fromStr(y[i], posBuf[i]);
+			posBuf[i] *= scale;
+		}
+		posBuf[1] = -posBuf[1];
+
+		insertFunc(XMFLOAT2(posBuf));
+	}
+}
 
 bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf)
 {
@@ -73,10 +109,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			const auto str = node.As<std::string>("1111");
 
 			constexpr int base = 2;
-			std::from_chars(std::to_address(str.begin()),
-							std::to_address(str.end()),
-							collisionDataList[key],
-							base);
+			fromStr<uint8_t, base>(str, collisionDataList[key]);
 		}
 	}
 
@@ -100,10 +133,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 			constexpr int base = 10;
 			uint8_t n = 0ui8;
-			const auto ret = std::from_chars(std::to_address(cellStr.begin()),
-											 std::to_address(cellStr.end()),
-											 n,
-											 base);
+			const auto ret = fromStr<uint8_t, base>(cellStr, n);
 
 			// 未定義の値なら
 			if (ret.ec == std::errc::invalid_argument ||
@@ -173,81 +203,23 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 	mapAABBs.shrink_to_fit();
 
 	// オブジェクト座標読み込み
-	loadStageObject(root, scale);
+	{
+		constexpr const char defStr[] = "NONE";
+
+		auto csvStr = root["goal"].As<std::string>(defStr);
+		if (csvStr != defStr)
+		{
+			loadStageObjList(csvStr, scale, [&](const XMFLOAT2& pos) { goals.emplace_front(std::make_unique<Goal>(camera, pos, scale)); });
+		}
+
+		csvStr = root["cone"].As<std::string>(defStr);
+		if (csvStr != defStr)
+		{
+			loadStageObjList(csvStr, scale, [&](const XMFLOAT2& pos) { cones.emplace_front(std::make_unique<ColorCone>(camera, pos, scale)); });
+		}
+	}
 
 	return false;
-}
-
-void GameMap::loadStageObject(Yaml::Node& node, const float scale)
-{
-	std::unordered_map<std::string, std::vector<XMFLOAT2>>stageObjectPos;
-	// 全オブジェクトの座標をu_mapに格納
-	for (auto& name : objectNames)
-	{
-		const std::string posString = node[name].As<std::string>("NONE");
-		if (posString == "NONE") { continue; }
-		const auto posStringData = Util::loadCsvFromString(posString);
-
-		std::vector<XMFLOAT2> objectPos(posStringData.size());
-		loadStageObjectPosition(posStringData, objectPos);
-
-		// スケールをかける
-		for (auto& pos : objectPos)
-		{
-			pos.x *= scale;
-			pos.y *= -scale;
-		}
-
-		stageObjectPos.emplace(name, objectPos);
-	}
-
-	// オブジェクト配置
-	setStageObjects(stageObjectPos, scale);
-}
-
-void GameMap::loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output)
-{
-	for (size_t y = 0u, yLen = posCSV.size(); y < yLen; ++y)
-	{
-		std::from_chars(std::to_address(posCSV[y][0].begin()),
-						std::to_address(posCSV[y][0].end()),
-						output[y].x);
-		std::from_chars(std::to_address(posCSV[y][1].begin()),
-						std::to_address(posCSV[y][1].end()),
-						output[y].y);
-	}
-}
-
-void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale)
-{
-	// リサイズ
-	size_t sizeNum = 0;
-	for (auto& posUMap : stageObjectPos)
-	{
-		for (auto& pos : posUMap.second)
-		{
-			++sizeNum;
-		}
-	}
-	stageObjects.resize(sizeNum);
-
-	size_t current = 0;
-	for (auto& posUMap : stageObjectPos)
-	{
-		for (auto& pos : posUMap.second)
-		{
-			if (posUMap.first == coneStr)
-			{
-				stageObjects[current] = std::make_unique<ColorCone>(camera, pos, scale);
-				++coneMax;
-			}
-			if (posUMap.first == goalStr)
-			{
-				stageObjects[current] = std::make_unique<Goal>(camera, pos, scale);
-			}
-			++current;
-		}
-	}
 }
 
 void GameMap::update()
@@ -257,9 +229,14 @@ void GameMap::update()
 		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
 	}
 
-	for (auto& obj : stageObjects)
+	for (auto& i : cones)
 	{
-		obj->update();
+		i->update();
+	}
+
+	for (auto& i : goals)
+	{
+		i->update();
 	}
 }
 
@@ -269,9 +246,15 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-	for (auto& obj : stageObjects)
+
+	for (auto& i : cones)
 	{
-		obj->draw();
+		i->draw();
+	}
+
+	for (auto& i : goals)
+	{
+		i->draw();
 	}
 }
 

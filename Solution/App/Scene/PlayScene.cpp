@@ -64,22 +64,27 @@ void PlayScene::checkCollision()
 		}
 	}
 
-	// オブジェクト判定
-	for (auto& obj : gameMap->getStageObjects())
+	// コーン判定
+	for (auto& obj : gameMap->getCones())
 	{
 		const auto& sphere = player->getShape();
 		const auto& aabb = obj->getRefAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
+			player->hitCone();
 			obj->hit(sphere);
+		}
+	}
 
-			if (typeid(*obj) == typeid(Goal))
-			{
-				player->hitGoal();
-			} else if (typeid(*obj) == typeid(ColorCone))
-			{
-				player->hitCone();
-			}
+	// ゴール判定
+	for (auto& obj : gameMap->getGoals())
+	{
+		const auto& sphere = player->getShape();
+		const auto& aabb = obj->getRefAABB();
+		if (Collision::CheckHit(sphere, aabb))
+		{
+			player->hitGoal();
+			obj->hit(sphere);
 		}
 	}
 }

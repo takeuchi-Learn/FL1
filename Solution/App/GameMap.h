@@ -2,13 +2,16 @@
 
 #include <memory>
 #include <string>
+#include <forward_list>
 #include <unordered_map>
+#include <functional>
 #include <DirectXMath.h>
 #include <Util/Util.h>
 #include <Collision/CollisionShape.h>
 #include <Util/YamlLoader.h>
-#include "Object/Goal.h"
 
+class Goal;
+class ColorCone;
 class Billboard;
 class GameCamera;
 class Collision;
@@ -46,8 +49,8 @@ private:
 	uint16_t mapSizeY = 0;
 
 	// ステージの配置物
-	std::vector<std::unique_ptr<StageObject>> stageObjects;
-	float goalPosX = 0.f;
+	std::forward_list<std::unique_ptr<Goal>> goals;
+	std::forward_list<std::unique_ptr<ColorCone>> cones;
 
 	// コーンの最大値
 	uint16_t coneMax = 0;
@@ -62,9 +65,7 @@ private:
 	/// @param scale 大きさ
 	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale, uint8_t collisionBitFlag = 0b1111ui8);
 
-	void loadStageObject(Yaml::Node& node, float scale);
-	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<DirectX::XMFLOAT2>& output);
-	void setStageObjects(const std::unordered_map<std::string, std::vector<DirectX::XMFLOAT2>>& stageObjectPos, float scale);
+	void loadStageObjList(const std::string& csvStr, float scale, const std::function<void(const DirectX::XMFLOAT2&)> insertFunc);
 
 public:
 	GameMap(GameCamera* camera);
@@ -83,15 +84,11 @@ public:
 	/// @return 当たり判定配列の参照
 	inline const auto& getMapAABBs() const { return mapAABBs; }
 
-	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	//inlnie const auto& getGoalAABB() const { return goal->getRefAABB(); }
-
-	inline const auto& getStageObjects() const { return stageObjects; }
+	inline const auto& getGoals() const { return goals; }
+	inline auto& getCones() { return cones; }
 
 	/// @brief ゲームオーバーになる座標
 	float calcGameoverPos() const;
-
-	inline float getGoalPosX() const { return goalPosX; }
 
 	inline uint16_t getMapX() const { return mapSizeX; }
 	inline uint16_t getMapY() const { return mapSizeY; }
