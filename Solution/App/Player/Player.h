@@ -9,9 +9,8 @@
 #include <functional>
 #include <memory>
 #include <3D/Billboard/Billboard.h>
-#include "../GameCamera.h"
-
 #include <Collision/CollisionShape.h>
+#include "../GameCamera.h"
 
 class Camera;
 class ObjModel;
@@ -92,6 +91,8 @@ class Player
 
 	// コーンのカウント
 	unsigned short coneCount = 0;
+
+	DirectX::XMVECTOR preColliderPos;
 
 #pragma region SE
 	std::weak_ptr<SoundData> jumpSE;

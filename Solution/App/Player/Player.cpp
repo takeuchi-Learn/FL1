@@ -124,6 +124,8 @@ Player::Player(GameCamera* camera)
 
 void Player::update()
 {
+	preColliderPos = sphere.center;
+
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
@@ -188,19 +190,22 @@ void Player::hitCone()
 void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir)
 {
 	// 衝突位置確認
-	const HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
-
+	HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
 	if (activeDir == HIT_AREA::NONE) { return; }
 
 	// 衝突無効面と当たっていたら終了
-	// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
 	if (!(validCollisionDir & uint8_t(activeDir))) { return; }
+
+	// 自機コライダーの移動ベクトル
+	const auto myColliderVel = sphere.center - preColliderPos;
 
 	// 方向ごとに分岐
 	switch (activeDir)
 	{
 		using enum HIT_AREA;
 	case TOP:
+		if (XMVectorGetY(myColliderVel) > 0.f) { return; }
+
 		// 地面衝突
 		if (!pushJumpKeyFrame || !reboundYFrame)
 		{
@@ -216,17 +221,23 @@ void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionD
 		break;
 
 	case BOTTOM:
+		if (XMVectorGetY(myColliderVel) < 0.f) { return; }
+
 		// 下方向に落下
 		fallStartSpeed = -0.2f;
 		fallTime = 0;
 		break;
 
 	case LEFT:
+		if (XMVectorGetX(myColliderVel) < 0.f) { return; }
+
 		// 横のバウンド開始
 		startSideRebound(XMVectorGetX(hitAABB.minPos), true);
 		break;
 
 	case RIGHT:
+		if (XMVectorGetX(myColliderVel) > 0.f) { return; }
+
 		// 横のバウンド開始
 		startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
 		break;

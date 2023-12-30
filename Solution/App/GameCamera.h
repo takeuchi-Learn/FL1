@@ -84,7 +84,6 @@ private:
 
 public:
 	/// @brief 入力を許可するか
-	/// todo 仮実装。操作を別クラスに分けたら消す
 	bool allowInput = true;
 
 private:
