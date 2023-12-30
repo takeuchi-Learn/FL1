@@ -36,7 +36,7 @@ namespace
 		TOP = 1 << 3,
 	};
 
-	inline HIT_AREA calcCollisionVec(const CollisionShape::AABB& aabb,
+	HIT_AREA calcCollisionVec(const CollisionShape::AABB& aabb,
 									 const CollisionShape::Sphere& sphere)
 	{
 		XMFLOAT3 boxCenter2Sphere{};
@@ -174,69 +174,69 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
 }
 
-void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName, uint8_t validCollisionDir)
+void Player::hitGoal()
 {
-	if (hitObjName == typeid(Goal).name()) // ゴール衝突
-	{
-		camera->changeStateClear();
-		isClear = true;
-	} else if (hitObjName == typeid(ColorCone).name())
-	{
-		++coneCount;
-	} else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
-	{
-		// 衝突位置確認
-		const HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
+	camera->changeStateClear();
+	isClear = true;
+}
 
-		if (activeDir == HIT_AREA::NONE) { return; }
+void Player::hitCone()
+{
+	++coneCount;
+}
 
-		// 衝突無効面と当たっていたら終了
-		// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
-		if (!(validCollisionDir & uint8_t(activeDir))) { return; }
+void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir)
+{
+	// 衝突位置確認
+	const HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
 
-		// 方向ごとに分岐
-		switch (activeDir)
+	if (activeDir == HIT_AREA::NONE) { return; }
+
+	// 衝突無効面と当たっていたら終了
+	// todo 現在位置だけでなく、自機の移動ベクトルで行う。（でないと通り抜けた時にはじかれる）
+	if (!(validCollisionDir & uint8_t(activeDir))) { return; }
+
+	// 方向ごとに分岐
+	switch (activeDir)
+	{
+		using enum HIT_AREA;
+	case TOP:
+		// 地面衝突
+		if (!pushJumpKeyFrame || !reboundYFrame)
 		{
-			using enum HIT_AREA;
-		case TOP:
-
-			// 地面衝突
-			if (!pushJumpKeyFrame || !reboundYFrame)
+			// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
+			if (isReboundY)
 			{
-				// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
-				if (isReboundY)
-				{
-					reboundEnd(hitAABB);
-				} else
-				{
-					jumpEnd(hitAABB);
-				}
+				reboundEnd(hitAABB);
+			} else
+			{
+				jumpEnd(hitAABB);
 			}
-			break;
-
-		case BOTTOM:
-			// 下方向に落下
-			fallStartSpeed = -0.2f;
-			fallTime = 0;
-			break;
-
-		case LEFT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
-			break;
-
-		case RIGHT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
-			break;
-
-		default:
-			break;
 		}
+		break;
 
-		getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-		gameObj->update(XMConvertToRadians(getObj()->rotation));
+	case BOTTOM:
+		// 下方向に落下
+		fallStartSpeed = -0.2f;
+		fallTime = 0;
+		break;
+
+	case LEFT:
+		// 横のバウンド開始
+		startSideRebound(XMVectorGetX(hitAABB.minPos), true);
+		break;
+
+	case RIGHT:
+		// 横のバウンド開始
+		startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
+		break;
+
+	default:
+		break;
 	}
+
+	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+	gameObj->update(XMConvertToRadians(getObj()->rotation));
 }
 
 void Player::calcJumpPos()

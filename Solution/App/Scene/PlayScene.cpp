@@ -15,8 +15,9 @@
 
 #include <Player/Player.h>
 #include <Object/Goal.h>
+#include <Object/ColorCone.h>
 #include <BackGround.h>
-#include<TutorialTexture.h>
+#include <TutorialTexture.h>
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
@@ -59,7 +60,7 @@ void PlayScene::checkCollision()
 	{
 		if (Collision::CheckHit(player->getShape(), aabb.aabb))
 		{
-			player->hit(aabb.aabb, typeid(*gameMap).name(), 0b1111ui8 & aabb.collisionDirectionBitFlag);
+			player->hitMap(aabb.aabb, 0b1111ui8 & aabb.collisionDirectionBitFlag);
 		}
 	}
 
@@ -70,8 +71,15 @@ void PlayScene::checkCollision()
 		const auto& aabb = obj->getRefAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
-			player->hit(aabb, typeid(*obj).name());
 			obj->hit(sphere);
+
+			if (typeid(*obj) == typeid(Goal))
+			{
+				player->hitGoal();
+			} else if (typeid(*obj) == typeid(ColorCone))
+			{
+				player->hitCone();
+			}
 		}
 	}
 }
