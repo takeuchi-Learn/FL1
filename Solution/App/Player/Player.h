@@ -49,7 +49,7 @@ class Player
 	//現在の落下速度
 	float currentFallVelovity = 0.0f;
 	// 重力加速度(一旦プレイヤー内に宣言)
-	const float gAcc = 0.35f;
+	static constexpr float gAcc = 0.35f;
 
 	// 落下中かどうか(跳ね返り用)
 	bool isDrop = false;
@@ -66,8 +66,6 @@ class Player
 	float sideAddX = 0.0f;
 	// 地形衝突時の座標
 	float terrainHitObjPosX = 0.f;
-	// 衝突した地形の座標
-	//float terrainHitPosX = 0.f;
 
 	// 加速度
 	float acc = 0.f;
@@ -80,7 +78,6 @@ class Player
 	/// @brief 座標がこの数値を下回ったら落下死
 	float gameoverPos = 0.f;
 	bool isDead = false;
-	bool isClear = false;
 
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
 	float leftScrollEndPos = 0.f;
@@ -90,7 +87,7 @@ class Player
 	bool setMoveLimitFlag = false;
 
 	// コーンのカウント
-	unsigned short coneCount = 0;
+	uint16_t coneCount = 0;
 
 	DirectX::XMVECTOR preColliderPos;
 
@@ -136,9 +133,6 @@ private:
 	/// @brief ステージの端にいるかの確認(スクロール停止用)
 	void checkStageSide();
 
-	/// @brief ゲームオーバーの確認
-	void checkGameOver();
-
 	/// @brief 移動制限設定
 	void moveLimit();
 public:
@@ -163,21 +157,20 @@ public:
 
 	/// @brief ゲームオーバー扱いになる座標をセットする関数
 	/// @param posY
-	void setGameOverPos(const float posY) { gameoverPos = posY; }
+	inline void setGameOverPos(float posY) { gameoverPos = posY; }
 
-	inline const auto& getObj()const { return gameObj->getFrontData(); }
+	inline const auto& getObj() const { return gameObj->getFrontData(); }
 
 	inline const auto& getMapPos() const { return mapPos; }
 
-	bool getIsDead() const { return isDead; }
-	bool getIsClear()const { return isClear; }
+	inline bool getIsDead() const { return isDead; }
 
-	float getStartPosX()const { return leftScrollEndPos; }
+	inline float getStartPosX() const { return leftScrollEndPos; }
 
-	unsigned short getConeCount()const { return coneCount; }
+	inline uint16_t getConeCount() const { return coneCount; }
 
-	void hitGoal();
-	void hitCone();
+	inline void incrementConeCount() { ++coneCount; }
+
 	void hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir = 0b1111ui8);
 
 	/// @brief 当たり判定取得

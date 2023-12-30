@@ -80,20 +80,32 @@ bool GameCamera::loadYaml()
 
 void GameCamera::preUpdate()
 {
-	gameCameraUpdate();
+	// todo カメラがどう動くかは、カメラの構成要素ではないので、別クラスに分けるべき。（ビヘイビアツリーやstateパターンを使う）
+
+	switch (cameraState)
+	{
+	case GameCamera::CameraState::INPUT:
+	case GameCamera::CameraState::FOLLOW_OFF:
+		// 入力確認とそれに応じた傾き
+		rotation();
+		// 上ベクトル回転
+		upRotate();
+		break;
+	}
+
+	// 追従
+	if (cameraState == GameCamera::CameraState::FOLLOW_OFF)
+	{
+		// Xは固定
+		followObject(false);
+	} else if (cameraState != GameCamera::CameraState::NO_UPDATE)
+	{
+		// 追従
+		followObject(true);
+	}
 }
 
 #pragma region INPUT
-
-void GameCamera::updateInput()
-{
-	// 入力確認とそれに応じた傾き
-	// ジャイロ導入でここの中身を書き換える
-	rotation();
-
-	// 上ベクトル回転
-	upRotate();
-}
 
 void GameCamera::rotation()
 {
@@ -215,11 +227,6 @@ void GameCamera::imuInputRotation()
 
 #pragma endregion
 
-#pragma region CLEAR
-void GameCamera::updateClear()
-{}
-#pragma endregion
-
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
 {
 	// 0.0fで上を向くように90.0fを加算
@@ -275,34 +282,5 @@ void GameCamera::setFollowFlag(const bool flag)
 	if (cameraState == CameraState::INPUT || cameraState == CameraState::FOLLOW_OFF)
 	{
 		cameraState = flag ? CameraState::INPUT : CameraState::FOLLOW_OFF;
-	}
-}
-
-void GameCamera::gameCameraUpdate()
-{
-	// todo カメラがどう動くかは、カメラの構成要素ではないので、別クラスに分けるべき。（ビヘイビアツリーやstateパターンを使う）
-
-	switch (cameraState)
-	{
-	case GameCamera::CameraState::INPUT:
-	case GameCamera::CameraState::FOLLOW_OFF:
-		updateInput();
-		break;
-	case GameCamera::CameraState::CLEAR:
-		updateClear();
-		break;
-	}
-
-	// 追従
-	if (cameraState == GameCamera::CameraState::FOLLOW_OFF)
-	{
-		// Xは固定
-		followObject(false);
-	} else if (cameraState == GameCamera::CameraState::OTHER)
-	{
-	} else
-	{
-		// 追従
-		followObject(true);
 	}
 }

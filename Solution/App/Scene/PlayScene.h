@@ -64,6 +64,7 @@ private:
 	void update_start();
 	void update_appearance();
 	void update_main();
+	void update_clear();
 
 public:
 	PlayScene();

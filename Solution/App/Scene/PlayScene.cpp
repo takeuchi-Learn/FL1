@@ -71,7 +71,7 @@ void PlayScene::checkCollision()
 		const auto& aabb = obj->getRefAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
-			player->hitCone();
+			player->incrementConeCount();
 			obj->hit(sphere);
 		}
 	}
@@ -83,8 +83,9 @@ void PlayScene::checkCollision()
 		const auto& aabb = obj->getRefAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
-			player->hitGoal();
 			obj->hit(sphere);
+			// クリア時の関数
+			updateProc = std::bind(&PlayScene::update_clear, this);
 		}
 	}
 }
@@ -147,7 +148,7 @@ PlayScene::PlayScene() :
 	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
 	// 何番ステージまでがチュートリアルかを指定する
 	// 一応_1までチュートリアルと仮定して1に設定
-	constexpr unsigned short tutorialStageMax = 1;
+	constexpr uint16_t tutorialStageMax = 1;
 
 	// チュートリアルステージだったら画像追加
 	if (stageNum <= tutorialStageMax)
@@ -175,7 +176,7 @@ void PlayScene::update()
 	backGround->update();
 	gameMap->update();
 
-	if (tutorialTexture)tutorialTexture->update();
+	if (tutorialTexture) { tutorialTexture->update(); }
 
 	// 衝突確認
 	checkCollision();
@@ -275,18 +276,15 @@ void PlayScene::update_main()
 			SceneManager::ins()->changeScene<GameOverScene>();
 		}
 	}
+}
 
-	// クリア確認
-	if (player->getIsClear())
-	{
-		camera->changeStateClear();
+void PlayScene::update_clear()
+{
+	// コーンのカウント記録
+	ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
 
-		// コーンのカウント記録
-		ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
-
-		// クリア演出後シーン切り替え
-		SceneManager::ins()->changeScene<ClearScene>();
-	}
+	// クリア演出後シーン切り替え
+	SceneManager::ins()->changeScene<ClearScene>();
 }
 
 void PlayScene::drawObj3d()

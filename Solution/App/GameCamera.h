@@ -32,8 +32,7 @@ public:
 	{
 		INPUT,// 入力受付
 		FOLLOW_OFF,// 入力受付 追従オフ(画面端用)
-		CLEAR,// クリア クリア時に演出でカメラを制御する必要がありそうなので追加
-		OTHER, //その他(何も更新しないとき)
+		NO_UPDATE, //その他(何も更新しないとき)
 	};
 
 	struct AxisVec
@@ -90,18 +89,10 @@ private:
 	// todo pragma reginで分けられるならクラスごと分けること
 #pragma region INPUT
 
-	/// @brief CameraState::INPUTの時のupdate
-	void updateInput();
-
 	/// @brief 入力確認とそれに応じた角度の加算減算
 	void rotation();
 	void directionalInputRotation();
 	void imuInputRotation();
-#pragma endregion
-
-#pragma region CLEAR
-	/// @brief CameraState::CLEARのupdate
-	void updateClear();
 #pragma endregion
 
 	void preUpdate() override;
@@ -116,9 +107,6 @@ private:
 
 	/// @brief 追従
 	void followObject(bool followX);
-
-	/// @brief 更新(元々のupdateと被らないように名前長くしてる)
-	void gameCameraUpdate();
 
 public:
 	/// @brief コンストラクタ
@@ -148,12 +136,11 @@ public:
 	/// @param flag ポーズしてるかどうか
 	inline void pause(bool flag)
 	{
-		cameraState = flag ? CameraState::OTHER : CameraState::INPUT;
+		cameraState = flag ? CameraState::NO_UPDATE : CameraState::INPUT;
 	}
 
 	// クリア状態に変更
-	inline void changeStateClear() { cameraState = CameraState::CLEAR; }
-	inline void changeStateGameover() { cameraState = CameraState::OTHER; }
+	inline void changeStateGameover() { cameraState = CameraState::NO_UPDATE; }
 
 	/// @brief 追従のオンオフ
 	void setFollowFlag(const bool flag);

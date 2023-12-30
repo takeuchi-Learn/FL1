@@ -154,8 +154,12 @@ void Player::update()
 
 	// 左右スクロールのオンオフ
 	checkStageSide();
+
 	// ゲームオーバー確認
-	checkGameOver();
+	if (mapPos.y <= gameoverPos)
+	{
+		isDead = true;
+	}
 }
 
 void Player::draw()
@@ -174,17 +178,6 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 
 	this->mapPos = pos;
 	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
-}
-
-void Player::hitGoal()
-{
-	camera->changeStateClear();
-	isClear = true;
-}
-
-void Player::hitCone()
-{
-	++coneCount;
 }
 
 void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir)
@@ -521,29 +514,15 @@ void Player::rot()
 
 void Player::checkStageSide()
 {
-	if (isDead)return;
+	if (isDead) { return; }
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if (mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
-	{
-		camera->setFollowFlag(false);
-	} else
-	{
-		camera->setFollowFlag(true);
-	}
-}
-
-void Player::checkGameOver()
-{
-	if (mapPos.y <= gameoverPos)
-	{
-		isDead = true;
-	}
+	camera->setFollowFlag(mapPos.x > leftScrollEndPos && mapPos.x < rightScrollEndPos);
 }
 
 void Player::moveLimit()
 {
-	if (setMoveLimitFlag)return;
+	if (setMoveLimitFlag) { return; }
 
 	// 操作可能になったタイミングの座標をセット
 	leftScrollEndPos = mapPos.x;
