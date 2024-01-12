@@ -62,6 +62,8 @@ private:
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;
 
+	// ゴール
+	std::unique_ptr<Goal>goal;
 	// ステージの配置物
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	float goalPosX = 0.f;
@@ -71,7 +73,10 @@ private:
 	unsigned short coneMax = 0;
 
 	GameCamera* camera = nullptr;
-
+	// ゴールなどの配置物用モデル
+	ObjModel* model = nullptr;
+	// ゴールなどの配置物用ライト
+	Light* light = nullptr;
 private:
 	/// @brief 指定要素のAABB情報を変更
 	/// @param x 配列の添え字
@@ -84,7 +89,11 @@ private:
 	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
 	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
 public:
-	GameMap(GameCamera* camera);
+	/// @brief 
+	/// @param camera カメラ
+	/// @param model ゴールなどの配置物用モデル
+	/// @param light ゴールなどの配置物用ライト
+	GameMap(GameCamera* camera,ObjModel* model,Light* light);
 	~GameMap() = default;
 
 	/// @brief YAMLファイルから読み込み
@@ -106,8 +115,7 @@ public:
 		datas = mapMapChipDatas;
 	}
 
-	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	//const CollisionShape::AABB& getGoalAABB()const { return goal->getRefAABB(); }
+	const std::unique_ptr<Goal>& getGoal()const { return goal; }
 	const std::vector<std::unique_ptr<StageObject>>& getStageObjects()const { return stageObjects; }
 
 

@@ -58,7 +58,6 @@ void PlayScene::checkCollision()
 	{
 		if (Collision::CheckHit(player->getShape(), aabbs[i]))
 		{
-			//player->hit(aabb, typeid(*gameMap).name());
 			player->hit(aabbs[i], std::to_string(datas[i]));
 		}
 	}
@@ -89,7 +88,7 @@ bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
 PlayScene::PlayScene() :
 	camera(std::make_unique<GameCamera>()),
 	timer(std::make_unique<Stopwatch>())
-{
+{	
 	updateProc = std::bind(&PlayScene::update_start, this);
 
 	bgm = Sound::ins()->loadWave(bgmPath);
@@ -104,26 +103,30 @@ PlayScene::PlayScene() :
 	camera->setTarget(XMFLOAT3(0, 0, 0));
 	camera->setPerspectiveProjFlag(false);
 
+
+	// 3D表示関連
+	light = std::make_unique<Light>();
+	// 背景
+	backGround = std::make_unique<BackGround>(camera.get(), light.get(), static_cast<float>(gameMap->getMapY()));
+
 	player = std::make_unique<Player>(camera.get());
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
 	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) + ".yml";
-	gameMap = std::make_unique<GameMap>(camera.get());
+	gameMap = std::make_unique<GameMap>(camera.get(), light.get());
 
 	XMFLOAT2 startPos{ 3.f, -1.f };
 	const bool ret = gameMap->loadDataFile(mapYamlPath, &startPos);
 	assert(false == ret);
 	player->setMapPos(startPos);
-	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
-
+	
 	// ゲームオーバー扱いになる座標をセット(セットした値をプレイヤーの座標が下回ったら落下死)
 	player->setGameOverPos(gameMap->getGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
 	// 開始時は物理挙動をしない
 	player->isDynamic = false;
-
 
 	// チュートリアル関係
 	// もしチュートリアルステージ(_0、_1)だったら画像追加

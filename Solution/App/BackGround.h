@@ -19,7 +19,7 @@ private:
 	std::unique_ptr<ObjModel> model;
 
 	// ライト(使う必要ないがセットが必須なため)
-	std::unique_ptr<Light>light;
+	Light* light = nullptr;
 
 public:
 

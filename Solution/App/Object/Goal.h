@@ -6,6 +6,9 @@
 #include"StageObject.h"
 
 class GameCamera;
+class AbstractGameObj;
+class ObjModel;
+class Light;
 
 
 // ゴールの仕様案
@@ -20,22 +23,33 @@ class GameCamera;
 // 現在は旗だが、車に変更する
 // 当たり判定がAABBから球に変わる為、StageObjectの継承を中止する
 // gameMapで配置する際は個別に変数作る
-// スプライトが横長なので、3Dの板ポリ(背景と)で実装すること(サイズは800*300)
+// スプライトが横長なので、3Dの板ポリ(背景と同じ)で実装すること(サイズは800*300)
 
 // ゴールクラス(ゴールの判定+車)
-class Goal :public StageObject
+class Goal
 {
 private:
+	GameCamera* camera = nullptr;
+	std::unique_ptr<AbstractGameObj> obj;
+	// テクスチャが違うと個別用意必須?なので生成
+	std::unique_ptr<ObjModel>* model;
+	// ライト(使う必要ないがセットが必須なため)
+	// これPlaySceneで生成する
+	Light* light = nullptr;
 
+	// ゴール判定
+	CollisionShape::Sphere sphere;
 	bool isGoal = false;
-
 private:
 	/// @brief ゴールフラグをtrueにする
 	void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
+	Goal(GameCamera* camera, Light* light, const DirectX::XMFLOAT2& pos);
 	~Goal() {}
+
+	void update();
+	void draw();
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }

@@ -40,8 +40,10 @@ void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, floa
 }
 
 
-GameMap::GameMap(GameCamera* camera) :
+GameMap::GameMap(GameCamera* camera, ObjModel* model, Light* light) :
 	camera(camera)
+	, model(model)
+	,light(light)
 {}
 
 bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf)
@@ -213,7 +215,7 @@ void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<
 			}
 			if (posUMap.first == goalStr)
 			{
-				stageObjects[current] = std::make_unique<Goal>(camera, pos, scale);
+				goal = std::make_unique<Goal>(camera, light, pos);
 			}
 			++current;
 		}
