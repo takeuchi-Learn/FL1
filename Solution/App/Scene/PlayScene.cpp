@@ -59,7 +59,7 @@ void PlayScene::checkCollision()
 		if (Collision::CheckHit(player->getShape(), aabbs[i]))
 		{
 			//player->hit(aabb, typeid(*gameMap).name());
-			player->hit(aabbs[i], typeid(datas[i]).name());
+			player->hit(aabbs[i], std::to_string(datas[i]));
 		}
 	}
 

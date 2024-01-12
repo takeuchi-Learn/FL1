@@ -198,10 +198,10 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		camera->changeStateClear();
 		isClear = true;
 	} 
-	else if (hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_BLOCK).name()
-			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_WALL).name()
-			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_OBSTACLE_OBJECT).name()
-			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_PLAIN_ROAD).name()) // マップとの衝突
+	else if (hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_BLOCK)
+			 || hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_WALL)
+			 || hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_OBSTACLE_OBJECT)
+			 || hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_PLAIN_ROAD)) // マップとの衝突
 	{
 		// 上のif後で修正します。許して
 
@@ -247,14 +247,14 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 		++coneCount;
 	}
-	else if(hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_SLIPTHROUGH_FLOOR).name())
+	else if(hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_SLIPTHROUGH_FLOOR))
 	{
 		// 衝突位置確認
 		HIT_AREA activeDir = checkHitArea(hitAABB);
 		
 		// 上に衝突かつ下に進行してたら(落下していたら)地面衝突処理
 		if(activeDir == HIT_AREA::TOP
-		   && currentFramePos.y - preFramePos.y < 0)
+		   && currentFallVelovity <= 0)
 		{
 			hitGround(hitAABB);
 		}
