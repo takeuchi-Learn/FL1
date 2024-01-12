@@ -37,7 +37,7 @@ namespace
 	};
 
 	HIT_AREA calcCollisionVec(const CollisionShape::AABB& aabb,
-									 const CollisionShape::Sphere& sphere)
+							  const CollisionShape::Sphere& sphere)
 	{
 		XMFLOAT3 boxCenter2Sphere{};
 		{

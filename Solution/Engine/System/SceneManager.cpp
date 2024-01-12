@@ -48,5 +48,10 @@ void SceneManager::drawFrontSprite()
 	nowScene->drawFrontSprite();
 }
 
+void SceneManager::draw_afterImGui()
+{
+	nowScene->draw_afterImGui();
+}
+
 SceneManager::~SceneManager()
 {}

@@ -74,15 +74,7 @@ void Looper::pushImGuiCol()
 
 void Looper::popImGuiCol()
 {
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
+	ImGui::PopStyleColor(7);
 }
 
 Looper::~Looper()
@@ -109,21 +101,23 @@ void Looper::loopDraw()
 	constexpr DirectX::XMFLOAT3 clearColor = { 0.f, 0.f, 0.f };	//黒色
 
 	// ポストエフェクト内の描画
-	PostEffect::getInstance()->startDrawScene(DX12Base::ins());
-	SceneManager::getInstange()->drawObj3d();
-	PostEffect::getInstance()->endDrawScene(DX12Base::ins());
+	PostEffect::ins()->startDrawScene(DX12Base::ins());
+	SceneManager::ins()->drawObj3d();
+	PostEffect::ins()->endDrawScene(DX12Base::ins());
 
 	// 全体の描画
 	DX12Base::ins()->startDraw();
 	DX12Base::ins()->clearBuffer(clearColor);
 	DX12Base::ins()->startImGui();
 
-	PostEffect::getInstance()->draw(DX12Base::ins());
+	PostEffect::ins()->draw(DX12Base::ins());
 
-	SceneManager::getInstange()->drawFrontSprite();
+	SceneManager::ins()->drawFrontSprite();
 
 	DX12Base::ins()->endImGui();
 	DX12Base::ins()->endDraw();
+
+	SceneManager::ins()->draw_afterImGui();
 }
 
 bool Looper::loop()

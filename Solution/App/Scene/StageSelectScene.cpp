@@ -116,8 +116,11 @@ void StageSelectScene::drawFrontSprite()
 			float size = -1.f;
 			if (i == currentStage)
 			{
+				// サイズは最大
 				constexpr float transitionEndSize = static_cast<float>(1 + std::max(WinAPI::window_width, WinAPI::window_height));
 				size = std::lerp(sizeMax, transitionEndSize, Util::easeOutBounce(transitionRaito));
+				// フォーカスはこのウインドウに合わせる（演出時に最前面にするため）
+				SetNextWindowFocus();
 			} else
 			{
 				constexpr auto min = sizeMax * 0.125f;

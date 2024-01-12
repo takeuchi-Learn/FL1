@@ -443,6 +443,8 @@ bool DX12Base::InitImgui()
 															   nullptr,
 															   glyphRangesJapanese);
 
+	io.Fonts->Build();
+
 	// 四角くする
 	ImGuiStyle& st = ImGui::GetStyle();
 	st.WindowRounding = 0.f;
