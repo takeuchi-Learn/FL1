@@ -143,6 +143,13 @@ public:
 	/// todo 仮実装。操作を別クラスに分けたら消す
 	bool allowInput = true;
 
+	/// @brief isReboundXとisReboundYをfalseにする
+	inline void resetReboundFlag()
+	{
+		isReboundX = false;
+		isReboundY = false;
+	}
+
 	// コンストラクタ仮
 	Player(GameCamera* camera);
 

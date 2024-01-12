@@ -169,10 +169,10 @@ void PlayScene::start()
 
 void PlayScene::update()
 {
+	updateProc();
+
 	// 衝突確認
 	checkCollision();
-
-	updateProc();
 
 	camera->update();
 	player->update();
@@ -189,6 +189,8 @@ void PlayScene::update_start()
 		// 自機は物理挙動する
 		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
 		player->isDynamic = true;
+		// 演出中の衝突フラグは無視する
+		player->resetReboundFlag();
 
 		PostEffect::ins()->setMosaicNum(winSize);
 		PostEffect::ins()->setAlpha(1.f);
