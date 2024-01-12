@@ -93,20 +93,29 @@ class Player
 	// コーンのカウント
 	unsigned short coneCount = 0;
 
-#pragma region SE
+
+	// 以下SE
+	
 	std::weak_ptr<SoundData> jumpSE;
 	std::weak_ptr<SoundData> boundXSE;
 	std::weak_ptr<SoundData> boundYSE;
 
-#pragma endregion
 
+	// 衝突位置
+	enum class HIT_AREA : uint8_t
+	{
+		NONE = 0,
+		TOP = 1 << 0,
+		BOTTOM = 1 << 1,
+		RIGHT = 1 << 2,
+		LEFT = 1 << 3,
+	};
 private:
 	/// @brief データをYAMLファイルから読み込む
 	/// @return エラーがあったかどうか（エラーでtrue）
 	bool loadYamlFile();
 
 	void loadSE();
-
 
 
 	/// @brief ジャンプ中の座標更新処理
@@ -142,6 +151,15 @@ private:
 
 	/// @brief 移動制限設定
 	void moveLimit();
+
+	
+	/// @brief AABB衝突時の衝突位置確認
+	/// @param hitAABB 地形などのAABB 
+	Player::HIT_AREA checkHitArea(const CollisionShape::AABB& hitAABB);
+
+	/// @brief 地形にぶつかった時の処理
+	void hitGround(const CollisionShape::AABB& hitAABB);
+
 public:
 	// 物理挙動をするかどうか
 	bool isDynamic = true;

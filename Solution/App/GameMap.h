@@ -20,7 +20,7 @@ using namespace DirectX;
 // 動かない地形のみ扱う
 class GameMap
 {
-private:
+public:
 	enum MAPCHIP_DATA : uint8_t
 	{
 		/// @brief 未定義
@@ -39,7 +39,8 @@ private:
 		MAPCHIP_TRANSPARENT_BLOCK,
 		/// @brief ただのブロック
 		MAPCHIP_BLOCK,
-
+		/// @brief すり抜け床
+		MAPCHIP_SLIPTHROUGH_FLOOR ,
 		/// @brief 最後の要素
 		MAPCHIP_ALLNUM
 	};
@@ -48,12 +49,13 @@ private:
 	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
 	std::vector<CollisionShape::AABB> mapAABBs;
+	/// @brief マップのマップチップデータ
+	std::vector<MAPCHIP_DATA>mapMapChipDatas;
 
 	// すり抜け床メモ
 	// 地形判定の配列とは別の配列を用意し、すり抜け床だけ隔離する
 	// で、GameMapから取得できるようにし、typeid(GameMap)で地形か確認していた部分を地形とすり抜け床で分ける
 	// ゴールもこれでいいかもしれない
-	std::vector<CollisionShape::AABB> slipthroughFloorAABBs;
 	
 	
 	// 縦横サイズ
@@ -97,6 +99,12 @@ public:
 	/// @brief 当たり判定の取得
 	/// @return 当たり判定配列の参照
 	const std::vector<CollisionShape::AABB>& getMapAABBs() const { return mapAABBs; }
+	
+	const void getMapAABBs(std::vector<CollisionShape::AABB>& aabbs, std::vector<MAPCHIP_DATA>& datas)
+	{
+		aabbs = mapAABBs;
+		datas = mapMapChipDatas;
+	}
 
 	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
 	//const CollisionShape::AABB& getGoalAABB()const { return goal->getRefAABB(); }

@@ -61,6 +61,70 @@ void Player::loadSE()
 	boundYSE = Sound::ins()->loadWave(boundYSEPath);
 }
 
+Player::HIT_AREA Player::checkHitArea(const CollisionShape::AABB& hitAABB)
+{
+	HIT_AREA activeDir = HIT_AREA::NONE;
+
+
+	// todo XVectorGetX等を使う
+	const XMFLOAT3 boxSize(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0],
+						   hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1],
+						   hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2]);
+	const XMFLOAT3 boxCenter(hitAABB.maxPos.m128_f32[0] - boxSize.x / 2.f,
+							 hitAABB.maxPos.m128_f32[1] - boxSize.y / 2.f,
+							 hitAABB.maxPos.m128_f32[2] - boxSize.z / 2.f);
+
+	XMFLOAT3 spherePos{};
+	XMStoreFloat3(&spherePos, sphere.center);
+
+	const auto boxCenter2Sphere =
+		XMFLOAT3(spherePos.x - boxCenter.x,
+				 spherePos.y - boxCenter.y,
+				 spherePos.z - boxCenter.z);
+
+	// 衝突した辺を四方向でとる
+	// 上下と左右どちらかだけにする
+	if (std::abs(boxCenter2Sphere.x) >=
+		std::abs(boxCenter2Sphere.y))
+	{
+		// x > yならx方向のみ判定
+		if (0.f <= boxCenter2Sphere.x)
+		{
+			activeDir = HIT_AREA::RIGHT;
+		} else if (boxCenter2Sphere.x <= -0.f)
+		{
+			activeDir = HIT_AREA::LEFT;
+		}
+	} else
+	{
+		// y > xならy方向のみ判定
+		if (0.f < boxCenter2Sphere.y)
+		{
+			activeDir = HIT_AREA::TOP;
+		} else if (boxCenter2Sphere.y <= 0.f)
+		{
+			activeDir = HIT_AREA::BOTTOM;
+		}
+	}
+
+	return activeDir;
+}
+
+void Player::hitGround(const CollisionShape::AABB& hitAABB)
+{
+	if (!pushJumpKeyFrame || !reboundYFrame)
+	{
+		// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
+		if (isReboundY)
+		{
+			reboundEnd(hitAABB);
+		} else
+		{
+			jumpEnd(hitAABB);
+		}
+	}
+}
+
 Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
@@ -134,62 +198,15 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 		camera->changeStateClear();
 		isClear = true;
 	} 
-	else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
+	else if (hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_BLOCK).name()
+			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_WALL).name()
+			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_OBSTACLE_OBJECT).name()
+			 || hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_PLAIN_ROAD).name()) // マップとの衝突
 	{
-		enum class HIT_AREA : uint8_t
-		{
-			NONE = 0,
-			TOP = 1 << 0,
-			BOTTOM = 1 << 1,
-			RIGHT = 1 << 2,
-			LEFT = 1 << 3,
-		};
-		HIT_AREA activeDir = HIT_AREA::NONE;
+		// 上のif後で修正します。許して
 
-#pragma region 衝突位置確認
-
-		// todo XVectorGetX等を使う
-		const XMFLOAT3 boxSize(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0],
-							   hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1],
-							   hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2]);
-		const XMFLOAT3 boxCenter(hitAABB.maxPos.m128_f32[0] - boxSize.x / 2.f,
-								 hitAABB.maxPos.m128_f32[1] - boxSize.y / 2.f,
-								 hitAABB.maxPos.m128_f32[2] - boxSize.z / 2.f);
-
-		XMFLOAT3 spherePos{};
-		XMStoreFloat3(&spherePos, sphere.center);
-
-		const auto boxCenter2Sphere =
-			XMFLOAT3(spherePos.x - boxCenter.x,
-					 spherePos.y - boxCenter.y,
-					 spherePos.z - boxCenter.z);
-
-		// 衝突した辺を四方向でとる
-		// 上下と左右どちらかだけにする
-		if (std::abs(boxCenter2Sphere.x) >=
-			std::abs(boxCenter2Sphere.y))
-		{
-			// x > yならx方向のみ判定
-			if (0.f <= boxCenter2Sphere.x)
-			{
-				activeDir = HIT_AREA::RIGHT;
-			} else if (boxCenter2Sphere.x <= -0.f)
-			{
-				activeDir = HIT_AREA::LEFT;
-			}
-		} else
-		{
-			// y > xならy方向のみ判定
-			if (0.f < boxCenter2Sphere.y)
-			{
-				activeDir = HIT_AREA::TOP;
-			} else if (boxCenter2Sphere.y <= 0.f)
-			{
-				activeDir = HIT_AREA::BOTTOM;
-			}
-		}
-
-#pragma endregion 衝突位置確認ここまで
+		// 衝突位置確認
+		HIT_AREA activeDir = checkHitArea(hitAABB);
 
 		// 方向ごとに分岐
 		switch (activeDir)
@@ -197,17 +214,7 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 			using enum HIT_AREA;
 		case TOP:
 			// 地面衝突
-			if (!pushJumpKeyFrame || !reboundYFrame)
-			{
-				// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
-				if (isReboundY)
-				{
-					reboundEnd(hitAABB);
-				} else
-				{
-					jumpEnd(hitAABB);
-				}
-			}
+			hitGround(hitAABB);
 			break;
 
 		case BOTTOM:
@@ -239,6 +246,18 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	else if (hitObjName == typeid(ColorCone).name())
 	{
 		++coneCount;
+	}
+	else if(hitObjName == typeid(GameMap::MAPCHIP_DATA::MAPCHIP_SLIPTHROUGH_FLOOR).name())
+	{
+		// 衝突位置確認
+		HIT_AREA activeDir = checkHitArea(hitAABB);
+		
+		// 上に衝突かつ下に進行してたら(落下していたら)地面衝突処理
+		if(activeDir == HIT_AREA::TOP
+		   && currentFramePos.y - preFramePos.y < 0)
+		{
+			hitGround(hitAABB);
+		}
 	}
 }
 

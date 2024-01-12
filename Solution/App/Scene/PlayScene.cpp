@@ -48,12 +48,18 @@ namespace
 
 void PlayScene::checkCollision()
 {
+	// 判定情報と種類を取得
+	std::vector<CollisionShape::AABB> aabbs;
+	std::vector < GameMap::MAPCHIP_DATA > datas;
+	gameMap->getMapAABBs(aabbs, datas);
+
 	// 地形判定
-	for (auto& aabb : gameMap->getMapAABBs()) 
+	for (size_t i = 0 ; i < aabbs.size(); i++)
 	{
-		if (Collision::CheckHit(player->getShape(), aabb))
+		if (Collision::CheckHit(player->getShape(), aabbs[i]))
 		{
-			player->hit(aabb, typeid(*gameMap).name());
+			//player->hit(aabb, typeid(*gameMap).name());
+			player->hit(aabbs[i], typeid(datas[i]).name());
 		}
 	}
 

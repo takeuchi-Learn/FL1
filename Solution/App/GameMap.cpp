@@ -66,6 +66,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 	const auto csvData = Util::loadCsvFromString(csv);
 
 	mapAABBs.reserve(csvData.size());
+	mapMapChipDatas.reserve(csvData.size());
 	mapSizeX = static_cast<unsigned int>(csvData[0].size());
 	mapSizeY = static_cast<unsigned int>(csvData.size());
 
@@ -134,6 +135,8 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 			// 判定作成
 			setAABBData(x, y, pos, scale);
+			// マップチップ情報追加
+			mapMapChipDatas.push_back(MAPCHIP_DATA(n));
 		}
 	}
 
