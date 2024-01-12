@@ -125,6 +125,15 @@ void Player::hitGround(const CollisionShape::AABB& hitAABB)
 	}
 }
 
+void Player::checkGoalDir(const CollisionShape::AABB& goalAABB)
+{
+	// 自身の中心とゴール判定の中心の距離が近くなったら(誤差1.0くらい)if文の中に入る
+	if(1)
+	{
+		justGoalPoint = true;
+	}
+}
+
 Player::Player(GameCamera* camera) :
 	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
@@ -197,6 +206,9 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 	{
 		camera->changeStateClear();
 		isClear = true;
+
+		// ゴール演出の為の処理
+		checkGoalDir(hitAABB);
 	} 
 	else if (hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_BLOCK)
 			 || hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_WALL)

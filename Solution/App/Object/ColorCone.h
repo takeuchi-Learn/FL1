@@ -36,7 +36,7 @@ private:
 public:
 	ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
 	~ColorCone(){}
-	void update();
-	void hit(const CollisionShape::Sphere& playerSphere);
+	void update()override;
+	void hit(const CollisionShape::Sphere& playerSphere)override;
 };
 

@@ -82,6 +82,9 @@ class Player
 	float gameoverPos = 0.f;
 	bool isDead = false;
 	bool isClear = false;
+	
+	// 自身の中心とゴール判定の中心がほぼ同じになったかどうか
+	bool justGoalPoint = false;
 
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
 	float leftScrollEndPos = 0.f;
@@ -92,6 +95,7 @@ class Player
 
 	// コーンのカウント
 	unsigned short coneCount = 0;
+
 
 
 	// 以下SE
@@ -159,6 +163,10 @@ private:
 
 	/// @brief 地形にぶつかった時の処理
 	void hitGround(const CollisionShape::AABB& hitAABB);
+
+	
+	/// @brief ゴールの判定の中心座標との距離を求め、自身の中心とほぼ同じになったらフラグをtrueにする関数
+	void checkGoalDir(const CollisionShape::AABB& goalAABB);
 
 public:
 	// 物理挙動をするかどうか

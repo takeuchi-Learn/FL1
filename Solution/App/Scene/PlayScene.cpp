@@ -74,7 +74,6 @@ void PlayScene::checkCollision()
 			obj->hit(sphere);
 		}
 	}
-
 }
 
 bool PlayScene::checkMinMax(const CollisionShape::AABB& aabb)
@@ -220,6 +219,8 @@ void PlayScene::update_main()
 	// クリア確認
 	if (player->getIsClear())
 	{
+		// ゴール演出が終わるタイミングでシーンを切り替えるように変更する
+
 		camera->changeStateClear();
 
 		// コーンのカウント記録

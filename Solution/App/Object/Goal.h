@@ -37,15 +37,15 @@ private:
 
 	bool isGoal = false;
 private:
-	/// @brief ゴールフラグをtrueにする
-	void goal() { isGoal = true; }
-
+	/// @brief 車が発射する処理
+	void departure();
 public:
 	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
 	~Goal() {}
 
-	void update();
-	void draw();
+	void update()override;
+	void draw()override;
+	void hit(const CollisionShape::Sphere& playerSphere)override;
 
 	// ゴールフラグがtrueかどうか
 	bool getIsGoal() const { return isGoal; }

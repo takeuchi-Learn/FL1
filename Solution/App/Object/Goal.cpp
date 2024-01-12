@@ -13,10 +13,15 @@ using namespace DirectX;
 // ここのパスマップのデータから読み取ったやつを使ったほうがいいから変更する
 // テクスチャをMapじゃない別のフォルダにオブジェクト移したほうがいいかも
 
+void Goal::departure()
+{
+
+}
+
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	:StageObject(camera, pos, scale * 5.f, L"Resources/Map/Tex/Goal_Car.png")
 {
-	// 補整座標(ymlで指定しやすくするため)
+	// 補整座標(ymlで指定できるようにするための補正)
 	constexpr float addObjPosY = 242.f;
 	gameObj->getFrontData()->position.y += addObjPosY;
 
@@ -38,7 +43,7 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 
 	// 仮　判定削除用
 	/* minPos(-999,-999);
-	 maxPos(-999, -999);
+	  maxPos(-999, -999);
 	aabb.minPos = XMLoadFloat2(&minPos);
 	aabb.maxPos = XMLoadFloat2(&maxPos);*/
 
@@ -61,18 +66,14 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 
 void Goal::update()
 {
+	gameObj->update(getCameraAngleDeg());
+
 #ifdef _DEBUG
 	aabbObj->update(getCameraAngleDeg());
 #endif // _DEBUG
 
-
-	gameObj->update(getCameraAngleDeg());
-
 	// 発進処理
-	if(isGoal)
-	{
-
-	}
+	if(isGoal)departure();
 }
 
 void Goal::draw()
@@ -83,4 +84,9 @@ void Goal::draw()
 #ifdef _DEBUG
 	aabbObj->draw();
 #endif // _DEBUG
+}
+
+void Goal::hit(const CollisionShape::Sphere& playerSphere)
+{
+	isGoal = true;
 }
