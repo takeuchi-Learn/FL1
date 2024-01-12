@@ -414,7 +414,11 @@ void Billboard::LoadTexture(const wchar_t* filePath)
 	ScratchImage scratchImg{};
 
 	// 画像データ読み込み
-	Texture::loadTexFile(filePath, metadata, scratchImg);
+	if (Texture::loadTexFile(filePath, metadata, scratchImg))
+	{
+		assert(0);
+		std::exit(1);
+	}
 
 	// テクスチャバッファ生成
 	auto cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
