@@ -169,6 +169,9 @@ void PlayScene::start()
 
 void PlayScene::update()
 {
+	// 衝突確認
+	checkCollision();
+
 	updateProc();
 
 	camera->update();
@@ -177,9 +180,6 @@ void PlayScene::update()
 	gameMap->update();
 
 	if (tutorialTexture) { tutorialTexture->update(); }
-
-	// 衝突確認
-	checkCollision();
 }
 
 void PlayScene::update_start()
