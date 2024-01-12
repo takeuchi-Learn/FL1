@@ -11,22 +11,14 @@ using namespace DirectX;
 
 
 // ここのパスマップのデータから読み取ったやつを使ったほうがいいから変更する
-Goal::Goal(GameCamera* camera, Light* light, const DirectX::XMFLOAT2& pos)
-	:camera(camera)
-	,model(std::make_unique<ObjModel>("Resources/goal/","goal"))
-	,light(light)
+Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos)
+	:StageObject(camera, pos, 800.f, L"Resources/Map/Tex/SafetyCone.png")
 {
-	// 判定位置調整用変数
-	constexpr XMFLOAT2 addPos = XMFLOAT2();
-
-	// 判定仮設定
-	sphere.center = { pos.x + addPos.x, pos.y + addPos.y, 0, 0 };
-	sphere.radius = 120.f;
 }
 
 void Goal::update()
 {
-	obj->update();
+	gameObj->update(getCameraAngleDeg());
 
 	// 発進処理
 	if(isGoal)
@@ -37,5 +29,5 @@ void Goal::update()
 
 void Goal::draw()
 {
-	obj->draw(light);
+	// タイヤの描画と本体の描画を行う
 }

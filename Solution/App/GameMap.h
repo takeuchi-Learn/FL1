@@ -62,8 +62,6 @@ private:
 	unsigned int mapSizeX = 0;
 	unsigned int mapSizeY = 0;
 
-	// ゴール
-	std::unique_ptr<Goal>goal;
 	// ステージの配置物
 	std::vector<std::unique_ptr<StageObject>>stageObjects;
 	float goalPosX = 0.f;
@@ -73,8 +71,6 @@ private:
 	unsigned short coneMax = 0;
 
 	GameCamera* camera = nullptr;
-	// ゴールなどの配置物用ライト
-	Light* light = nullptr;
 private:
 	/// @brief 指定要素のAABB情報を変更
 	/// @param x 配列の添え字
@@ -86,11 +82,11 @@ private:
 	void loadStageObject(Yaml::Node& node,float scale);
 	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
 	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
+
 public:
 	/// @brief 
 	/// @param camera カメラ
-	/// @param light ゴールなどの配置物用ライト
-	GameMap(GameCamera* camera,Light* light);
+	GameMap(GameCamera* camera);
 	~GameMap() = default;
 
 	/// @brief YAMLファイルから読み込み
@@ -112,7 +108,6 @@ public:
 		datas = mapMapChipDatas;
 	}
 
-	const std::unique_ptr<Goal>& getGoal()const { return goal; }
 	const std::vector<std::unique_ptr<StageObject>>& getStageObjects()const { return stageObjects; }
 
 

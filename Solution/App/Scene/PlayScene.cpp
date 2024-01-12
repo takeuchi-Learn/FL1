@@ -106,15 +106,13 @@ PlayScene::PlayScene() :
 
 	// 3D表示関連
 	light = std::make_unique<Light>();
-	// 背景
-	backGround = std::make_unique<BackGround>(camera.get(), light.get(), static_cast<float>(gameMap->getMapY()));
-
+	
 	player = std::make_unique<Player>(camera.get());
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
 	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) + ".yml";
-	gameMap = std::make_unique<GameMap>(camera.get(), light.get());
+	gameMap = std::make_unique<GameMap>(camera.get());
 
 	XMFLOAT2 startPos{ 3.f, -1.f };
 	const bool ret = gameMap->loadDataFile(mapYamlPath, &startPos);
@@ -127,6 +125,11 @@ PlayScene::PlayScene() :
 
 	// 開始時は物理挙動をしない
 	player->isDynamic = false;
+
+
+	// 背景
+	backGround = std::make_unique<BackGround>(camera.get(), light.get(), static_cast<float>(gameMap->getMapY()));
+
 
 	// チュートリアル関係
 	// もしチュートリアルステージ(_0、_1)だったら画像追加
