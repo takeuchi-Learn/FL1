@@ -213,7 +213,7 @@ void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<
 			}
 			if (posUMap.first == goalStr)
 			{
-				stageObjects[current] = std::make_unique<Goal>(camera, pos);
+				stageObjects[current] = std::make_unique<Goal>(camera, pos, scale);
 			}
 			++current;
 		}

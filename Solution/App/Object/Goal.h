@@ -23,12 +23,17 @@ class Light;
 // 上記だと無駄にBillboardを持たせることになってしまうが、実装速度とバグ増加を考慮して一旦継承する
 // 画像を無理やり正方形にしてBillboardでもいいようにする
 
-// もしかしたら浮いてしまうので、テクスチャのサイズをブロックの倍数にするか、補正する
+// もしかしたら浮いてしまうので補正する
 
 // ゴールクラス(ゴールの判定+車)
 class Goal :public StageObject
 {
 private:
+#ifdef _DEBUG
+	// 当たり判定確認用
+	std::unique_ptr<Billboard> aabbObj;
+#endif // _DEBUG
+
 
 	bool isGoal = false;
 private:
@@ -36,7 +41,7 @@ private:
 	void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos);
+	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
 	~Goal() {}
 
 	void update();
