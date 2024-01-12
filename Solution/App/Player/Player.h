@@ -19,6 +19,29 @@ class SoundData;
 
 class Player
 {
+	class YamlData
+	{
+	public:
+		YamlData() = default;
+		~YamlData() = default;
+
+		/// @brief データをYAMLファイルから読み込む
+		/// @return エラーがあったかどうか（エラーでtrue）
+		bool loadYamlFile();
+
+		// yamlから読む変数
+		float jumpPower{};
+		float bigJumpPower{};
+		float jumpSensorValue{};
+		float bigSensorJyroValue{};
+		float boundEndVel{};
+		float speedMag{};
+		float fallVelMag{};
+		float sideReboundAddVal{};
+		float maxSpeedX{};
+		float accMagX{};
+	};
+
 	DirectX::XMFLOAT2 mapPos{};
 	std::unique_ptr<Billboard> gameObj;
 
@@ -26,17 +49,7 @@ class Player
 
 	CollisionShape::Sphere sphere;
 
-	// yamlから読む変数
-	float jumpPower{};
-	float bigJumpPower{};
-	float jumpSensorValue{};
-	float bigSensorJyroValue{};
-	float boundEndVel{};
-	float speedMag{};
-	float fallVelMag{};
-	float sideReboundAddVal{};
-	float maxSpeedX{};
-	float accMagX{};
+	std::unique_ptr<YamlData> yamlData;
 
 	// 現在のフレームでジャンプキー押したかどうか(ジャンプできない不具合防止用)
 	bool pushJumpKeyFrame = false;
@@ -64,8 +77,6 @@ class Player
 	float dropStartY = 0.f;
 	// 横跳ね返り時に加算する値
 	float sideAddX = 0.0f;
-	// 地形衝突時の座標
-	float terrainHitObjPosX = 0.f;
 
 	// 加速度
 	float acc = 0.f;
@@ -99,10 +110,6 @@ class Player
 #pragma endregion
 
 private:
-	/// @brief データをYAMLファイルから読み込む
-	/// @return エラーがあったかどうか（エラーでtrue）
-	bool loadYamlFile();
-
 	void loadSE();
 
 	/// @brief ジャンプ中の座標更新処理

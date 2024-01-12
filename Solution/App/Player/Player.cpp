@@ -7,12 +7,12 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 #include <Input/PadImu.h>
-#include<JumpVectorCalculation.h>
-#include<Sound/SoundData.h>
+#include <JumpVectorCalculation.h>
+#include <Sound/SoundData.h>
 
 #include <GameMap.h>
 #include <Object/Goal.h>
-#include<Object/ColorCone.h>
+#include <Object/ColorCone.h>
 
 using namespace DirectX;
 
@@ -75,7 +75,7 @@ namespace
 	}
 }
 
-bool Player::loadYamlFile()
+bool Player::YamlData::loadYamlFile()
 {
 	constexpr const char filePath[] = "Resources/DataFile/player.yml";
 
@@ -110,11 +110,12 @@ void Player::loadSE()
 Player::Player(GameCamera* camera)
 	: gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
+	, yamlData(std::make_unique<YamlData>())
 {
 	constexpr float scale = mapSize * 0.9f;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
-	loadYamlFile();
+	yamlData->loadYamlFile();
 	loadSE();
 
 	// 判定仮設定
@@ -234,9 +235,6 @@ void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionD
 		// 横のバウンド開始
 		startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
 		break;
-
-	default:
-		break;
 	}
 
 	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
@@ -284,7 +282,7 @@ void Player::jump()
 			triggerJump |= state.lTrigger >= 0.5f || state.rTrigger >= 0.5f;
 		}
 
-		if (triggerJump || sensorValue >= jumpSensorValue)
+		if (triggerJump || sensorValue >= yamlData->jumpSensorValue)
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
@@ -293,14 +291,14 @@ void Player::jump()
 			// 大ジャンプ
 			bool hitBigJump = Input::ins()->hitKey(DIK_X);
 			hitBigJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER);
-			if (hitBigJump || sensorValue >= bigSensorJyroValue)
+			if (hitBigJump || sensorValue >= yamlData->bigSensorJyroValue)
 			{
-				fallStartSpeed = bigJumpPower;
+				fallStartSpeed = yamlData->bigJumpPower;
 			} else// 通常ジャンプ
 			{
 				// 初速度を設定
 				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-				fallStartSpeed = jumpPower;
+				fallStartSpeed = yamlData->jumpPower;
 			}
 
 			// バウンド強制終了
@@ -376,7 +374,7 @@ void Player::startRebound()
 	isReboundY = true;
 
 	// 落下した高さに合わせて跳ね返り量を変える
-	fallStartSpeed = -currentFallVelovity * fallVelMag;
+	fallStartSpeed = -currentFallVelovity * yamlData->fallVelMag;
 
 	reboundYFrame = true;
 
@@ -396,7 +394,7 @@ void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
 
-	if (-currentFallVelovity <= boundEndVel)
+	if (-currentFallVelovity <= yamlData->boundEndVel)
 	{
 		isReboundY = false;
 		isDrop = false;
@@ -418,7 +416,7 @@ void Player::calcSideRebound()
 	// 変化する値
 	if (sideAddX > 0)
 	{
-		sideAddX -= sideReboundAddVal;
+		sideAddX -= yamlData->sideReboundAddVal;
 
 		// 負の値になったら演算終了
 		if (sideAddX <= 0)
@@ -428,7 +426,7 @@ void Player::calcSideRebound()
 		}
 	} else
 	{
-		sideAddX += sideReboundAddVal;
+		sideAddX += yamlData->sideReboundAddVal;
 
 		if (sideAddX >= 0)
 		{
@@ -441,13 +439,7 @@ void Player::calcSideRebound()
 void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
 	// 当たった向きに応じて押し出す
-	if (hitLeft)
-	{
-		mapPos.x = wallPosX - sphere.radius;
-	} else
-	{
-		mapPos.x = wallPosX + sphere.radius;
-	}
+	mapPos.x = wallPosX + (hitLeft ? -sphere.radius : sphere.radius);
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;
@@ -461,8 +453,6 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	sideAddX = vec * mag;
 
 	isReboundX = true;
-	// 衝突時の座標を代入
-	terrainHitObjPosX = mapPos.x;
 
 	// 速度があったら鳴らす
 	if (abs(sideAddX) >= 14.f)
@@ -478,16 +468,16 @@ void Player::move()
 	// 角度を取得
 	const float angle = camera->getAngleDeg();
 
-	const float addPos = angle * speedMag;
+	const float addPos = angle * yamlData->speedMag;
 
 	DirectX::XMFLOAT2 position = mapPos;
 	position.x += addPos;
 
 	// 加速度計算と加算
 	// 最大速度
-	if (abs(preFramePos.x - position.x) <= maxSpeedX)
+	if (abs(preFramePos.x - position.x) <= yamlData->maxSpeedX)
 	{
-		acc += addPos * accMagX;
+		acc += addPos * yamlData->accMagX;
 		position.x += acc;
 
 		// 停止したらリセット
