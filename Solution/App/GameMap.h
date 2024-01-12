@@ -73,8 +73,6 @@ private:
 	unsigned short coneMax = 0;
 
 	GameCamera* camera = nullptr;
-	// ゴールなどの配置物用モデル
-	ObjModel* model = nullptr;
 	// ゴールなどの配置物用ライト
 	Light* light = nullptr;
 private:
@@ -91,9 +89,8 @@ private:
 public:
 	/// @brief 
 	/// @param camera カメラ
-	/// @param model ゴールなどの配置物用モデル
 	/// @param light ゴールなどの配置物用ライト
-	GameMap(GameCamera* camera,ObjModel* model,Light* light);
+	GameMap(GameCamera* camera,Light* light);
 	~GameMap() = default;
 
 	/// @brief YAMLファイルから読み込み

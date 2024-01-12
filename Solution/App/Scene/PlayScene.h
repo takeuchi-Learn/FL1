@@ -29,8 +29,6 @@ class PlayScene :
 {
 private:
 
-	// 背景などの板ポリモデル
-	std::unique_ptr<ObjModel> model;
 	// 板ポリ用ライト
 	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;

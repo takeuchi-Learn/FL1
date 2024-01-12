@@ -10,12 +10,13 @@
 
 using namespace DirectX;
 
-BackGround::BackGround(GameCamera* camera,ObjModel* model, Light* light,const float mapY, const unsigned int stageNum)
+BackGround::BackGround(GameCamera* camera, Light* light,const float mapY, const unsigned int stageNum)
 	:camera(camera)
 	, light(light)
-	, model(model)
+	, model(std::make_unique<ObjModel>("Resources/backGround/back_" + std::to_string(stageNum) + "/",
+									   "back_" + std::to_string(stageNum)))
 {
-	obj = std::make_unique<AbstractGameObj>(camera, model);
+	obj = std::make_unique<AbstractGameObj>(camera, model.get());
 
 	// 比率計算のためにテクスチャサイズ取得
 	// 取得できないため一旦直接入力
@@ -33,5 +34,5 @@ void BackGround::update()
 
 void BackGround::draw()
 {
-	obj->draw(light.get());
+	obj->draw(light);
 }

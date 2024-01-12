@@ -24,7 +24,7 @@ private:
 public:
 
 	/// @brief 読み込み
-	BackGround(GameCamera* camera, float mapY,unsigned int stageNum = 0);
+	BackGround(GameCamera* camera,Light* light, float mapY,unsigned int stageNum = 0);
 
 	void update();
 	void draw();

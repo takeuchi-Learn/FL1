@@ -32,7 +32,7 @@ private:
 	GameCamera* camera = nullptr;
 	std::unique_ptr<AbstractGameObj> obj;
 	// テクスチャが違うと個別用意必須?なので生成
-	std::unique_ptr<ObjModel>* model;
+	std::unique_ptr<ObjModel> model;
 	// ライト(使う必要ないがセットが必須なため)
 	// これPlaySceneで生成する
 	Light* light = nullptr;

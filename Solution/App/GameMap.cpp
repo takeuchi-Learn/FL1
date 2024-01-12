@@ -40,9 +40,8 @@ void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, floa
 }
 
 
-GameMap::GameMap(GameCamera* camera, ObjModel* model, Light* light) :
+GameMap::GameMap(GameCamera* camera,  Light* light) :
 	camera(camera)
-	, model(model)
 	,light(light)
 {}
 
