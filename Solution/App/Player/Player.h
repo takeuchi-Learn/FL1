@@ -55,8 +55,8 @@ class Player
 	bool pushJumpKeyFrame = false;
 	bool reboundYFrame = false;
 
-	//落下時間
-	int fallTime = 0;
+	//落下フレーム
+	int fallFrame = 0;
 	//落下初速
 	float fallStartSpeed = 0.0f;
 	//現在の落下速度

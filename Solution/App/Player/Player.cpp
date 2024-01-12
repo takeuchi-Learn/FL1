@@ -219,7 +219,7 @@ void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionD
 
 		// 下方向に落下
 		fallStartSpeed = -0.2f;
-		fallTime = 0;
+		fallFrame = 0;
 		break;
 
 	case LEFT:
@@ -245,10 +245,10 @@ void Player::calcJumpPos()
 {
 	if (!isDynamic) { return; }
 
-	++fallTime;
+	++fallFrame;
 
 	const float PRE_VEL_Y = currentFallVelovity;
-	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallTime);
+	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallFrame);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
@@ -269,7 +269,7 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	if (!isJump && fallTime < 1 || isReboundY)
+	if (!isJump && fallFrame < 1 || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->hitInputPadLT() || Input::ins()->hitInputPadRT();
@@ -286,7 +286,7 @@ void Player::jump()
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
-			fallTime = 0;
+			fallFrame = 0;
 
 			// 大ジャンプ
 			bool hitBigJump = Input::ins()->hitKey(DIK_X);
@@ -335,11 +335,11 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 
 	isDrop = false;
 
-	if (fallTime > 2)
+	if (fallFrame > 2)
 	{
 		startRebound();
 	}
-	fallTime = 0;
+	fallFrame = 0;
 }
 
 void Player::calcDropVec()
@@ -387,7 +387,7 @@ void Player::startRebound()
 
 void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
-	fallTime = 0;
+	fallFrame = 0;
 
 	// 押し出し後の位置
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
