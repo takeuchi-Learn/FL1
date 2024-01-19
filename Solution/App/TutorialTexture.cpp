@@ -6,11 +6,11 @@ using namespace DirectX;
 
 namespace
 {
-	const wchar_t* texPath = L"Resources/Map/Tex/blockobj.png";
+	constexpr const wchar_t texPath[] = L"Resources/Map/Tex/tutorial.png";
 };
 
 TutorialTexture::TutorialTexture(GameCamera* camera, const uint16_t stageNum)
-	:gameObj(std::make_unique<Billboard>(texPath, camera))
+	: gameObj(std::make_unique<Billboard>(texPath, camera))
 	, camera(camera)
 	, STAGE_NUM(stageNum)
 {

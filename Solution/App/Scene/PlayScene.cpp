@@ -134,8 +134,11 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 
 	XMFLOAT2 startPos{ 3.f, -1.f };
-	const bool ret = gameMap->loadDataFile(mapYamlPath, &startPos);
-	assert(false == ret);
+	if (gameMap->loadDataFile(mapYamlPath, &startPos))
+	{
+		assert(0);
+		std::exit(1);
+	}
 	player->setMapPos(startPos);
 	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
 
