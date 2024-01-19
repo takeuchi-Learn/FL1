@@ -7,17 +7,17 @@
 class ConeRecorder
 {
 private:
-	// 記録<ステージ番号,カウント>
+	/// @brief ステージ番号,カウント
 	std::unordered_map<uint16_t, uint16_t> records;
 
 private:
 	ConeRecorder() = default;
-	~ConeRecorder() = default;
-
-public:
+	virtual ~ConeRecorder() = default;
 	ConeRecorder(ConeRecorder& c) = delete;
 	ConeRecorder operator=(ConeRecorder& c) = delete;
-	static ConeRecorder* getInstance()
+
+public:
+	inline static ConeRecorder* ins()
 	{
 		static ConeRecorder counter{};
 		return &counter;

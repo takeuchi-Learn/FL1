@@ -310,7 +310,7 @@ void PlayScene::update_goal()
 void PlayScene::update_clear()
 {
 	// コーンのカウント記録
-	ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
+	ConeRecorder::ins()->registration(stageNum, player->getConeCount());
 
 	// クリア演出後シーン切り替え
 	SceneManager::ins()->changeScene<ClearScene>();
