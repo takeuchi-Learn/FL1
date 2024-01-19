@@ -3,10 +3,9 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
-#include"StageObject.h"
+#include "StageObject.h"
 
 class GameCamera;
-
 
 // ゴールの仕様案
 // ゴールの判定に触れたら自動ではまる ゴールに球の判定持たせておいて、
@@ -33,8 +32,8 @@ private:
 	inline void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
-	~Goal() {}
+	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFLOAT2& scale);
+	virtual ~Goal() {}
 
 	// ゴールフラグがtrueかどうか
 	inline bool getIsGoal() const { return isGoal; }

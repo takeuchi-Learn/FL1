@@ -49,7 +49,7 @@ Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
 	assert(SUCCEEDED(result));
 }
 
-void Billboard::update(float angleRad)
+void Billboard::update(float angleRad, const XMFLOAT2& center)
 {
 	// 寿命が尽きたものを全削除
 	billboards.remove_if([&](const std::shared_ptr<BillboardData>& x) { if (x->deleteFlag) { --drawNum; return true; } return false; });
@@ -85,6 +85,7 @@ void Billboard::update(float angleRad)
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
 	constMap->angleRad = angleRad;
+	constMap->center = center;
 	constBuff->Unmap(0, nullptr);
 }
 
@@ -134,6 +135,23 @@ std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
 
 	p->position = position;
 	p->rotation = rotation;
+	p->scale = XMFLOAT2(scale, scale);
+	p->color = color;
+	p->deleteFlag = false;
+
+	return p;
+}
+
+std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
+											const XMFLOAT2& scale,
+											float rotation,
+											const XMFLOAT4& color)
+{
+	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
+	++drawNum;
+
+	p->position = position;
+	p->rotation = rotation;
 	p->scale = scale;
 	p->color = color;
 	p->deleteFlag = false;
@@ -157,9 +175,9 @@ void Billboard::InitializeDescriptorHeap()
 
 void Billboard::InitializeGraphicsPipeline()
 {
-	constexpr auto vsPath = L"Resources/Shaders/ParticleVS.hlsl";
-	constexpr auto psPath = L"Resources/Shaders/ParticlePS.hlsl";
-	constexpr auto gsPath = L"Resources/Shaders/ParticleGS.hlsl";
+	constexpr auto vsPath = L"Resources/Shaders/BillboardVS.hlsl";
+	constexpr auto psPath = L"Resources/Shaders/BillboardPS.hlsl";
+	constexpr auto gsPath = L"Resources/Shaders/BillboardGS.hlsl";
 
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -254,7 +272,7 @@ void Billboard::InitializeGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // スケール
-			"TEXCOORD", 0, DXGI_FORMAT_R32_FLOAT, 0,
+			"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},

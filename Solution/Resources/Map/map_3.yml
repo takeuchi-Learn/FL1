@@ -11,7 +11,7 @@ startPos:
 texFileName:
   1: wall.png
   2: /INVISIBLE/
-  3: goal.png
+  3: NODEF.png
   4: PlainRoad.png
   5: blockobj.png
   6: toumeiBlock.png

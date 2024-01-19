@@ -577,6 +577,9 @@
     <FxCompile Include="Resources\Shaders\CircularGaugeGS.hlsl" />
     <FxCompile Include="Resources\Shaders\CircularGaugePS.hlsl" />
     <FxCompile Include="Resources\Shaders\CircularGaugeVS.hlsl" />
+    <FxCompile Include="Resources\Shaders\BillboardGS.hlsl" />
+    <FxCompile Include="Resources\Shaders\BillboardPS.hlsl" />
+    <FxCompile Include="Resources\Shaders\BillboardVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Basic.hlsli">
@@ -600,5 +603,6 @@
     </None>
     <None Include="Resources\Shaders\PbrObj.hlsli" />
     <None Include="Resources\Shaders\CircularGauge.hlsli" />
+    <None Include="Resources\Shaders\Billboard.hlsli" />
   </ItemGroup>
 </Project>

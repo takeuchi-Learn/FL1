@@ -18,12 +18,14 @@ protected:
 	std::unique_ptr<Billboard> gameObj;
 	// 当たり判定
 	CollisionShape::AABB aabb{};
+	// 0~1で画像のどこを中心とするか
+	DirectX::XMFLOAT2 center{};
 
 protected:
 	float calcCameraAngleRad();
 
 public:
-	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale, const std::wstring& texPath);
+	StageObject(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFLOAT2& scale, const std::wstring& texPath);
 	virtual ~StageObject() {}
 
 	virtual void update();
@@ -33,5 +35,8 @@ public:
 	/// @param playerSphere プレイヤーの判定
 	virtual void hit(const CollisionShape::Sphere& playerSphere) {}
 
-	const CollisionShape::AABB& getRefAABB()const { return aabb; }
+	inline const CollisionShape::AABB& getRefAABB()const { return aabb; }
+
+	inline const auto& getCenter() const { return center; }
+	inline void setCenter(const auto& center) { this->center = center; }
 };

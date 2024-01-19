@@ -44,7 +44,7 @@ void ColorCone::checkDead()
 }
 
 ColorCone::ColorCone(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
-	: StageObject(camera, pos, scale, L"Resources/Map/Tex/SafetyCone.png")
+	: StageObject(camera, pos, XMFLOAT2(scale, scale), L"Resources/Map/Tex/SafetyCone.png")
 	, se(Sound::ins()->loadWave("Resources/SE/Sys_Set03-click.wav"))
 {
 	// 当たり判定調整

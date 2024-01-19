@@ -492,7 +492,8 @@ void Player::move()
 void Player::rot()
 {
 	// 直径
-	const float d = getObj()->scale;
+	// 正方形であるものとして計算する
+	const float d = getObj()->scale.x;
 	const float ensyuu = d * XM_PI;
 
 	constexpr float angleMax = 360.f;
