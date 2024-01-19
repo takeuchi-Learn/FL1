@@ -28,6 +28,7 @@
 #include "TitleScene.h"
 #include "ClearScene.h"
 #include "GameOverScene.h"
+#include "StageSelectScene.h"
 
 using namespace DirectX;
 
@@ -273,6 +274,32 @@ void PlayScene::update_main()
 	}
 
 #endif // _DEBUG
+
+	// ステージ選択へ戻る
+	{
+		// 左シフト + R
+		bool hit = Input::ins()->triggerKey(DIK_R) && Input::ins()->hitKey(DIK_LSHIFT);
+
+		// ABXYの上と左
+		if (PadImu::ins()->getDevCount() > 0)
+		{
+			constexpr auto useJSLMask = JSMASK_N | JSMASK_W;
+
+			const int preState = PadImu::ins()->getPreStates()[0].buttons;
+			const int state = PadImu::ins()->getStates()[0].buttons;
+
+			const bool pre = PadImu::hitButtons(preState, useJSLMask);
+			const bool current = PadImu::hitButtons(state, useJSLMask);
+
+			hit |= !pre && current;
+		}
+
+		// 指定の入力があったらステージ選択に戻る
+		if (hit)
+		{
+			SceneManager::ins()->changeScene<StageSelectScene>();
+		}
+	}
 
 	// シネスコ更新関数
 	updateCinemaScopeProc();
