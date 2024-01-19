@@ -21,7 +21,7 @@ namespace
 	constexpr auto transitionTime = static_cast<Timer::timeType>(Timer::oneSecF * transitionTimeSec);
 	constexpr float endPos = static_cast<float>(WinAPI::window_height) + 10.f;
 
-	constexpr auto tutoGraph = L"Resources/title/tutorial_oji.png";
+	constexpr auto tutoGraph = L"Resources/title/OperationEx.png";
 }
 
 TitleScene::TitleScene()
