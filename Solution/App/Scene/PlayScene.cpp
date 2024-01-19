@@ -328,9 +328,9 @@ void PlayScene::update_goal()
 	}
 
 	auto& goal = hitGoalPtr->getObj()->getFrontData();
-	goal->position.y = std::lerp(goalPreGoalPos.y, goalPreGoalPos.y + 100.f, raito);
+	goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + 100.f, raito);
 
-	const XMFLOAT2 playerEndPos = XMFLOAT2(plyerPreGoalPos.x, plyerPreGoalPos.y + 100.f);
+	const XMFLOAT2 playerEndPos = XMFLOAT2(plyerPreGoalPos.x + 100.f, plyerPreGoalPos.y);
 	player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, raito));
 }
 
