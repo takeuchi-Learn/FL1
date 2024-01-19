@@ -40,6 +40,7 @@ class Player
 		float sideReboundAddVal{};
 		float maxSpeedX{};
 		float accMagX{};
+		uint8_t tutorialStageMax = 0ui8;
 	};
 
 	DirectX::XMFLOAT2 mapPos{};
@@ -184,6 +185,8 @@ public:
 	inline uint16_t getConeCount() const { return coneCount; }
 
 	inline void incrementConeCount() { ++coneCount; }
+
+	inline const auto& getYamlData() const { return yamlData; }
 
 	void hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir = 0b1111ui8);
 

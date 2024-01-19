@@ -22,3 +22,5 @@ sideReboundAddVal: 2.5
 
 maxSpeedX: 5.0
 accMagX: 0.015
+
+tutorialStageMax: 1

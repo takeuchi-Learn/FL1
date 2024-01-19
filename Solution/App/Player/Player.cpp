@@ -96,6 +96,7 @@ bool Player::YamlData::loadYamlFile()
 	LoadYamlData(root, sideReboundAddVal);
 	LoadYamlData(root, maxSpeedX);
 	LoadYamlData(root, accMagX);
+	LoadYamlData(root, tutorialStageMax);
 
 	return false;
 }

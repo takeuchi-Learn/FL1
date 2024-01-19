@@ -143,15 +143,8 @@ PlayScene::PlayScene() :
 	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
-	// チュートリアル関係
-	// もしチュートリアルステージ(_0、_1)だったら画像追加
-	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
-	// 何番ステージまでがチュートリアルかを指定する
-	// 一応_1までチュートリアルと仮定して1に設定
-	constexpr uint16_t tutorialStageMax = 1;
-
 	// チュートリアルステージだったら画像追加
-	if (stageNum <= tutorialStageMax)
+	if (stageNum <= player->getYamlData()->tutorialStageMax)
 	{
 		tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), stageNum);
 	}
