@@ -337,7 +337,7 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	isJump = false;
 
 	// 押し出し後の位置
-	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	const float extrusionEndPosY = XMVectorGetY(hitAABB.maxPos) + sphere.radius;
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
 
