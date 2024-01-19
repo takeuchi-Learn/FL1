@@ -169,10 +169,10 @@ void PlayScene::start()
 
 void PlayScene::update()
 {
-	updateProc();
-
 	// 衝突確認
 	checkCollision();
+
+	updateProc();
 
 	camera->update();
 	player->update();
