@@ -1,23 +1,21 @@
 ﻿#include "TutorialTexture.h"
-
-#include<DirectXMath.h>
-#include<3D/Billboard/Billboard.h>
-#include<GameCamera.h>
+#include <3D/Billboard/Billboard.h>
+#include <GameCamera.h>
 
 using namespace DirectX;
 
 namespace
 {
-	const wchar_t* texPath = L"Resources/Map/Tex/blockobj.png";
+	constexpr const wchar_t texPath[] = L"Resources/Map/Tex/tutorial.png";
 };
 
-TutorialTexture::TutorialTexture(GameCamera* camera,const unsigned short stageNum)
-	:gameObj(std::make_unique<Billboard>(texPath, camera))
-	,camera(camera)
+TutorialTexture::TutorialTexture(GameCamera* camera, const uint16_t stageNum)
+	: gameObj(std::make_unique<Billboard>(texPath, camera))
+	, camera(camera)
 	, STAGE_NUM(stageNum)
 {
 	// 数値は仮設定
-	gameObj->add(XMFLOAT3(300, -700,0), 300.f);
+	gameObj->add(XMFLOAT3(300, -700, 0), 300.f);
 
 	createState();
 }
@@ -25,7 +23,7 @@ TutorialTexture::TutorialTexture(GameCamera* camera,const unsigned short stageNu
 void TutorialTexture::update()
 {
 	state->update();
-	state->addTime();
+	state->updateCount();
 }
 
 void TutorialTexture::draw()
@@ -35,112 +33,86 @@ void TutorialTexture::draw()
 
 void TutorialTexture::createState()
 {
-	constexpr short TUTORIAL_MOVE = 0;
-	constexpr short TUTORIAL_JUMP = 1;
+	constexpr decltype(STAGE_NUM) TUTORIAL_MOVE = 0ui16;
+	constexpr decltype(STAGE_NUM) TUTORIAL_JUMP = 1ui16;
 
-	if(STAGE_NUM == TUTORIAL_MOVE)
+	switch (STAGE_NUM)
 	{
-		state = std::make_unique<Move>(gameObj.get(), camera);
-	}
-	else 
-	if(STAGE_NUM == TUTORIAL_JUMP)
-	{
-		state = std::make_unique<Jump>(gameObj.get(), camera);
+	case TUTORIAL_MOVE:
+		state = std::make_unique<RotationTutorial>(gameObj.get(), camera);
+		break;
+	case TUTORIAL_JUMP:
+		state = std::make_unique<JumpTutorial>(gameObj.get(), camera);
+		break;
 	}
 }
 
-void TutorialTexture::Move::update()
+void TutorialTexture::RotationTutorial::update()
 {
-
 	// 回転させる
 
-	constexpr float piMag2 = 3.14f * 2;
-	if (x < piMag2)
-	{
-		constexpr float frameAddNum = 0.05f;
-		x += frameAddNum;
-	}
-	else
-	{
-		x = piMag2;
-	}
+	constexpr float angleMax = 45.f;
+	const float angleDeg = std::sin(raito * XM_2PI) * angleMax;
 
-	constexpr float mag = 45.f;
-	float angleDeg = std::sin(x);
-	angleDeg *= mag;
-	gameObj->getFrontData()->rotation = angleDeg;
+	gameObj->update(XMConvertToRadians(angleDeg - camera->getAngleDeg()));
 
-	gameObj->update(XMConvertToRadians(-camera->getAngleDeg() + angleDeg));
-	
 	// 終了処理 何かしらあったら記述
-	if(loopEnd())
+	/*if (loopEnd())
 	{
+	}*/
+}
+
+TutorialTexture::JumpTutorial::JumpTutorial(Billboard* gameObj, GameCamera* camera)
+	:State(gameObj, camera, Timer::oneMS * 2500u)
+	, START_POS_Y(gameObj->getFrontData()->position.y)
+{}
+
+void TutorialTexture::JumpTutorial::update()
+{
+	auto& me = gameObj->getFrontData();
+
+	// 上昇幅
+	constexpr float moveValMax = 100.f;
+
+	// 上昇から下降に変わる閾値
+	constexpr float thresholdRaito = 0.2f;
+	if (raito < thresholdRaito)
+	{
+		// 上がる
+		const float t = raito / thresholdRaito;
+		me->position.y = moveValMax * easingUp(t);
+	} else
+	{
+		// 下がる
+		constexpr float inv = 1.f - thresholdRaito;
+		const float t = 1.f - ((raito - thresholdRaito) / inv);
+		me->position.y = moveValMax * easingDown(t);
 	}
 
-}
-
-TutorialTexture::Jump::Jump(Billboard* gameObj, GameCamera* camera)
-	:State(gameObj, camera, static_cast<unsigned int>(60.f * 2.5f))
-	, START_POS_Y(gameObj->getFrontData()->position.y)
-{
-}
-
-void TutorialTexture::Jump::update()
-{
-	constexpr unsigned int startTime = static_cast<unsigned int>(60.f * 1.f);
-	if (getTime() >= startTime)jump();
+	me->position.y += START_POS_Y;
 
 	gameObj->update(XMConvertToRadians(-camera->getAngleDeg()));
-
-	// 終了処理
-	if (loopEnd())
-	{
-		gameObj->getFrontData()->position.y = START_POS_Y; 
-		downMove = false;
-	}
-
 }
 
-void TutorialTexture::Jump::jump()
+TutorialTexture::State::State(Billboard* gameObj,
+							  GameCamera* camera,
+							  Timer::timeType interval)
+	: gameObj(gameObj)
+	, camera(camera)
+	, timer(std::make_unique<Stopwatch>())
+	, interval(interval)
 {
-	float& posY = gameObj->getFrontData()->position.y;
-
-	constexpr float mag = 200.f;
-	if (downMove)
-	{
-		posY = START_POS_Y + easingDown(1.f - x) * mag;
-	}
-	else
-	{
-		posY = START_POS_Y + easingUp(x) * mag;
-	}
-
-	if (x < 1.f)
-	{
-		constexpr float frameAddNum = 0.04f;
-		x += frameAddNum;
-	}
-	else
-	{
-		if (!downMove)
-		{
-			x = 0.f;
-			downMove = true;
-		} 
-		else
-		{
-			x = 1.f;
-		}
-	}
+	timer->reset();
 }
 
-bool TutorialTexture::State::loopEnd()
+void TutorialTexture::State::updateCount()
 {
-	if(time == TIME_MAX)
+	const auto now = timer->getNowTime();
+	if (now >= interval)
 	{
-		time = 0;
-		x = 0;
-		return true;
+		raito = 0.f;
+		timer->reset();
+		return;
 	}
-	return false;
+	raito = static_cast<float>(now) / static_cast<float>(interval);
 }

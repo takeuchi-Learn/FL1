@@ -46,8 +46,7 @@ int Sensor::updateSensor()
 	}
 
 	buttonStatePre = buttonState;
-	if (receivedSize <= 0) { buttonState = true; }
-	else { buttonState = false; }
+	if (receivedSize <= 0) { buttonState = true; } else { buttonState = false; }
 
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);

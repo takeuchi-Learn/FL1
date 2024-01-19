@@ -119,6 +119,7 @@
     <ClCompile Include="App\Scene\ClearScene.cpp" />
     <ClCompile Include="App\Scene\GameOverScene.cpp" />
     <ClCompile Include="App\ConeRecorder.cpp" />
+    <ClCompile Include="Engine\3D\Billboard\CircularGauge.cpp" />
     <ClCompile Include="Engine\3D\Billboard\Billboard.cpp" />
     <ClCompile Include="App\Object\Goal.cpp" />
     <ClCompile Include="Engine\GameObject\BaseMovableObject.cpp" />
@@ -164,9 +165,7 @@
     <ClCompile Include="App\GameCamera.cpp" />
     <ClCompile Include="App\GameMap.cpp" />
     <ClCompile Include="Engine\Input\PadImu.cpp" />
-    <ClCompile Include="App\Object\ObstacleObject.cpp" />
     <ClCompile Include="App\Scene\StageSelectScene.cpp" />
-    <ClCompile Include="App\JumpVectorCalculation.cpp" />
     <ClCompile Include="lib\imgui\include\imgui.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_demo.cpp" />
     <ClCompile Include="lib\imgui\include\imgui_draw.cpp" />
@@ -185,6 +184,7 @@
     <ClInclude Include="App\Scene\GameOverScene.h" />
     <ClInclude Include="App\ConeRecorder.h" />
     <ClInclude Include="Engine\3D\Billboard\Billboard.h" />
+    <ClInclude Include="Engine\3D\Billboard\CircularGauge.h" />
     <ClInclude Include="Engine\GameObject\BaseMovableObject.h" />
     <ClInclude Include="Engine\GameObject\AbstractGameObj.h" />
     <ClInclude Include="Engine\CollisionMgr.h" />
@@ -236,7 +236,6 @@
     <ClInclude Include="App\GameCamera.h" />
     <ClInclude Include="App\GameMap.h" />
     <ClInclude Include="Engine\Input\PadImu.h" />
-    <ClInclude Include="App\Object\ObstacleObject.h" />
     <ClInclude Include="App\Scene\StageSelectScene.h" />
     <ClInclude Include="App\JumpVectorCalculation.h" />
     <ClInclude Include="lib\imgui\include\imconfig.h" />
@@ -273,6 +272,30 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\BillboardGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\BillboardPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\BillboardVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CircularGaugeGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CircularGaugePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\CircularGaugeVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\DistanceDitherPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -335,6 +358,8 @@
     <None Include=".editorconfig" />
     <None Include="Resources\Shaders\Back.hlsli" />
     <None Include="Resources\Shaders\Basic.hlsli" />
+    <None Include="Resources\Shaders\Billboard.hlsli" />
+    <None Include="Resources\Shaders\CircularGauge.hlsli" />
     <None Include="Resources\Shaders\DistanceDither.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="Resources\Shaders\PbrObj.hlsli" />

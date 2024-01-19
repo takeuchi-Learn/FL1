@@ -24,7 +24,7 @@ private:
 	UINT postEff2Num = 0U;
 
 public:
-	inline UINT getPostEff2Num() { return postEff2Num; }
+	inline UINT getPostEff2Num() const { return postEff2Num; }
 
 	inline static SceneManager* getInstange()
 	{
@@ -41,6 +41,7 @@ public:
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
+	void draw_afterImGui() override;
 
 	template <class SCENE>
 	inline void changeScene() { nextScene = std::make_unique<SCENE>(); }

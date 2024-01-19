@@ -22,8 +22,7 @@ namespace
 }
 
 StageSelectScene::StageSelectScene() :
-	timer(std::make_unique<Stopwatch>()),
-	drawText("Press SPACE")
+	timer(std::make_unique<Stopwatch>())
 {
 	// ステージ存在確認
 	for (uint16_t i = 0u; i < UINT16_MAX; ++i)
@@ -61,7 +60,6 @@ void StageSelectScene::update_main()
 		if (currentStage > 0u) { --currentStage; }
 	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
-		drawText = "NOW LOADING...";
 		PlayScene::setStageNum(currentStage);
 		thread = std::make_unique<std::jthread>([&]
 												{
@@ -94,11 +92,6 @@ void StageSelectScene::update()
 void StageSelectScene::drawFrontSprite()
 {
 	using namespace ImGui;
-	SetNextWindowPos(ImVec2(0, 0));
-	Begin("StageSelectScene::drawFrontSprite", nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-	Text(std::format("currentStage: {}", currentStage).c_str());
-	Text(drawText.c_str());
-	End();
 
 	const auto stageCount = stageMaxNum + 1;
 	for (int i = 0; i < stageCount; ++i)
@@ -123,8 +116,11 @@ void StageSelectScene::drawFrontSprite()
 			float size = -1.f;
 			if (i == currentStage)
 			{
+				// サイズは最大
 				constexpr float transitionEndSize = static_cast<float>(1 + std::max(WinAPI::window_width, WinAPI::window_height));
 				size = std::lerp(sizeMax, transitionEndSize, Util::easeOutBounce(transitionRaito));
+				// フォーカスはこのウインドウに合わせる（演出時に最前面にするため）
+				SetNextWindowFocus();
 			} else
 			{
 				constexpr auto min = sizeMax * 0.125f;

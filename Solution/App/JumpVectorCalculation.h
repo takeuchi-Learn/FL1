@@ -13,15 +13,13 @@ public:
 	/// @param gravAcc 加速度
 	/// @param t 時間
 	/// @return
-	static float calcFallVector
+	constexpr static float calcFallVector
 	(
-		const float startVel,
-		const float gravAcc,
-		const int t
+		float startVel,
+		float gravAcc,
+		int t
 	)
 	{
 		return startVel + -gravAcc * static_cast<float>(t);
 	}
-
 };
-

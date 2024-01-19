@@ -2,60 +2,55 @@
 
 #include <memory>
 #include <string>
+#include <forward_list>
 #include <unordered_map>
-#include<DirectXMath.h>
-
-#include<Util/Util.h>
+#include <functional>
+#include <DirectXMath.h>
+#include <Util/Util.h>
 #include <Collision/CollisionShape.h>
 #include <Util/YamlLoader.h>
-#include "Object/Goal.h"
 
+class Goal;
+class ColorCone;
 class Billboard;
 class GameCamera;
 class Collision;
-
-using namespace DirectX;
 
 // マップクラス
 // 動かない地形のみ扱う
 class GameMap
 {
-private:
-	enum MAPCHIP_DATA : uint8_t
+public:
+	class Collider
 	{
-		/// @brief 未定義
-		MAPCHIP_UNDEF = 0U,
-		/// @brief 壁
-		MAPCHIP_WALL,
-		/// @brief 道
-		MAPCHIP_ROAD,
-		/// @brief ゴール
-		MAPCHIP_GOAL,
-		/// @brief 道路
-		MAPCHIP_PLAIN_ROAD,
-		/// @brief 障害物
-		MAPCHIP_OBSTACLE_OBJECT,
-		/// @brief ステージ外進行防止の透明な壁
-		MAPCHIP_TRANSPARENT_BLOCK,
-		/// @brief ただのブロック
-		MAPCHIP_BLOCK,
+	public:
+		CollisionShape::AABB aabb;
+		uint8_t collisionDirectionBitFlag;
 
-		/// @brief 最後の要素
-		MAPCHIP_ALLNUM
+		Collider(const DirectX::XMFLOAT2& minPos,
+				 const DirectX::XMFLOAT2& maxPos,
+				 uint8_t collisionBitFlag);
+
+		Collider(const DirectX::XMFLOAT2& minPos,
+				 const DirectX::XMFLOAT2& maxPos)
+			: Collider(minPos, maxPos, 0b1111ui8)
+		{}
 	};
 
 private:
-	std::unordered_map<MAPCHIP_DATA, std::unique_ptr<Billboard>> billboard;
+	std::unordered_map<std::string, uint8_t> collisionDataList;
+
+	std::unordered_map<uint8_t, std::unique_ptr<Billboard>> billboard;
 	/// @brief 地形のAABB
-	std::vector<CollisionShape::AABB> mapAABBs;
+	std::vector<Collider> mapAABBs;
+
 	// 縦横サイズ
 	uint16_t mapSizeX = 0;
 	uint16_t mapSizeY = 0;
 
 	// ステージの配置物
-	std::vector<std::unique_ptr<StageObject>>stageObjects;
-	float goalPosX = 0.f;
-	
+	std::forward_list<std::unique_ptr<Goal>> goals;
+	std::forward_list<std::unique_ptr<ColorCone>> cones;
 
 	// コーンの最大値
 	uint16_t coneMax = 0;
@@ -68,11 +63,10 @@ private:
 	/// @param y 配列の添え字
 	/// @param pos 座標
 	/// @param scale 大きさ
-	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale);
+	void setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale, uint8_t collisionBitFlag = 0b1111ui8);
 
-	void loadStageObject(Yaml::Node& node, float scale);
-	void loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output);
-	void setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale);
+	void loadStageObjList(const std::string& csvStr, float scale, const std::function<void(const DirectX::XMFLOAT2&)> insertFunc);
+
 public:
 	GameMap(GameCamera* camera);
 	~GameMap() = default;
@@ -90,15 +84,13 @@ public:
 	/// @return 当たり判定配列の参照
 	inline const auto& getMapAABBs() const { return mapAABBs; }
 
-	/// @brief 仮のゴール当たり判定取得(後々StageObjectを継承して配列にまとめて取得できるようにします)
-	//inlnie const auto& getGoalAABB()const { return goal->getRefAABB(); }
+	inline const auto& getGoals() const { return goals; }
+	inline auto& getGoals() { return goals; }
 
-	inline const auto& getStageObjects()const { return stageObjects; }
+	inline auto& getCones() { return cones; }
 
 	/// @brief ゲームオーバーになる座標
 	float calcGameoverPos() const;
-
-	inline float getGoalPosX() const { return goalPosX; }
 
 	inline uint16_t getMapX() const { return mapSizeX; }
 	inline uint16_t getMapY() const { return mapSizeY; }

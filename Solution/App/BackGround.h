@@ -9,8 +9,6 @@ class Light;
 // 背景クラス
 class BackGround
 {
-public:
-
 private:
 	GameCamera* camera = nullptr;
 
@@ -22,9 +20,8 @@ private:
 	std::unique_ptr<Light>light;
 
 public:
-
 	/// @brief 読み込み
-	BackGround(GameCamera* camera, float mapY,unsigned int stageNum = 0);
+	BackGround(GameCamera* camera, float mapY, unsigned int stageNum = 0);
 
 	void update();
 	void draw();

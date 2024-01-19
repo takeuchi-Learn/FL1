@@ -7,13 +7,12 @@
 #include <Util/YamlLoader.h>
 #include <3D/Light/Light.h>
 #include <Input/PadImu.h>
-#include<JumpVectorCalculation.h>
-#include<Sound/SoundData.h>
+#include <JumpVectorCalculation.h>
+#include <Sound/SoundData.h>
 
 #include <GameMap.h>
 #include <Object/Goal.h>
-#include<Object/ColorCone.h>
-
+#include <Object/ColorCone.h>
 
 using namespace DirectX;
 
@@ -27,9 +26,56 @@ namespace
 	constexpr auto boundYSEPath = "Resources/SE/Player/boundY.wav";
 
 	constexpr float defaultJumpPower = 15.f;
+
+	enum class HIT_AREA : uint8_t
+	{
+		NONE = 0,
+		LEFT = 1 << 0,
+		RIGHT = 1 << 1,
+		BOTTOM = 1 << 2,
+		TOP = 1 << 3,
+	};
+
+	HIT_AREA calcCollisionVec(const CollisionShape::AABB& aabb,
+							  const CollisionShape::Sphere& sphere)
+	{
+		XMFLOAT3 boxCenter2Sphere{};
+		{
+			const auto boxSizeVec = aabb.maxPos - aabb.minPos;
+			const auto boxCenterVec = aabb.maxPos - (boxSizeVec / 2.f);
+			XMStoreFloat3(&boxCenter2Sphere, sphere.center - boxCenterVec);
+		}
+
+		// 衝突した辺を四方向でとる
+		// 上下と左右どちらかだけにする
+		if (std::abs(boxCenter2Sphere.x) >=
+			std::abs(boxCenter2Sphere.y))
+		{
+			// x > yならx方向のみ判定
+			if (0.f <= boxCenter2Sphere.x)
+			{
+				return HIT_AREA::RIGHT;
+			} else
+			{
+				return HIT_AREA::LEFT;
+			}
+		} else
+		{
+			// y > xならy方向のみ判定
+			if (0.f < boxCenter2Sphere.y)
+			{
+				return HIT_AREA::TOP;
+			} else
+			{
+				return HIT_AREA::BOTTOM;
+			}
+		}
+
+		return HIT_AREA::NONE;
+	}
 }
 
-bool Player::loadYamlFile()
+bool Player::YamlData::loadYamlFile()
 {
 	constexpr const char filePath[] = "Resources/DataFile/player.yml";
 
@@ -50,6 +96,7 @@ bool Player::loadYamlFile()
 	LoadYamlData(root, sideReboundAddVal);
 	LoadYamlData(root, maxSpeedX);
 	LoadYamlData(root, accMagX);
+	LoadYamlData(root, tutorialStageMax);
 
 	return false;
 }
@@ -61,14 +108,15 @@ void Player::loadSE()
 	boundYSE = Sound::ins()->loadWave(boundYSEPath);
 }
 
-Player::Player(GameCamera* camera) :
-	gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
+Player::Player(GameCamera* camera)
+	: gameObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 	, camera(camera)
+	, yamlData(std::make_unique<YamlData>())
 {
 	constexpr float scale = mapSize * 0.9f;
 	gameObj->add(XMFLOAT3(), scale, 0.f);
 
-	loadYamlFile();
+	yamlData->loadYamlFile();
 	loadSE();
 
 	// 判定仮設定
@@ -78,6 +126,8 @@ Player::Player(GameCamera* camera) :
 
 void Player::update()
 {
+	preColliderPos = sphere.center;
+
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
@@ -85,8 +135,9 @@ void Player::update()
 	move();
 	rot();
 
-	// スタート時はジャンプしないように
-	if (camera->getCameraState() != GameCamera::CameraState::START)
+	// 入力可能なら
+	// todo 別クラスに分ける。自機の操作は、自機の構成要素ではない。
+	if (allowInput)
 	{
 		moveLimit();
 
@@ -105,8 +156,12 @@ void Player::update()
 
 	// 左右スクロールのオンオフ
 	checkStageSide();
+
 	// ゲームオーバー確認
-	checkGameOver();
+	if (mapPos.y <= gameoverPos)
+	{
+		isDead = true;
+	}
 }
 
 void Player::draw()
@@ -127,129 +182,81 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
 }
 
-void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjName)
+void Player::setWorldPos(const DirectX::XMFLOAT2& pos)
 {
-	if (hitObjName == typeid(Goal).name()) // ゴール衝突
+	// todo mapPosの扱いを正したら変える
+	this->mapPos = pos;
+	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
+}
+
+void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir)
+{
+	// 衝突位置確認
+	HIT_AREA activeDir = calcCollisionVec(hitAABB, sphere);
+	if (activeDir == HIT_AREA::NONE) { return; }
+
+	// 衝突無効面と当たっていたら終了
+	if (!(validCollisionDir & uint8_t(activeDir))) { return; }
+
+	// 自機コライダーの移動ベクトル
+	const auto myColliderVel = sphere.center - preColliderPos;
+
+	// 方向ごとに分岐
+	switch (activeDir)
 	{
-		camera->changeStateClear();
-		isClear = true;
-	} 
-	else if (hitObjName == typeid(GameMap).name()) // マップとの衝突
-	{
-		enum class HIT_AREA : uint8_t
+		using enum HIT_AREA;
+	case TOP:
+		if (XMVectorGetY(myColliderVel) > 0.f) { return; }
+
+		// 地面衝突
+		if (!pushJumpKeyFrame || !reboundYFrame)
 		{
-			NONE = 0,
-			TOP = 1 << 0,
-			BOTTOM = 1 << 1,
-			RIGHT = 1 << 2,
-			LEFT = 1 << 3,
-		};
-		HIT_AREA activeDir = HIT_AREA::NONE;
-
-#pragma region 衝突位置確認
-
-		// todo XVectorGetX等を使う
-		const XMFLOAT3 boxSize(hitAABB.maxPos.m128_f32[0] - hitAABB.minPos.m128_f32[0],
-							   hitAABB.maxPos.m128_f32[1] - hitAABB.minPos.m128_f32[1],
-							   hitAABB.maxPos.m128_f32[2] - hitAABB.minPos.m128_f32[2]);
-		const XMFLOAT3 boxCenter(hitAABB.maxPos.m128_f32[0] - boxSize.x / 2.f,
-								 hitAABB.maxPos.m128_f32[1] - boxSize.y / 2.f,
-								 hitAABB.maxPos.m128_f32[2] - boxSize.z / 2.f);
-
-		XMFLOAT3 spherePos{};
-		XMStoreFloat3(&spherePos, sphere.center);
-
-		const auto boxCenter2Sphere =
-			XMFLOAT3(spherePos.x - boxCenter.x,
-					 spherePos.y - boxCenter.y,
-					 spherePos.z - boxCenter.z);
-
-		// 衝突した辺を四方向でとる
-		// 上下と左右どちらかだけにする
-		if (std::abs(boxCenter2Sphere.x) >=
-			std::abs(boxCenter2Sphere.y))
-		{
-			// x > yならx方向のみ判定
-			if (0.f <= boxCenter2Sphere.x)
+			// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
+			if (isReboundY)
 			{
-				activeDir = HIT_AREA::RIGHT;
-			} else if (boxCenter2Sphere.x <= -0.f)
+				reboundEnd(hitAABB);
+			} else
 			{
-				activeDir = HIT_AREA::LEFT;
-			}
-		} else
-		{
-			// y > xならy方向のみ判定
-			if (0.f < boxCenter2Sphere.y)
-			{
-				activeDir = HIT_AREA::TOP;
-			} else if (boxCenter2Sphere.y <= 0.f)
-			{
-				activeDir = HIT_AREA::BOTTOM;
+				jumpEnd(hitAABB);
 			}
 		}
+		break;
 
-#pragma endregion 衝突位置確認ここまで
+	case BOTTOM:
+		if (XMVectorGetY(myColliderVel) < 0.f) { return; }
 
-		// 方向ごとに分岐
-		switch (activeDir)
-		{
-			using enum HIT_AREA;
-		case TOP:
-			// 地面衝突
-			if (!pushJumpKeyFrame || !reboundYFrame)
-			{
-				// 跳ね返りかジャンプか確認し、それぞれに応じた関数を呼び出す
-				if (isReboundY)
-				{
-					reboundEnd(hitAABB);
-				} else
-				{
-					jumpEnd(hitAABB);
-				}
-			}
-			break;
+		// 下方向に落下
+		fallStartSpeed = -0.2f;
+		fallFrame = 0;
+		break;
 
-		case BOTTOM:
-			// 下方向に落下
-			fallStartSpeed = -0.2f;
-			fallTime = 0;
-			break;
+	case LEFT:
+		if (XMVectorGetX(myColliderVel) < 0.f) { return; }
 
-		case RIGHT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
-			break;
+		// 横のバウンド開始
+		startSideRebound(XMVectorGetX(hitAABB.minPos), true);
+		break;
 
-		case LEFT:
-			// 横のバウンド開始
-			startSideRebound(XMVectorGetX(hitAABB.minPos), true);
-			break;
+	case RIGHT:
+		if (XMVectorGetX(myColliderVel) > 0.f) { return; }
 
-		default:
-			break;
-		}
-
-		if (activeDir != HIT_AREA::NONE)
-		{
-			getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
-			gameObj->update(XMConvertToRadians(getObj()->rotation));
-		}
+		// 横のバウンド開始
+		startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
+		break;
 	}
-	else if (hitObjName == typeid(ColorCone).name())
-	{
-		++coneCount;
-	}
+
+	getObj()->position = XMFLOAT3(mapPos.x, mapPos.y, getObj()->position.z);
+	gameObj->update(XMConvertToRadians(getObj()->rotation));
 }
 
 void Player::calcJumpPos()
 {
 	if (!isDynamic) { return; }
 
-	++fallTime;
+	++fallFrame;
 
 	const float PRE_VEL_Y = currentFallVelovity;
-	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallTime);
+	currentFallVelovity = JumpVectorCalculation::calcFallVector(fallStartSpeed, gAcc, fallFrame);
 	const float ADD_VEL_Y = currentFallVelovity - PRE_VEL_Y;
 
 	//毎フレーム速度を加算
@@ -270,7 +277,7 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	if (!isJump && fallTime < 1 || isReboundY)
+	if (!isJump && fallFrame < 1 || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->hitInputPadLT() || Input::ins()->hitInputPadRT();
@@ -283,23 +290,23 @@ void Player::jump()
 			triggerJump |= state.lTrigger >= 0.5f || state.rTrigger >= 0.5f;
 		}
 
-		if (triggerJump || sensorValue >= jumpSensorValue)
+		if (triggerJump || sensorValue >= yamlData->jumpSensorValue)
 		{
 			pushJumpKeyFrame = true;
 			isJump = true;
-			fallTime = 0;
+			fallFrame = 0;
 
 			// 大ジャンプ
 			bool hitBigJump = Input::ins()->hitKey(DIK_X);
 			hitBigJump |= Input::ins()->triggerPadButton(XINPUT_GAMEPAD_RIGHT_SHOULDER);
-			if (hitBigJump || sensorValue >= bigSensorJyroValue)
+			if (hitBigJump || sensorValue >= yamlData->bigSensorJyroValue)
 			{
-				fallStartSpeed = bigJumpPower;
+				fallStartSpeed = yamlData->bigJumpPower;
 			} else// 通常ジャンプ
 			{
 				// 初速度を設定
 				// ジャイロの値を取得できるようになったらここをジャイロの数値を適当に変換して代入する
-				fallStartSpeed = jumpPower;
+				fallStartSpeed = yamlData->jumpPower;
 			}
 
 			// バウンド強制終了
@@ -330,17 +337,17 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 	isJump = false;
 
 	// 押し出し後の位置
-	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
+	const float extrusionEndPosY = XMVectorGetY(hitAABB.maxPos) + sphere.radius;
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
 
 	isDrop = false;
 
-	if (fallTime > 2)
+	if (fallFrame > 2)
 	{
 		startRebound();
 	}
-	fallTime = 0;
+	fallFrame = 0;
 }
 
 void Player::calcDropVec()
@@ -375,7 +382,7 @@ void Player::startRebound()
 	isReboundY = true;
 
 	// 落下した高さに合わせて跳ね返り量を変える
-	fallStartSpeed = -currentFallVelovity * fallVelMag;
+	fallStartSpeed = -currentFallVelovity * yamlData->fallVelMag;
 
 	reboundYFrame = true;
 
@@ -388,14 +395,14 @@ void Player::startRebound()
 
 void Player::reboundEnd(const CollisionShape::AABB& hitAABB)
 {
-	fallTime = 0;
+	fallFrame = 0;
 
 	// 押し出し後の位置
 	const float extrusionEndPosY = hitAABB.maxPos.m128_f32[1] + sphere.radius;
 	//mapPos.y = mapPos.y + hitPosY;
 	mapPos.y = extrusionEndPosY + 0.01f;
 
-	if (-currentFallVelovity <= boundEndVel)
+	if (-currentFallVelovity <= yamlData->boundEndVel)
 	{
 		isReboundY = false;
 		isDrop = false;
@@ -417,7 +424,7 @@ void Player::calcSideRebound()
 	// 変化する値
 	if (sideAddX > 0)
 	{
-		sideAddX -= sideReboundAddVal;
+		sideAddX -= yamlData->sideReboundAddVal;
 
 		// 負の値になったら演算終了
 		if (sideAddX <= 0)
@@ -427,7 +434,7 @@ void Player::calcSideRebound()
 		}
 	} else
 	{
-		sideAddX += sideReboundAddVal;
+		sideAddX += yamlData->sideReboundAddVal;
 
 		if (sideAddX >= 0)
 		{
@@ -440,13 +447,7 @@ void Player::calcSideRebound()
 void Player::startSideRebound(const float wallPosX, bool hitLeft)
 {
 	// 当たった向きに応じて押し出す
-	if (hitLeft)
-	{
-		mapPos.x = wallPosX - sphere.radius;
-	} else
-	{
-		mapPos.x = wallPosX + sphere.radius;
-	}
+	mapPos.x = wallPosX + (hitLeft ? -sphere.radius : sphere.radius);
 
 	// 壁の隣に移動
 	const XMFLOAT2 clampPos = mapPos;
@@ -460,8 +461,6 @@ void Player::startSideRebound(const float wallPosX, bool hitLeft)
 	sideAddX = vec * mag;
 
 	isReboundX = true;
-	// 衝突時の座標を代入
-	terrainHitObjPosX = mapPos.x;
 
 	// 速度があったら鳴らす
 	if (abs(sideAddX) >= 14.f)
@@ -477,16 +476,16 @@ void Player::move()
 	// 角度を取得
 	const float angle = camera->getAngleDeg();
 
-	const float addPos = angle * speedMag;
+	const float addPos = angle * yamlData->speedMag;
 
 	DirectX::XMFLOAT2 position = mapPos;
 	position.x += addPos;
 
 	// 加速度計算と加算
 	// 最大速度
-	if (abs(preFramePos.x - position.x) <= maxSpeedX)
+	if (abs(preFramePos.x - position.x) <= yamlData->maxSpeedX)
 	{
-		acc += addPos * accMagX;
+		acc += addPos * yamlData->accMagX;
 		position.x += acc;
 
 		// 停止したらリセット
@@ -501,7 +500,8 @@ void Player::move()
 void Player::rot()
 {
 	// 直径
-	const float d = getObj()->scale;
+	// 正方形であるものとして計算する
+	const float d = getObj()->scale.x;
 	const float ensyuu = d * XM_PI;
 
 	constexpr float angleMax = 360.f;
@@ -513,29 +513,15 @@ void Player::rot()
 
 void Player::checkStageSide()
 {
-	if (isDead)return;
+	if (isDead) { return; }
 
 	// 初期位置より下になったら、または、ゴールに近づいたらスクロール停止
-	if (mapPos.x <= leftScrollEndPos || mapPos.x >= rightScrollEndPos)
-	{
-		camera->setFollowFlag(false);
-	} else
-	{
-		camera->setFollowFlag(true);
-	}
-}
-
-void Player::checkGameOver()
-{
-	if (mapPos.y <= gameoverPos)
-	{
-		isDead = true;
-	}
+	camera->setFollowFlag(mapPos.x > leftScrollEndPos && mapPos.x < rightScrollEndPos);
 }
 
 void Player::moveLimit()
 {
-	if (setMoveLimitFlag)return;
+	if (setMoveLimitFlag) { return; }
 
 	// 操作可能になったタイミングの座標をセット
 	leftScrollEndPos = mapPos.x;

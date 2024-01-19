@@ -25,9 +25,6 @@ class StageSelectScene :
 	std::unique_ptr<Stopwatch> timer;
 	float transitionRaito = 0.f;
 
-	// todo デバッグ時の確認用。見た目を作ったら消す。
-	std::string drawText{};
-
 	void update_main();
 	void update_transition();
 

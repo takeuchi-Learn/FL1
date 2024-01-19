@@ -1,6 +1,4 @@
-﻿#include "Billboard.h"
-
-#include <Texture/Texture.h>
+﻿#include "CircularGauge.h"
 #include <System/PostEffect.h>
 
 #include <d3dcompiler.h>
@@ -11,65 +9,35 @@ using namespace Microsoft::WRL;
 
 namespace
 {
-	constexpr auto operator+(const XMFLOAT3& l, const XMFLOAT3& r)
-	{
-		return XMFLOAT3(l.x + r.x,
-						l.y + r.y,
-						l.z + r.z);
-	}
+	auto* dxBase = DX12Base::ins();
+
+	constexpr auto vsPath = L"Resources/Shaders/CircularGaugeVS.hlsl";
+	constexpr auto psPath = L"Resources/Shaders/CircularGaugePS.hlsl";
+	constexpr auto gsPath = L"Resources/Shaders/CircularGaugeGS.hlsl";
 }
 
-DX12Base* Billboard::dxBase = DX12Base::getInstance();
-
-Billboard::Billboard() : Billboard(L"Resources/white.png", nullptr) {}
-
-Billboard::Billboard(const wchar_t* texFilePath, Camera* camera) :
-	camera(camera)
+CircularGauge::CircularGauge(Camera* camera)
+	: camera(camera)
 {
-	// デスクリプタヒープの初期化
-	InitializeDescriptorHeap();
-
-	// パイプライン初期化
-	InitializeGraphicsPipeline();
-
-	// テクスチャ読み込み
-	LoadTexture(texFilePath);
-
-	// モデル生成
-	CreateModel();
-
-	// 定数バッファの生成
-	HRESULT result = dxBase->getDev()->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuff));
-	assert(SUCCEEDED(result));
+	initDescHeap();
+	initGraphPipeline();
+	createModel();
+	createConstBuff();
 }
 
-void Billboard::update(float angleRad, const XMFLOAT2& center)
+void CircularGauge::update()
 {
-	// 寿命が尽きたものを全削除
-	billboards.remove_if([&](const std::shared_ptr<BillboardData>& x) { if (x->deleteFlag) { --drawNum; return true; } return false; });
-
-	// 頂点バッファへデータ転送
-	VertexPos* vertMap = nullptr;
-	HRESULT result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result))
+	Vertex* vertMap = nullptr;
+	if (SUCCEEDED(vertBuff->Map(0, nullptr, (void**)&vertMap)))
 	{
-		uint32_t vertCount = 0;
-		// 各要素の情報を1つずつ反映
-		for (auto& it : billboards)
+		uint16_t vertCount = 0ui16;
+		for (auto& i : gauges)
 		{
-			// 座標
-			vertMap->pos = it->position;
-			// スケール
-			vertMap->scale = it->scale;
-			// 色
-			vertMap->color = it->color;
-			// 次の頂点へ
+			vertMap->pos = i->position;
+			vertMap->color = i->color;
+			vertMap->scale = i->scale;
+			vertMap->holeSize = i->holeSize;
+			vertMap->gaugeRaito = i->gaugeRaito;
 			vertMap++;
 			if (++vertCount >= vertexCount)
 			{
@@ -81,85 +49,50 @@ void Billboard::update(float angleRad, const XMFLOAT2& center)
 
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	HRESULT result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
-	constMap->angleRad = angleRad;
-	constMap->center = center;
 	constBuff->Unmap(0, nullptr);
 }
 
-void Billboard::draw()
+void CircularGauge::draw()
 {
-	// 最大数を超えないようにする
-	if (drawNum > vertexCount)
-	{
-		drawNum = vertexCount;
-	}
-
-	// パーティクルが1つもない場合
-	if (drawNum == 0)
-	{
-		return;
-	}
+	if (drawNum == 0ui16) { return; }
+	drawNum = std::min(drawNum, vertexCount);
 
 	// パイプラインステートの設定
-	dxBase->getCmdList()->SetPipelineState(pipelinestate[(size_t)nowBlendMode].Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[static_cast<size_t>(nowBlendMode)].Get());
 	// ルートシグネチャの設定
 	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
 	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
-
 	// 頂点バッファの設定
 	dxBase->getCmdList()->IASetVertexBuffers(0, 1, &vbView);
-
 	// デスクリプタヒープの配列
 	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
 	dxBase->getCmdList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
-	// シェーダリソースビューをセット
-	dxBase->getCmdList()->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	// 描画コマンド
 	dxBase->getCmdList()->DrawInstanced(drawNum, 1, 0, 0);
 }
-
-std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
-											float scale,
-											float rotation,
-											const XMFLOAT4& color)
+std::weak_ptr<CircularGaugeData> CircularGauge::add(const XMFLOAT3& pos, float scale, const XMFLOAT4& color)
 {
-	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
+	if (drawNum >= vertexCount)
+	{
+		return std::weak_ptr<CircularGaugeData>();
+	}
+	auto& i = gauges.emplace_front(std::make_shared<CircularGaugeData>());
 	++drawNum;
 
-	p->position = position;
-	p->rotation = rotation;
-	p->scale = XMFLOAT2(scale, scale);
-	p->color = color;
-	p->deleteFlag = false;
+	i->position = pos;
+	i->scale = scale;
+	i->color = color;
 
-	return p;
+	return i;
 }
 
-std::weak_ptr<BillboardData> Billboard::add(const XMFLOAT3& position,
-											const XMFLOAT2& scale,
-											float rotation,
-											const XMFLOAT4& color)
-{
-	auto& p = billboards.emplace_front(std::make_shared<BillboardData>());
-	++drawNum;
-
-	p->position = position;
-	p->rotation = rotation;
-	p->scale = scale;
-	p->color = color;
-	p->deleteFlag = false;
-
-	return p;
-}
-
-void Billboard::InitializeDescriptorHeap()
+void CircularGauge::initDescHeap()
 {
 	// デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
@@ -173,12 +106,8 @@ void Billboard::InitializeDescriptorHeap()
 	descriptorHandleIncrementSize = dxBase->getDev()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-void Billboard::InitializeGraphicsPipeline()
+void CircularGauge::initGraphPipeline()
 {
-	constexpr auto vsPath = L"Resources/Shaders/BillboardVS.hlsl";
-	constexpr auto psPath = L"Resources/Shaders/BillboardPS.hlsl";
-	constexpr auto gsPath = L"Resources/Shaders/BillboardGS.hlsl";
-
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
@@ -272,12 +201,22 @@ void Billboard::InitializeGraphicsPipeline()
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // スケール
-			"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+			"TEXCOORD", 0, DXGI_FORMAT_R32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
 		{ // 色
 			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ // 穴の大きさ
+			"HOLE_SIZE", 0, DXGI_FORMAT_R32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+		{ // ゲージ量
+			"GAUGE_RAITO", 0, DXGI_FORMAT_R32_FLOAT, 0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
@@ -425,32 +364,13 @@ void Billboard::InitializeGraphicsPipeline()
 #pragma endregion 半透明合成のパイプライン生成
 }
 
-void Billboard::LoadTexture(const wchar_t* filePath)
-{
-	// WICテクスチャのロード
-	TexMetadata metadata{};
-	ScratchImage scratchImg{};
-
-	// 画像データ読み込み
-	if (Texture::loadTexFile(filePath, metadata, scratchImg))
-	{
-		assert(0);
-		std::exit(1);
-	}
-
-	// テクスチャバッファ生成
-	auto cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
-	gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
-	Texture::createTexBuff(metadata, scratchImg, texbuff, cpuDescHandleSRV);
-}
-
-void Billboard::CreateModel()
+void CircularGauge::createModel()
 {
 	// 頂点バッファ生成
 	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPos) * vertexCount),
+		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(Vertex) * vertexCount),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vertBuff));
@@ -462,6 +382,19 @@ void Billboard::CreateModel()
 
 	// 頂点バッファビューの作成
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
-	vbView.SizeInBytes = sizeof(VertexPos) * vertexCount;
-	vbView.StrideInBytes = sizeof(VertexPos);
+	vbView.SizeInBytes = sizeof(Vertex) * vertexCount;
+	vbView.StrideInBytes = sizeof(Vertex);
+}
+
+void CircularGauge::createConstBuff()
+{
+	// 定数バッファの生成
+	HRESULT result = dxBase->getDev()->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuff));
+	assert(SUCCEEDED(result));
 }

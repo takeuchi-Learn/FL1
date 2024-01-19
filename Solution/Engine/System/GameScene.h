@@ -9,4 +9,5 @@ public:
 	virtual void update() = 0; // 実装必須
 	virtual void drawObj3d() {}
 	virtual void drawFrontSprite() {}
+	virtual void draw_afterImGui() {}
 };

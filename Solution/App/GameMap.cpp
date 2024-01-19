@@ -3,12 +3,10 @@
 #include <Util/YamlLoader.h>
 #include <Util/Util.h>
 #include <DirectXMath.h>
-
-#include "Object/Goal.h"
-#include "Object/ColorCone.h"
+#include <Object/Goal.h>
+#include <Object/ColorCone.h>
 #include "GameCamera.h"
-
-#include<sstream>
+#include <sstream>
 
 using namespace DirectX;
 
@@ -18,30 +16,73 @@ namespace
 	constexpr char* goalStr = "goal";
 
 	// オブジェクト一覧
-	const std::vector<char*>objectNames =
+	constexpr std::array<char*, 2> objectNames =
 	{
 		coneStr,
 		goalStr,
 	};
+
+	template <std::integral Ty, int base = 10>
+	std::from_chars_result fromStr(std::string_view str, Ty& ret)
+	{
+		return std::from_chars(std::to_address(str.begin()),
+							   std::to_address(str.end()),
+							   ret, base);
+	}
+
+	template <std::floating_point Ty>
+	std::from_chars_result fromStr(std::string_view str, Ty& ret)
+	{
+		return std::from_chars(std::to_address(str.begin()),
+							   std::to_address(str.end()),
+							   ret);
+	}
 }
 
-void GameMap::setAABBData(size_t x, size_t y, const DirectX::XMFLOAT3& pos, float scale)
-{
-	const float harfScale = scale / 2;
-	XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
-	XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
-
-	CollisionShape::AABB aabb;
-	aabb.minPos = XMLoadFloat2(&minPos);
-	aabb.maxPos = XMLoadFloat2(&maxPos);
-	mapAABBs.push_back(aabb);
-	//mapAABBs[y][x].minPos = XMLoadFloat2(&minPos);
-	//mapAABBs[y][x].maxPos = XMLoadFloat2(&maxPos);
-}
-
-GameMap::GameMap(GameCamera* camera) :
-	camera(camera)
+GameMap::Collider::Collider(const DirectX::XMFLOAT2& minPos,
+							const DirectX::XMFLOAT2& maxPos,
+							uint8_t collisionBitFlag)
+	: aabb({ XMLoadFloat2(&minPos), XMLoadFloat2(&maxPos) }),
+	collisionDirectionBitFlag(collisionBitFlag)
 {}
+
+void GameMap::setAABBData(size_t x, size_t y,
+						  const DirectX::XMFLOAT3& pos,
+						  float scale,
+						  uint8_t collisionBitFlag)
+{
+	const float harfScale = scale / 2.f;
+	const XMFLOAT2 minPos(pos.x - harfScale, pos.y - harfScale);
+	const XMFLOAT2 maxPos(pos.x + harfScale, pos.y + harfScale);
+
+	mapAABBs.emplace_back(minPos, maxPos, collisionBitFlag);
+}
+
+GameMap::GameMap(GameCamera* camera)
+	: camera(camera)
+{}
+
+void GameMap::loadStageObjList(const std::string& csvStr, float scale, const std::function<void(const DirectX::XMFLOAT2&)> insertFunc)
+{
+	auto csv = Util::loadCsvFromString(csvStr);
+
+	float posBuf[2]{};
+
+	for (auto& y : csv)
+	{
+		const auto yLen = y.size();
+		if (yLen < 2) { continue; }
+
+		for (uint8_t i = 0ui8; i < 2ui8; ++i)
+		{
+			fromStr(y[i], posBuf[i]);
+			posBuf[i] *= scale;
+		}
+		posBuf[1] = -posBuf[1];
+
+		insertFunc(XMFLOAT2(posBuf));
+	}
+}
 
 bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* startPosBuf)
 {
@@ -55,6 +96,21 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 	{
 		XMFLOAT2& startPos = *startPosBuf;
 		LoadYamlDataToFloat2(root, startPos);
+	}
+
+	if (auto& collisionNode = root["collisionBitFlag"];
+		collisionNode.Size() > 0)
+	{
+		for (auto i = collisionNode.Begin(); i != collisionNode.End(); i++)
+		{
+			const auto& key = (*i).first;
+			const auto& node = (*i).second;
+
+			const auto str = node.As<std::string>("1111");
+
+			constexpr int base = 2;
+			fromStr<uint8_t, base>(str, collisionDataList[key]);
+		}
 	}
 
 	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
@@ -76,17 +132,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 			const auto& cellStr = csvData[y][x];
 
 			constexpr int base = 10;
-			uint8_t n = MAPCHIP_UNDEF;
-			const auto ret = std::from_chars(std::to_address(cellStr.begin()),
-											 std::to_address(cellStr.end()),
-											 n,
-											 base);
+			uint8_t n = 0ui8;
+			const auto ret = fromStr<uint8_t, base>(cellStr, n);
 
 			// 未定義の値なら
 			if (ret.ec == std::errc::invalid_argument ||
 				ret.ec == std::errc::result_out_of_range ||
-				n == MAPCHIP_UNDEF ||
-				n >= MAPCHIP_ALLNUM)
+				n == 0ui8)
 			{
 				assert(0);
 				return true;
@@ -94,124 +146,90 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 
 			const auto pos = XMFLOAT3(float(x) * scale,
 									  -float(y) * scale,
-									  0);
+									  0.f);
 
-			// 通れる道ならcontinueする
-			// 一旦GOALもcontinue
-			if (n == GameMap::MAPCHIP_ROAD || n == GameMap::MAPCHIP_GOAL)continue;
+			{
+				// コリジョンデータが未指定なら全方向判定を取る
+				uint8_t currentCollisionData = 0b1111ui8;
 
-			std::wstring wTexPath{};
+				// コリジョンデータがあればそれを使う
+				if (auto it = collisionDataList.find(cellStr);
+					it != collisionDataList.end())
+				{
+					currentCollisionData = it->second;
+				}
+
+				// コリジョンデータに一方向でも判定が有ればコライダーを追加
+				if (const uint8_t flags = currentCollisionData & 0b1111ui8;
+					flags)
+				{
+					setAABBData(x, y, pos, scale, flags);
+				}
+			}
 
 			// パスをstringからwstringに変換
 			try
 			{
+				constexpr const char defStr[] = "/INVISIBLE/";
+				std::string texPath = texFileNameNode[cellStr].As<std::string>(defStr);
+				if (texPath == defStr || texPath == "") { continue; }
+
 				// string型のパス
-				const std::string texPath = texFolderPath + texFileNameNode[cellStr].As<std::string>();
+				texPath = texFolderPath + texPath;
+
 				// 長さを取得
 				const auto len = MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, (wchar_t*)NULL, 0);
 				std::vector<wchar_t> buf(len);
 
 				//string -> wstring
 				MultiByteToWideChar(CP_ACP, 0, texPath.c_str(), -1, buf.data(), len);
-				wTexPath = std::wstring(buf.data(), buf.data() + len - 1);
+				std::wstring wTexPath = std::wstring(buf.data(), buf.data() + len - 1);
+
+				// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
+				// YAML内の画像ファイルパスを反映させる
+				const auto addRet = billboard.try_emplace(n, nullptr);
+				auto& data = addRet.first->second;
+				// 新たに挿入されたら addRet.second == true
+				if (addRet.second) { data = std::make_unique<Billboard>(wTexPath.c_str(), camera); }
+				data->setCamera(camera);
+				data->add(pos, scale);
 			} catch (...)
 			{
-				assert(0);
-				return true;
+				continue;
 			}
-
-			// ここで "billboard[MAPCHIP_DATA(n)];" 要素を追加する
-			// YAML内の画像ファイルパスを反映させる
-			const auto addRet = billboard.try_emplace(MAPCHIP_DATA(n), std::make_unique<Billboard>(wTexPath.c_str(), camera));
-			auto& data = addRet.first->second;
-			data->setCamera(camera);
-
-			// 新たに挿入されたら addRet.second == true
-
-			data->add(pos, scale);
-
-			// 判定作成
-			setAABBData(x, y, pos, scale);
 		}
 	}
 
 	mapAABBs.shrink_to_fit();
 
 	// オブジェクト座標読み込み
-	loadStageObject(root, scale);
+	{
+		constexpr const char defStr[] = "NONE";
+
+		auto csvStr = root["goal"].As<std::string>(defStr);
+		if (csvStr != defStr)
+		{
+			loadStageObjList(csvStr, scale,
+							 [&](const XMFLOAT2& pos)
+							 {
+								 constexpr auto texSize = XMFLOAT2(800.f, 300.f);
+								 auto& i = goals.emplace_front(std::make_unique<Goal>(camera, pos, texSize));
+
+								 constexpr auto centerPx = XMFLOAT2(249.f, 249.f);
+								 constexpr auto centerUv = XMFLOAT2(1.f - centerPx.x / texSize.x, centerPx.y / texSize.y);
+								 constexpr auto center = XMFLOAT2(std::lerp(-1.f, 1.f, centerUv.x), std::lerp(-1.f, 1.f, centerUv.y));
+								 i->setCenter(center);
+							 });
+		}
+
+		csvStr = root["cone"].As<std::string>(defStr);
+		if (csvStr != defStr)
+		{
+			loadStageObjList(csvStr, scale, [&](const XMFLOAT2& pos) { cones.emplace_front(std::make_unique<ColorCone>(camera, pos, scale)); });
+		}
+	}
 
 	return false;
-}
-
-void GameMap::loadStageObject(Yaml::Node& node, const float scale)
-{
-	std::unordered_map<std::string, std::vector<XMFLOAT2>>stageObjectPos;
-	// 全オブジェクトの座標をu_mapに格納
-	for (auto& name : objectNames)
-	{
-		const std::string posString = node[name].As<std::string>("NONE");
-		if (posString == "NONE") { continue; }
-		const auto posStringData = Util::loadCsvFromString(posString);
-		std::vector<XMFLOAT2> objectPos(posStringData.size());
-		loadStageObjectPosition(posStringData, objectPos);
-
-		// スケールをかける
-		for (auto& pos : objectPos)
-		{
-			pos.x *= scale;
-			pos.y *= -scale;
-		}
-
-		stageObjectPos.emplace(name, objectPos);
-	}
-
-	// オブジェクト配置
-	setStageObjects(stageObjectPos, scale);
-}
-
-void GameMap::loadStageObjectPosition(const Util::CSVType& posCSV, std::vector<XMFLOAT2>& output)
-{
-	for (size_t y = 0u, yLen = posCSV.size(); y < yLen; ++y)
-	{
-		std::from_chars(std::to_address(posCSV[y][0].begin()),
-						std::to_address(posCSV[y][0].end()),
-						output[y].x);
-		std::from_chars(std::to_address(posCSV[y][1].begin()),
-						std::to_address(posCSV[y][1].end()),
-						output[y].y);
-	}
-}
-
-void GameMap::setStageObjects(const std::unordered_map<std::string, std::vector<XMFLOAT2>>& stageObjectPos, float scale)
-{
-	// リサイズ
-	size_t sizeNum = 0;
-	for (auto& posUMap : stageObjectPos)
-	{
-		for (auto& pos : posUMap.second)
-		{
-			++sizeNum;
-		}
-	}
-	stageObjects.resize(sizeNum);
-
-	size_t current = 0;
-	for (auto& posUMap : stageObjectPos)
-	{
-		for (auto& pos : posUMap.second)
-		{
-			if (posUMap.first == coneStr)
-			{
-				stageObjects[current] = std::make_unique<ColorCone>(camera, pos, scale);
-				++coneMax;
-			}
-			if (posUMap.first == goalStr)
-			{
-				stageObjects[current] = std::make_unique<Goal>(camera, pos, scale);
-			}
-			++current;
-		}
-	}
 }
 
 void GameMap::update()
@@ -221,9 +239,14 @@ void GameMap::update()
 		i.second->update(XMConvertToRadians(-camera->getAngleDeg()));
 	}
 
-	for (auto& obj : stageObjects)
+	for (auto& i : cones)
 	{
-		obj->update();
+		i->update();
+	}
+
+	for (auto& i : goals)
+	{
+		i->update();
 	}
 }
 
@@ -233,9 +256,15 @@ void GameMap::draw()
 	{
 		i.second->draw();
 	}
-	for (auto& obj : stageObjects)
+
+	for (auto& i : cones)
 	{
-		obj->draw();
+		i->draw();
+	}
+
+	for (auto& i : goals)
+	{
+		i->draw();
 	}
 }
 
@@ -243,5 +272,5 @@ float GameMap::calcGameoverPos() const
 {
 	// ゲームオーバー座標に減算する数値(これでゲームオーバー判定地点を変更できる)
 	constexpr float gameOverPosSubNum = 150.f;
-	return XMVectorGetY(mapAABBs.back().minPos) - gameOverPosSubNum;
+	return XMVectorGetY(mapAABBs.back().aabb.minPos) - gameOverPosSubNum;
 }

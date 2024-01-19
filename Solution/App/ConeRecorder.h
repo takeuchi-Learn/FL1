@@ -7,26 +7,26 @@
 class ConeRecorder
 {
 private:
-	// 記録<ステージ番号,カウント>
-	std::unordered_map<unsigned short, unsigned short>records;
-	
+	/// @brief ステージ番号,カウント
+	std::unordered_map<uint16_t, uint16_t> records;
+
 private:
-	ConeRecorder(){}
-	~ConeRecorder(){}
-public:
+	ConeRecorder() = default;
+	virtual ~ConeRecorder() = default;
 	ConeRecorder(ConeRecorder& c) = delete;
 	ConeRecorder operator=(ConeRecorder& c) = delete;
-	static ConeRecorder* getInstance()
+
+public:
+	inline static ConeRecorder* ins()
 	{
 		static ConeRecorder counter{};
 		return &counter;
 	}
 
 	/// @brief クリアした時に自己ベストだったら記録登録する関数
-	void registration(const unsigned short stageNum,const unsigned short coneCount);
+	/// @return エラーでtrue
+	bool registration(const uint16_t stageNum, const uint16_t coneCount);
 
-	const unsigned short getRecord(const unsigned short stageNum) { return records.at(stageNum); }
-	const std::unordered_map<unsigned short, unsigned short>& getRecords()const { return records; }
-
+	const uint16_t getRecord(const uint16_t stageNum) { return records.at(stageNum); }
+	const auto& getRecords()const { return records; }
 };
-

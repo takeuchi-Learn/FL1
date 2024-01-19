@@ -15,18 +15,20 @@
 
 #include <Player/Player.h>
 #include <Object/Goal.h>
+#include <Object/ColorCone.h>
 #include <BackGround.h>
-#include<TutorialTexture.h>
+#include <TutorialTexture.h>
 #include <GameMap.h>
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
-#include<ConeRecorder.h>
-
+#include <ConeRecorder.h>
+#include <format>
 #include <Input/PadImu.h>
 
 #include "TitleScene.h"
 #include "ClearScene.h"
 #include "GameOverScene.h"
+#include "StageSelectScene.h"
 
 using namespace DirectX;
 
@@ -39,6 +41,12 @@ namespace
 	constexpr auto billboardGraphPath = L"Resources/judgeRange.png";
 
 	constexpr Timer::timeType transitionTime = Timer::oneSec;
+	constexpr Timer::timeType appearanceTime = Timer::oneSec * 2;
+
+	constexpr float cameraAngleDef = 30.f;
+
+	constexpr auto winSize = XMFLOAT2(static_cast<float>(WinAPI::window_width), static_cast<float>(WinAPI::window_height));
+	constexpr float csHeight = (winSize.y - (winSize.x / 2.35f)) / 2.f;
 
 	constexpr XMFLOAT2 lerp(const XMFLOAT2& s, const XMFLOAT2& e, float t)
 	{
@@ -48,25 +56,51 @@ namespace
 
 void PlayScene::checkCollision()
 {
+	if (!isActiveCollision) { return; }
+
 	// 地形判定
-	for (auto& aabb : gameMap->getMapAABBs())
+	for (auto& map : gameMap->getMapAABBs())
 	{
-		if (Collision::CheckHit(player->getShape(), aabb))
+		if (Collision::CheckHit(player->getShape(), map.aabb))
 		{
-			player->hit(aabb, typeid(*gameMap).name());
+			player->hitMap(map.aabb, 0b1111ui8 & map.collisionDirectionBitFlag);
 		}
 	}
 
-	// オブジェクト判定
-	const std::vector<std::unique_ptr<StageObject>>& objs = gameMap->getStageObjects();
-	for (auto& obj : objs)
+	// コーン判定
+	for (auto& cone : gameMap->getCones())
 	{
-		const CollisionShape::Sphere& sphere = player->getShape();
-		const CollisionShape::AABB& aabb = obj->getRefAABB();
+		const auto& sphere = player->getShape();
+		const auto& aabb = cone->getAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
-			player->hit(aabb, typeid(*obj).name());
-			obj->hit(sphere);
+			player->incrementConeCount();
+			cone->hit(sphere);
+		}
+	}
+
+	// ゴール判定
+	for (auto& goal : gameMap->getGoals())
+	{
+		const auto& sphere = player->getShape();
+		const auto& aabb = goal->getAABB();
+		if (Collision::CheckHit(sphere, aabb))
+		{
+			isActiveCollision = false;
+			player->isDynamic = false;
+			player->allowInput = false;
+			camera->allowInput = false;
+
+			{
+				auto& obj = goal->getObj()->getFrontData();
+				goalPreGoalPos = XMFLOAT2(obj->position.x, obj->position.y);
+			}
+			plyerPreGoalPos = goalPreGoalPos;
+
+			hitGoalPtr = goal.get();
+			goal->hit(sphere);
+			updateProc = std::bind(&PlayScene::update_goal, this);
+			timer->reset();
 		}
 	}
 }
@@ -84,20 +118,30 @@ PlayScene::PlayScene() :
 	timer(std::make_unique<Stopwatch>())
 {
 	updateProc = std::bind(&PlayScene::update_start, this);
+	updateCinemaScopeProc = [] {};
 
 	bgm = Sound::ins()->loadWave(bgmPath);
 
 	spriteBase = std::make_unique<SpriteBase>();
-	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/judgeRange.png"),
-									  spriteBase.get(),
-									  XMFLOAT2(0.5f, 0.5f));
-	sprite->color.w = 0.5f;
+	const auto blackTexNum = spriteBase->loadTexture(L"Resources/black.bmp");
+	for (auto& i : cinemaScope)
+	{
+		i = std::make_unique<Sprite>(blackTexNum, spriteBase.get(), XMFLOAT2(0.f, 0.f));
+		i->setSize(XMFLOAT2(winSize.x, csHeight));
+	}
+	cinemaScope.back()->setAnchorPoint(XMFLOAT2(0.f, 1.f));
+	constexpr float bottomY = static_cast<float>(WinAPI::window_height - 1);
+	cinemaScope.back()->position.y = bottomY;
 
 	camera->setEye(XMFLOAT3(0, 0, -5));
 	camera->setTarget(XMFLOAT3(0, 0, 0));
 	camera->setPerspectiveProjFlag(false);
+	camera->setAngleDeg(cameraAngleDef);
+	camera->allowInput = false;
 
 	player = std::make_unique<Player>(camera.get());
+	player->allowInput = false;
+	player->isDynamic = false;
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
 
@@ -105,8 +149,11 @@ PlayScene::PlayScene() :
 	gameMap = std::make_unique<GameMap>(camera.get());
 
 	XMFLOAT2 startPos{ 3.f, -1.f };
-	const bool ret = gameMap->loadDataFile(mapYamlPath, &startPos);
-	assert(false == ret);
+	if (gameMap->loadDataFile(mapYamlPath, &startPos))
+	{
+		assert(0);
+		std::exit(1);
+	}
 	player->setMapPos(startPos);
 	backGround = std::make_unique<BackGround>(camera.get(), static_cast<float>(gameMap->getMapY()));
 
@@ -114,18 +161,8 @@ PlayScene::PlayScene() :
 	player->setGameOverPos(gameMap->calcGameoverPos());
 	player->setScrollendPosRight(static_cast<float>(gameMap->getMapX()) * 100.f - 1.f);
 
-	// 開始時は物理挙動をしない
-	player->isDynamic = false;
-
-	// チュートリアル関係
-	// もしチュートリアルステージ(_0、_1)だったら画像追加
-	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
-	// 何番ステージまでがチュートリアルかを指定する
-	// 一応_1までチュートリアルと仮定して1に設定
-	constexpr unsigned short tutorialStageMax = 1;
-
 	// チュートリアルステージだったら画像追加
-	if (stageNum <= tutorialStageMax)
+	if (stageNum <= player->getYamlData()->tutorialStageMax)
 	{
 		tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), stageNum);
 	}
@@ -143,6 +180,9 @@ void PlayScene::start()
 
 void PlayScene::update()
 {
+	// 衝突確認
+	checkCollision();
+
 	updateProc();
 
 	camera->update();
@@ -150,30 +190,72 @@ void PlayScene::update()
 	backGround->update();
 	gameMap->update();
 
-	if (tutorialTexture)tutorialTexture->update();
-
-	// 衝突確認
-	checkCollision();
+	if (tutorialTexture) { tutorialTexture->update(); }
 }
 
 void PlayScene::update_start()
 {
 	if (timer->getNowTime() > transitionTime)
 	{
+		// 自機は物理挙動する
+		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
 		player->isDynamic = true;
-		PostEffect::ins()->setMosaicNum(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+		// 演出中の衝突フラグは無視する
+		player->resetReboundFlag();
+
+		PostEffect::ins()->setMosaicNum(winSize);
 		PostEffect::ins()->setAlpha(1.f);
 		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
-		updateProc = std::bind(&PlayScene::update_main, this);
+		updateProc = std::bind(&PlayScene::update_appearance, this);
 		timer->reset();
 	} else
 	{
 		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
 		//PostEffect::ins()->setAlpha(raito);
 		//raito *= raito * raito * raito * raito;
-		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * float(WinAPI::window_width),
-												 raito * float(WinAPI::window_height)));
+		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * winSize.x,
+												 raito * winSize.y));
 	}
+}
+
+void PlayScene::update_appearance()
+{
+	const auto now = timer->getNowTime();
+	if (now > appearanceTime)
+	{
+		// シネスコをだんだん消す
+		updateCinemaScopeProc = [&]
+			{
+				constexpr auto maxTime = Timer::oneSec / 2;
+				constexpr float maxTimeF = static_cast<float>(maxTime);
+				const auto now = timer->getNowTime();
+				if (now >= maxTime)
+				{
+					// 終わったらシネスコは非表示に、シネスコ更新関数は空にする。
+					for (auto& i : cinemaScope)
+					{
+						i->isInvisible = true;
+					}
+					updateCinemaScopeProc = [] {};
+					return;
+				}
+				const auto raito = static_cast<float>(now) / maxTimeF;
+				const float height = std::lerp(csHeight, 0.f, raito);
+				for (auto& i : cinemaScope)
+				{
+					i->setSize(XMFLOAT2(winSize.x, height));
+				}
+			};
+
+		camera->setAngleDeg(0.f);
+		camera->allowInput = true;
+		player->allowInput = true;
+		updateProc = std::bind(&PlayScene::update_main, this);
+		timer->reset();
+		return;
+	}
+	const auto raito = static_cast<float>(now) / static_cast<float>(appearanceTime);
+	camera->setAngleDeg(std::lerp(cameraAngleDef, 0.f, raito));
 }
 
 void PlayScene::update_main()
@@ -193,31 +275,72 @@ void PlayScene::update_main()
 
 #endif // _DEBUG
 
+	// ステージ選択へ戻る
+	{
+		// 左シフト + R
+		bool hit = Input::ins()->triggerKey(DIK_R) && Input::ins()->hitKey(DIK_LSHIFT);
+
+		// ABXYの上と左
+		if (PadImu::ins()->getDevCount() > 0)
+		{
+			constexpr auto useJSLMask = JSMASK_N | JSMASK_W;
+
+			const int preState = PadImu::ins()->getPreStates()[0].buttons;
+			const int state = PadImu::ins()->getStates()[0].buttons;
+
+			const bool pre = PadImu::hitButtons(preState, useJSLMask);
+			const bool current = PadImu::hitButtons(state, useJSLMask);
+
+			hit |= !pre && current;
+		}
+
+		// 指定の入力があったらステージ選択に戻る
+		if (hit)
+		{
+			SceneManager::ins()->changeScene<StageSelectScene>();
+		}
+	}
+
+	// シネスコ更新関数
+	updateCinemaScopeProc();
+
 	// ゲームオーバー確認
 	if (player->getIsDead())
 	{
 		camera->changeStateGameover();
 
-		gameOverTimer++;
-
 		// 一定時間後にゲームオーバーシーン切り替え
-		if (gameOverTimer >= GAME_OVER_TIME_MAX)
+		if (++gameOverDelayFrame >= GAME_OVER_DELAY_FRAME)
 		{
 			SceneManager::ins()->changeScene<GameOverScene>();
 		}
 	}
+}
 
-	// クリア確認
-	if (player->getIsClear())
+void PlayScene::update_goal()
+{
+	constexpr float max = Timer::oneSecF;
+	const float raito = static_cast<float>(timer->getNowTime()) / max;
+	if (raito >= 1.f)
 	{
-		camera->changeStateClear();
-
-		// コーンのカウント記録
-		ConeRecorder::getInstance()->registration(stageNum, player->getConeCount());
-
-		// クリア演出後シーン切り替え
-		SceneManager::ins()->changeScene<ClearScene>();
+		updateProc = std::bind(&PlayScene::update_clear, this);
+		return;
 	}
+
+	auto& goal = hitGoalPtr->getObj()->getFrontData();
+	goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + 100.f, raito);
+
+	const XMFLOAT2 playerEndPos = XMFLOAT2(plyerPreGoalPos.x + 100.f, plyerPreGoalPos.y);
+	player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, raito));
+}
+
+void PlayScene::update_clear()
+{
+	// コーンのカウント記録
+	ConeRecorder::ins()->registration(stageNum, player->getConeCount());
+
+	// クリア演出後シーン切り替え
+	SceneManager::ins()->changeScene<ClearScene>();
 }
 
 void PlayScene::drawObj3d()
@@ -231,4 +354,10 @@ void PlayScene::drawObj3d()
 }
 
 void PlayScene::drawFrontSprite()
-{}
+{
+	spriteBase->drawStart(DX12Base::ins()->getCmdList());
+	for (auto& i : cinemaScope)
+	{
+		i->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+	}
+}

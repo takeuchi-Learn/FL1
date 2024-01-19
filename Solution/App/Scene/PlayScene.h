@@ -2,12 +2,12 @@
 
 #include <System/GameScene.h>
 #include <Util/Stopwatch.h>
+#include <GameCamera.h>
+#include <Collision/CollisionShape.h>
 #include <memory>
 #include <functional>
+#include <array>
 
-#include "../GameCamera.h"
-
-#include <Collision/CollisionShape.h>
 class Camera;
 class Light;
 class ObjModel;
@@ -17,7 +17,6 @@ class SpriteBase;
 class SoundData;
 class ParticleMgr;
 class Collision;
-
 class Player;
 class Goal;
 class BackGround;
@@ -34,28 +33,34 @@ private:
 	std::unique_ptr<GameCamera> camera;
 
 	std::unique_ptr<SpriteBase> spriteBase;
-	std::unique_ptr<Sprite> sprite;
+	std::array<std::unique_ptr<Sprite>, 2u> cinemaScope;
 
 	std::unique_ptr<ParticleMgr> particle;
 
 	std::unique_ptr<Player> player;
-	std::unique_ptr<Goal> goal;
 
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<TutorialTexture> tutorialTexture;
 	std::unique_ptr<GameMap> gameMap;
 
-	std::function<void()> updateProc;
 	std::unique_ptr<Stopwatch> timer;
+
+	std::function<void()> updateProc;
+	std::function<void()> updateCinemaScopeProc;
 
 	std::weak_ptr<SoundData> bgm;
 
 	static uint16_t stageNum;
 
-#pragma region ゲームオーバー関係
-	int gameOverTimer = 0;
-	const int GAME_OVER_TIME_MAX = (int)(60.f * 1.f);
-#pragma endregion
+	uint16_t gameOverDelayFrame = 0ui16;
+	static constexpr uint16_t GAME_OVER_DELAY_FRAME = 60ui16;
+
+	bool isActiveCollision = true;
+
+	Goal* hitGoalPtr = nullptr;
+	// todo 仮演出のための変数。演出を作ったら消す。
+	DirectX::XMFLOAT2 plyerPreGoalPos{};
+	DirectX::XMFLOAT2 goalPreGoalPos{};
 
 private:
 	/// @brief 衝突確認関数
@@ -63,7 +68,10 @@ private:
 	bool checkMinMax(const CollisionShape::AABB& aabb);
 
 	void update_start();
+	void update_appearance();
 	void update_main();
+	void update_goal();
+	void update_clear();
 
 public:
 	PlayScene();

@@ -16,7 +16,7 @@ public:
 	// 色
 	DirectX::XMFLOAT4 color = { 1, 1, 1, 1 };
 	// スケール
-	float scale = 1.f;
+	DirectX::XMFLOAT2 scale = { 1.f, 1.f };
 	// 回転
 	float rotation = 0.f;
 
@@ -54,7 +54,7 @@ public:
 	struct VertexPos
 	{
 		XMFLOAT3 pos; // xyz座標
-		float scale; // スケール
+		XMFLOAT2 scale; // スケール
 		XMFLOAT4 color;
 	};
 
@@ -64,6 +64,7 @@ public:
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
 		float angleRad = 0.f;
+		XMFLOAT2 center{ 0.f, 0.f };
 	};
 
 	// 定数
@@ -109,7 +110,7 @@ public:
 	// 指定の画像で初期化
 	Billboard(const wchar_t* texFilePath, Camera* camera);
 
-	void update(float angleRad = 0.f);
+	void update(float angleRad = 0.f, const XMFLOAT2& center = { 0.f, 0.f });
 	void draw();
 
 	inline void setCamera(Camera* camera) { this->camera = camera; }
@@ -119,7 +120,13 @@ public:
 									 float rotation = 0.f,
 									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
 
+	std::weak_ptr<BillboardData> add(const XMFLOAT3& position,
+									 const XMFLOAT2& scale,
+									 float rotation = 0.f,
+									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
+
 	inline auto& getFrontData() { return billboards.front(); }
+	inline auto& getBillboardData() { return billboards; }
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();
