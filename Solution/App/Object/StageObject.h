@@ -35,7 +35,7 @@ public:
 	/// @param playerSphere プレイヤーの判定
 	virtual void hit(const CollisionShape::Sphere& playerSphere) {}
 
-	inline const CollisionShape::AABB& getRefAABB()const { return aabb; }
+	inline const auto& getAABB() const { return aabb; }
 
 	inline const auto& getCenter() const { return center; }
 	inline void setCenter(const auto& center) { this->center = center; }

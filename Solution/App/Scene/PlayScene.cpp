@@ -56,34 +56,34 @@ namespace
 void PlayScene::checkCollision()
 {
 	// 地形判定
-	for (auto& aabb : gameMap->getMapAABBs())
+	for (auto& map : gameMap->getMapAABBs())
 	{
-		if (Collision::CheckHit(player->getShape(), aabb.aabb))
+		if (Collision::CheckHit(player->getShape(), map.aabb))
 		{
-			player->hitMap(aabb.aabb, 0b1111ui8 & aabb.collisionDirectionBitFlag);
+			player->hitMap(map.aabb, 0b1111ui8 & map.collisionDirectionBitFlag);
 		}
 	}
 
 	// コーン判定
-	for (auto& obj : gameMap->getCones())
+	for (auto& cone : gameMap->getCones())
 	{
 		const auto& sphere = player->getShape();
-		const auto& aabb = obj->getRefAABB();
+		const auto& aabb = cone->getAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
 			player->incrementConeCount();
-			obj->hit(sphere);
+			cone->hit(sphere);
 		}
 	}
 
 	// ゴール判定
-	for (auto& obj : gameMap->getGoals())
+	for (auto& goal : gameMap->getGoals())
 	{
 		const auto& sphere = player->getShape();
-		const auto& aabb = obj->getRefAABB();
+		const auto& aabb = goal->getAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
-			obj->hit(sphere);
+			goal->hit(sphere);
 			// クリア時の関数
 			updateProc = std::bind(&PlayScene::update_clear, this);
 		}

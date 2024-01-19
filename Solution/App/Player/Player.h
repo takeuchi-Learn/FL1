@@ -189,5 +189,5 @@ public:
 
 	/// @brief 当たり判定取得
 	/// @return 当たり判定の情報
-	const CollisionShape::Sphere& getShape() const { return sphere; }
+	const auto& getShape() const { return sphere; }
 };
