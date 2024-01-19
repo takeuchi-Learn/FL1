@@ -182,6 +182,13 @@ void Player::setMapPos(const DirectX::XMFLOAT2& mapPos)
 	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
 }
 
+void Player::setWorldPos(const DirectX::XMFLOAT2& pos)
+{
+	// todo mapPosの扱いを正したら変える
+	this->mapPos = pos;
+	getObj()->position = XMFLOAT3(pos.x, pos.y, getObj()->position.z);
+}
+
 void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionDir)
 {
 	// 衝突位置確認

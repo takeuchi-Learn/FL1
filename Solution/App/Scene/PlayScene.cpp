@@ -22,7 +22,7 @@
 #include <System/PostEffect.h>
 #include <Collision/Collision.h>
 #include <ConeRecorder.h>
-
+#include <format>
 #include <Input/PadImu.h>
 
 #include "TitleScene.h"
@@ -55,6 +55,8 @@ namespace
 
 void PlayScene::checkCollision()
 {
+	if (!isActiveCollision) { return; }
+
 	// 地形判定
 	for (auto& map : gameMap->getMapAABBs())
 	{
@@ -83,9 +85,21 @@ void PlayScene::checkCollision()
 		const auto& aabb = goal->getAABB();
 		if (Collision::CheckHit(sphere, aabb))
 		{
+			isActiveCollision = false;
+			player->isDynamic = false;
+			player->allowInput = false;
+			camera->allowInput = false;
+
+			{
+				auto& obj = goal->getObj()->getFrontData();
+				goalPreGoalPos = XMFLOAT2(obj->position.x, obj->position.y);
+			}
+			plyerPreGoalPos = goalPreGoalPos;
+
+			hitGoalPtr = goal.get();
 			goal->hit(sphere);
-			// クリア時の関数
-			updateProc = std::bind(&PlayScene::update_clear, this);
+			updateProc = std::bind(&PlayScene::update_goal, this);
+			timer->reset();
 		}
 	}
 }
@@ -274,6 +288,23 @@ void PlayScene::update_main()
 			SceneManager::ins()->changeScene<GameOverScene>();
 		}
 	}
+}
+
+void PlayScene::update_goal()
+{
+	constexpr float max = Timer::oneSecF;
+	const float raito = static_cast<float>(timer->getNowTime()) / max;
+	if (raito >= 1.f)
+	{
+		updateProc = std::bind(&PlayScene::update_clear, this);
+		return;
+	}
+
+	auto& goal = hitGoalPtr->getObj()->getFrontData();
+	goal->position.y = std::lerp(goalPreGoalPos.y, goalPreGoalPos.y + 100.f, raito);
+
+	const XMFLOAT2 playerEndPos = XMFLOAT2(plyerPreGoalPos.x, plyerPreGoalPos.y + 100.f);
+	player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, raito));
 }
 
 void PlayScene::update_clear()

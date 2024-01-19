@@ -38,7 +38,6 @@ private:
 	std::unique_ptr<ParticleMgr> particle;
 
 	std::unique_ptr<Player> player;
-	std::unique_ptr<Goal> goal;
 
 	std::unique_ptr<BackGround> backGround;
 	std::unique_ptr<TutorialTexture> tutorialTexture;
@@ -56,6 +55,13 @@ private:
 	uint16_t gameOverDelayFrame = 0ui16;
 	static constexpr uint16_t GAME_OVER_DELAY_FRAME = 60ui16;
 
+	bool isActiveCollision = true;
+
+	Goal* hitGoalPtr = nullptr;
+	// todo 仮演出のための変数。演出を作ったら消す。
+	DirectX::XMFLOAT2 plyerPreGoalPos{};
+	DirectX::XMFLOAT2 goalPreGoalPos{};
+
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();
@@ -64,6 +70,7 @@ private:
 	void update_start();
 	void update_appearance();
 	void update_main();
+	void update_goal();
 	void update_clear();
 
 public:

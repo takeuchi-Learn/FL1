@@ -40,7 +40,7 @@ class Player
 		float sideReboundAddVal{};
 		float maxSpeedX{};
 		float accMagX{};
-		uint8_t tutorialStageMax = 0ui8;
+		uint16_t tutorialStageMax = 0ui8;
 	};
 
 	DirectX::XMFLOAT2 mapPos{};
@@ -169,6 +169,7 @@ public:
 	inline void setScrollendPosRight(float pos) { rightScrollEndPos = pos; }
 
 	void setMapPos(const DirectX::XMFLOAT2& mapPos);
+	void setWorldPos(const DirectX::XMFLOAT2& pos);
 
 	/// @brief ゲームオーバー扱いになる座標をセットする関数
 	/// @param posY

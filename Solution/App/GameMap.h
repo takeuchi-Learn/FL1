@@ -85,6 +85,8 @@ public:
 	inline const auto& getMapAABBs() const { return mapAABBs; }
 
 	inline const auto& getGoals() const { return goals; }
+	inline auto& getGoals() { return goals; }
+
 	inline auto& getCones() { return cones; }
 
 	/// @brief ゲームオーバーになる座標

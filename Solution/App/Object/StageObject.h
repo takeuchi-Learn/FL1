@@ -39,4 +39,6 @@ public:
 
 	inline const auto& getCenter() const { return center; }
 	inline void setCenter(const auto& center) { this->center = center; }
+
+	inline auto& getObj() { return gameObj; }
 };

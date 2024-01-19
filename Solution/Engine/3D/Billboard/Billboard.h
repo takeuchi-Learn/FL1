@@ -126,6 +126,7 @@ public:
 									 const XMFLOAT4& color = XMFLOAT4(1.f, 1.f, 1.f, 1.f));
 
 	inline auto& getFrontData() { return billboards.front(); }
+	inline auto& getBillboardData() { return billboards; }
 
 	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();
