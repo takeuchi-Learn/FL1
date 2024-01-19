@@ -343,10 +343,7 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 
 	isDrop = false;
 
-	if (fallFrame > 2)
-	{
-		startRebound();
-	}
+	startRebound();
 	fallFrame = 0;
 }
 
