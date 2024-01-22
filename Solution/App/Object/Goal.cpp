@@ -15,11 +15,26 @@ using namespace DirectX;
 // ここのパスマップのデータから読み取ったやつを使ったほうがいいから変更する
 // テクスチャをMapじゃない別のフォルダにオブジェクト移したほうがいいかも
 
+void Goal::movePlayer()
+{
+
+
+
+}
+
 void Goal::departure()
 {
+	// 移動
 	constexpr float frameAddSpeed = 0.25f;
 	speed += frameAddSpeed;
 	gameObj->getFrontData()->position.x += speed;
+	tireObj->getFrontData()->position.x += speed;
+	player->getObj()->position.x += speed;
+
+	// 回転 
+	const float angleDeg = 1.5f * speed;
+	tireObj->getFrontData()->rotation += angleDeg;
+	player->getObj()->rotation += angleDeg;
 }
 
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
@@ -53,7 +68,7 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	aabb.maxPos = XMLoadFloat2(&maxPos);*/
 
 
-	// タイヤ
+	// タイヤ追加&座標セット
 	XMFLOAT2 tirePos = pos;
 	tirePos.x += 175.f;
 	tirePos.y += -10.f;
@@ -80,13 +95,20 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 void Goal::update()
 {
 	gameObj->update(getCameraAngleDeg());
-	tireObj->update();
+	tireObj->update(getCameraAngleDeg() + tireObj->getFrontData()->rotation);
 #ifdef _DEBUG
 	aabbObj->update(getCameraAngleDeg());
 #endif // _DEBUG
 
 	// 発進処理
-	if(isGoal)departure();
+	if (isGoal && !isDeparture)
+	{
+		movePlayer();
+		// プレイヤーが穴にハマったら発車
+		if(1) isDeparture = true;
+	}
+	if (isDeparture)departure();
+
 }
 
 void Goal::draw()

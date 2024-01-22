@@ -36,9 +36,12 @@ private:
 
 
 	bool isGoal = false;
+	bool isDeparture = false;
 	float speed = 0.f;
 
 private:
+	/// @brief プレイヤーを黒い部分にはめる処理
+	void movePlayer();
 	/// @brief 車が発射する処理
 	void departure();
 public:

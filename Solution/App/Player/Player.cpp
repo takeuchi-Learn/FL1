@@ -151,6 +151,12 @@ Player::Player(GameCamera* camera) :
 
 void Player::update()
 {
+	if (!justGoalPoint)
+	{
+		gameObj->update(XMConvertToRadians(getObj()->rotation));
+		return;
+	}
+
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);
