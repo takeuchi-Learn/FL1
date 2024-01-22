@@ -227,7 +227,8 @@ void PlayScene::update_main()
 
 		// クリア演出後シーン切り替え
 		++stageNum;
-		//SceneManager::ins()->changeScene<ClearScene>();
+
+		if (player->getGoalMoveTimeMaxFlag())SceneManager::ins()->changeScene<ClearScene>();
 
 
 

@@ -85,6 +85,8 @@ class Player
 	
 	// 自身の中心とゴール判定の中心がほぼ同じになったかどうか
 	bool justGoalPoint = false;
+	// ゴール後経過した時間
+	unsigned short goalMoveTime = 0;
 
 	// スクロール止める左側の座標(mapPosがこれを下回った場合追従をオフにする)
 	float leftScrollEndPos = 0.f;
@@ -198,6 +200,12 @@ public:
 	float getStartPosX()const { return leftScrollEndPos; }
 	
 	unsigned short getConeCount()const { return coneCount; }
+
+	bool getGoalMoveTimeMaxFlag()
+	{
+		constexpr unsigned short timeMax = static_cast<unsigned short>(60.f * 2.f);
+		return goalMoveTime >= timeMax;
+	}
 
 	/// @brief 衝突時に呼び出す関数
 	/// @param hitAABB 判定

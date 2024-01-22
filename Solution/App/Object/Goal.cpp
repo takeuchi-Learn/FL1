@@ -36,6 +36,7 @@ void Goal::departure()
 	const float angleDeg = -0.5f * speed;
 	tireObj->getFrontData()->rotation += angleDeg;
 	player->getObj()->rotation += angleDeg;
+
 }
 
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)

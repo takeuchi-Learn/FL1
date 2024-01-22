@@ -131,6 +131,7 @@ void Player::checkGoalDir(const CollisionShape::AABB& goalAABB)
 	if(1)
 	{
 		justGoalPoint = true;
+		sphere.radius = 0.f;
 	}
 }
 
@@ -154,6 +155,7 @@ void Player::update()
 	if (justGoalPoint)
 	{
 		gameObj->update(XMConvertToRadians(getObj()->rotation));
+		++goalMoveTime;
 		return;
 	}
 
@@ -215,7 +217,6 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 
 		// ゴール演出の為の処理
 		checkGoalDir(hitAABB);
-
 
 		// 仮
 		justGoalPoint = true;
