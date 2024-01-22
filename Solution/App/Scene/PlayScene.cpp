@@ -109,6 +109,8 @@ PlayScene::PlayScene() :
 	player = std::make_unique<Player>(camera.get());
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
+	StageObject::setPlayer(player.get());
+
 
 	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) + ".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());
@@ -130,9 +132,7 @@ PlayScene::PlayScene() :
 	backGround = std::make_unique<BackGround>(camera.get(), light.get(), static_cast<float>(gameMap->getMapY()));
 
 
-	// チュートリアル関係
-	// もしチュートリアルステージ(_0、_1)だったら画像追加
-	// ここで_0などの番号渡して画像を指定してもいいかもしれない(チュートリアルの画像名をtutorial_0みたいにして指定する)
+	// チュートリアル
 	// 何番ステージまでがチュートリアルかを指定する
 	// 一応_1までチュートリアルと仮定して1に設定
 	constexpr unsigned short tutorialStageMax = 1;
@@ -219,8 +219,7 @@ void PlayScene::update_main()
 	// クリア確認
 	if (player->getIsClear())
 	{
-		// ゴール演出が終わるタイミングでシーンを切り替えるように変更する
-
+		// クリア時の処理を行うように
 		camera->changeStateClear();
 
 		// コーンのカウント記録
@@ -228,7 +227,10 @@ void PlayScene::update_main()
 
 		// クリア演出後シーン切り替え
 		++stageNum;
-		SceneManager::ins()->changeScene<ClearScene>();
+		//SceneManager::ins()->changeScene<ClearScene>();
+
+
+
 	}
 }
 

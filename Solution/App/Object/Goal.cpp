@@ -7,6 +7,8 @@
 #include <3D/Obj/ObjModel.h>
 #include <3D/Light/Light.h>
 
+#include<Player/Player.h>
+
 using namespace DirectX;
 
 
@@ -15,11 +17,14 @@ using namespace DirectX;
 
 void Goal::departure()
 {
-
+	constexpr float frameAddSpeed = 0.25f;
+	speed += frameAddSpeed;
+	gameObj->getFrontData()->position.x += speed;
 }
 
 Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	:StageObject(camera, pos, scale * 5.f, L"Resources/Map/Tex/Goal_Car.png")
+	,tireObj(std::make_unique<Billboard>(L"Resources/player/player.png", camera))
 {
 	// 補整座標(ymlで指定できるようにするための補正)
 	constexpr float addObjPosY = 242.f;
@@ -47,6 +52,14 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 	aabb.minPos = XMLoadFloat2(&minPos);
 	aabb.maxPos = XMLoadFloat2(&maxPos);*/
 
+
+	// タイヤ
+	XMFLOAT2 tirePos = pos;
+	tirePos.x += 175.f;
+	tirePos.y += -10.f;
+	tireObj->add(XMFLOAT3(tirePos.x, tirePos.y, 0), player->getObj()->scale);
+
+
 #ifdef _DEBUG
 	// ゴールの判定確認用
 
@@ -67,7 +80,7 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale)
 void Goal::update()
 {
 	gameObj->update(getCameraAngleDeg());
-
+	tireObj->update();
 #ifdef _DEBUG
 	aabbObj->update(getCameraAngleDeg());
 #endif // _DEBUG
@@ -80,6 +93,7 @@ void Goal::draw()
 {
 	// タイヤの描画と本体の描画を行う
 	gameObj->draw();
+	tireObj->draw();
 
 #ifdef _DEBUG
 	aabbObj->draw();

@@ -9,6 +9,8 @@ class Light;
 class GameCamera;
 class Billboard;
 
+class Player;
+
 // ステージ配置物の親クラス
 class StageObject
 {
@@ -20,6 +22,7 @@ protected:
 	// 当たり判定
 	CollisionShape::AABB aabb{};
 
+	static Player* player;
 protected:
 	float getCameraAngleDeg();
 
@@ -36,6 +39,6 @@ public:
 
 	const CollisionShape::AABB& getRefAABB()const { return aabb; }
 
-	
+	static void setPlayer(Player* p) { player = p; }
 };
 
