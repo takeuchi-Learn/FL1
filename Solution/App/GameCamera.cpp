@@ -246,7 +246,9 @@ void GameCamera::checkKeyInput()
 
 #pragma region CLEAR
 void GameCamera::updateClear()
-{}
+{
+
+}
 #pragma endregion
 
 void GameCamera::angleToUp(float angle, DirectX::XMFLOAT2& upXY)
@@ -333,7 +335,7 @@ void GameCamera::gameCameraUpdate()
 	{
 		// Xは固定
 		followObject(false);
-	} else if (cameraState == GameCamera::CameraState::OTHER)
+	} else if (cameraState == GameCamera::CameraState::OTHER || cameraState == GameCamera::CameraState::CLEAR)
 	{
 	} else
 	{

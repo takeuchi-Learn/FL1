@@ -151,7 +151,7 @@ Player::Player(GameCamera* camera) :
 
 void Player::update()
 {
-	if (!justGoalPoint)
+	if (justGoalPoint)
 	{
 		gameObj->update(XMConvertToRadians(getObj()->rotation));
 		return;
@@ -215,6 +215,13 @@ void Player::hit(const CollisionShape::AABB& hitAABB, const std::string& hitObjN
 
 		// ゴール演出の為の処理
 		checkGoalDir(hitAABB);
+
+
+		// 仮
+		justGoalPoint = true;
+		// 本来は自動移動終了後に行う(これしないと地面にぶつかった際にposに値が代入されるので、移動の制御が行えない)
+		sphere.radius = 0.f;
+
 	} 
 	else if (hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_BLOCK)
 			 || hitObjName == std::to_string(GameMap::MAPCHIP_DATA::MAPCHIP_WALL)

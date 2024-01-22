@@ -29,10 +29,11 @@ void Goal::departure()
 	speed += frameAddSpeed;
 	gameObj->getFrontData()->position.x += speed;
 	tireObj->getFrontData()->position.x += speed;
+	float d = player->getObj()->position.x;
 	player->getObj()->position.x += speed;
 
 	// 回転 
-	const float angleDeg = 1.5f * speed;
+	const float angleDeg = -0.5f * speed;
 	tireObj->getFrontData()->rotation += angleDeg;
 	player->getObj()->rotation += angleDeg;
 }
