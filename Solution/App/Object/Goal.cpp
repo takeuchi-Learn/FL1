@@ -25,7 +25,7 @@ void Goal::movePlayer()
 void Goal::departure()
 {
 	//// 移動
-	constexpr float frameAddSpeed = 0.25f;
+	constexpr float frameAddSpeed = 0.45f;
 	speed += frameAddSpeed;
 	//gameObj->getFrontData()->position.x += speed;
 	tireObj->getFrontData()->position.x += speed;

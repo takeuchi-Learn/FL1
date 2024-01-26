@@ -321,7 +321,8 @@ void PlayScene::update_main()
 
 void PlayScene::update_goal()
 {
-	constexpr float max = Timer::oneSecF;
+	//constexpr float max = Timer::oneSecF;
+	constexpr float max = Timer::oneSecF * 1.5f;
 	const float raito = static_cast<float>(timer->getNowTime()) / max;
 	
 
@@ -329,17 +330,20 @@ void PlayScene::update_goal()
 
 	auto& goal = hitGoalPtr->getObj()->getFrontData();
 	//goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + moveVal, raito);
-	goal->position.x += hitGoalPtr->getSpeed();
+	
+	const float speed = hitGoalPtr->getSpeed();
+	goal->position.x += speed;
 
 	const XMFLOAT2 playerEndPos = XMFLOAT2(plyerPreGoalPos.x + moveVal, plyerPreGoalPos.y);
 	//player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, raito));
-	player->setWorldPos(XMFLOAT2(player->getObj()->position.x + hitGoalPtr->getSpeed(), player->getObj()->position.y));
+	player->setWorldPos(XMFLOAT2(player->getObj()->position.x + speed, player->getObj()->position.y));
 	
 	// 位置セット
 	if(!setGoalPos)
 	{
 		goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + moveVal, 0.f);
-		player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, 0.f));
+		//player->setWorldPos(lerp(plyerPreGoalPos, playerEndPos, 0.f));
+		player->setWorldPos(XMFLOAT2(plyerPreGoalPos.x, plyerPreGoalPos.y - 8.f));
 		setGoalPos = true;
 	}
 
