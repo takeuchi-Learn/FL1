@@ -113,7 +113,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		}
 	}
 
-	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
+	const auto texFolderPath = root["texFolderPath"].As<std::string>("");
 	auto& texFileNameNode = root["texFileName"];
 
 	auto& csv = root["csv"].As<std::string>("NONE");

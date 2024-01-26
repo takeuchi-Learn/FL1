@@ -99,6 +99,28 @@ void PlayScene::checkCollision()
 
 			loadNextScene = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<ClearScene>(); });
 
+			for (auto& i : cinemaScope)
+			{
+				i->isInvisible = false;
+			}
+			updateCinemaScopeProc = [&]
+				{
+					constexpr auto maxTime = Timer::oneSec / 4;
+					constexpr float maxTimeF = static_cast<float>(maxTime);
+					const auto now = timer->getNowTime();
+					if (now > maxTime)
+					{
+						updateCinemaScopeProc = [] {};
+						return;
+					}
+					const auto raito = static_cast<float>(now) / maxTimeF;
+					const float height = std::lerp(0.f, csHeight, raito);
+					for (auto& i : cinemaScope)
+					{
+						i->setSize(XMFLOAT2(winSize.x, height));
+					}
+				};
+
 			hitGoalPtr = goal.get();
 			goal->hit(sphere);
 			updateProc = std::bind(&PlayScene::update_goal, this);
@@ -185,6 +207,9 @@ void PlayScene::update()
 	// 衝突確認
 	checkCollision();
 
+	// シネスコ更新関数
+	updateCinemaScopeProc();
+
 	updateProc();
 
 	camera->update();
@@ -197,27 +222,26 @@ void PlayScene::update()
 
 void PlayScene::update_start()
 {
-	if (timer->getNowTime() > transitionTime)
+	if (const auto nowTime = timer->getNowTime();
+		nowTime <= transitionTime)
 	{
-		// 自機は物理挙動する
-		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
-		player->isDynamic = true;
-		// 演出中の衝突フラグは無視する
-		player->resetReboundFlag();
-
-		PostEffect::ins()->setMosaicNum(winSize);
-		PostEffect::ins()->setAlpha(1.f);
-		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
-		updateProc = std::bind(&PlayScene::update_appearance, this);
-		timer->reset();
-	} else
-	{
-		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
-		//PostEffect::ins()->setAlpha(raito);
-		//raito *= raito * raito * raito * raito;
+		const float raito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * winSize.x,
 												 raito * winSize.y));
+		return;
 	}
+
+	// 自機は物理挙動する
+	// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
+	player->isDynamic = true;
+	// 演出中の衝突フラグは無視する
+	player->resetReboundFlag();
+
+	PostEffect::ins()->setMosaicNum(winSize);
+	PostEffect::ins()->setAlpha(1.f);
+	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
+	updateProc = std::bind(&PlayScene::update_appearance, this);
+	timer->reset();
 }
 
 void PlayScene::update_appearance()
@@ -302,9 +326,6 @@ void PlayScene::update_main()
 			SceneManager::ins()->changeScene<StageSelectScene>();
 		}
 	}
-
-	// シネスコ更新関数
-	updateCinemaScopeProc();
 
 	// ゲームオーバー確認
 	if (player->getIsDead())
