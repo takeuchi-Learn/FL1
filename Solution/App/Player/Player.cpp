@@ -277,7 +277,7 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	if (!isJump && fallFrame < 1 || isReboundY)
+	if (!isJump || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->hitInputPadLT() || Input::ins()->hitInputPadRT();
