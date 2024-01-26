@@ -50,16 +50,15 @@ StageSelectScene::StageSelectScene() :
 	backGroundSprite->setSize(winSize);
 
 	// ステージ画像
-	stageTexSprite.resize(stageMaxNum);
-	for (uint16_t i = 0u; i < stageMaxNum; i++)
+	stageTexSprite.resize(stageMaxNum + 1);
+	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
 	{
 		if (i == 3)continue;
 
 		const std::wstring path = L"Resources/stageSelect/stage" + std::to_wstring(i) + L".png";
 		stageTexSprite[i] = std::make_unique<Sprite>(spBase->loadTexture(path.c_str()), spBase.get(), XMFLOAT2(0.f, 0.f));
-		
-		constexpr float size = 0.f;
-		//spr->setSize(winSize);
+		stageTexSprite[i]->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
+
 	}
 }
 
@@ -118,6 +117,7 @@ void StageSelectScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+	
 
 	using namespace ImGui;
 
@@ -132,7 +132,19 @@ void StageSelectScene::drawFrontSprite()
 			const float shiftVal = mapSize * 1.5f;
 			constexpr auto posY = static_cast<float>(WinAPI::window_height) / 2.f;
 			constexpr auto posX = static_cast<float>(WinAPI::window_width) / 2.f;
-			SetNextWindowPos(ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY), 0, ImVec2(0.5f, 0.5f));
+
+			const auto windowPos = ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY);
+			SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
+
+
+			if (i <= stageMaxNum)
+			{
+				if (stageTexSprite[i])
+				{
+					stageTexSprite[i]->position.x = windowPos.x;
+					stageTexSprite[i]->position.y = windowPos.y;
+				}
+			}
 		}
 
 		{
@@ -157,10 +169,38 @@ void StageSelectScene::drawFrontSprite()
 			}
 
 			SetNextWindowSize(ImVec2(size, size));
+
+			if (i <= stageMaxNum)
+			{
+				// stage3の画像が無いのでif書いてます
+				if (stageTexSprite[i])
+				{
+					if (i == currentStage)
+					{
+						constexpr float sprSize = 200.f * 0.985f;
+						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+					}
+					else
+					{
+						const float sprSize = size;
+						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+					}
+				}
+			}
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
 		Text(std::format("{}", i).c_str());
 		End();
+
+
+		if (i <= stageMaxNum)
+		{
+			// stage3の画像が無いのでif書いてます
+			if (stageTexSprite[i])
+			{
+				stageTexSprite[i]->drawWithUpdate(DX12Base::ins(), spBase.get());
+			}
+		}
 	}
 }
