@@ -194,7 +194,7 @@ void StageSelectScene::drawFrontSprite()
 					}
 					else
 					{
-						const float sprSize = size * 0.7f;
+						const float sprSize = size * 0.81f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 				}
@@ -202,7 +202,9 @@ void StageSelectScene::drawFrontSprite()
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-		Text(std::format("{}", i).c_str());
+		//Text("\n");
+		//Text(std::format("{}", i).c_str());
+		//SetWindowFontScale(1.5f);
 		End();
 
 
