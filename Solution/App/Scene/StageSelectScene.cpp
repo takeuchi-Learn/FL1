@@ -51,6 +51,13 @@ StageSelectScene::StageSelectScene() :
 	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
 	backGroundSprite->setSize(winSize);
 
+	// 矢印
+	arrowSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/arrow.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	constexpr float arrowSize = 1200.f;
+	arrowSprite->setSize(XMFLOAT2(arrowSize, arrowSize));
+	arrowSprite->position = XMFLOAT3(WinAPI::window_width / 2.f, 450.f, 0.f);
+	arrowSprite->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
+
 	// ステージ画像
 	stageTexSprite.resize(stageMaxNum + 1);
 	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
@@ -129,7 +136,8 @@ void StageSelectScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
-	
+	arrowSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
 	using namespace ImGui;
 
 	const auto stageCount = stageMaxNum + 1;

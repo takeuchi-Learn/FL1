@@ -43,6 +43,8 @@ class StageSelectScene :
 	std::unique_ptr<Sprite>backGroundSprite;
 	// ステージ画面
 	std::vector<std::unique_ptr<Sprite>>stageTexSprite;
+	// 矢印
+	std::unique_ptr<Sprite>arrowSprite;
 
 	// コントローラー回転してるやつ
 	std::unique_ptr<TutorialTexture>tutorialTexture;
