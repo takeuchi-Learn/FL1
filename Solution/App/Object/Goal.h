@@ -53,7 +53,6 @@ public:
 
 	void update()override;
 	void draw()override;
-	void hit(const CollisionShape::Sphere& playerSphere)override;
 
 	// ゴールフラグがtrueかどうか
 	inline bool getIsGoal() const { return isGoal; }

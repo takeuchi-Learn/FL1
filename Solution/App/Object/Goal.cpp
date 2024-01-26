@@ -25,10 +25,10 @@ void Goal::movePlayer()
 void Goal::departure()
 {
 	//// 移動
-	//constexpr float frameAddSpeed = 0.25f;
-	//speed += frameAddSpeed;
+	constexpr float frameAddSpeed = 0.25f;
+	speed += frameAddSpeed;
 	//gameObj->getFrontData()->position.x += speed;
-	//tireObj->getFrontData()->position.x += speed;
+	tireObj->getFrontData()->position.x += speed;
 	//float d = player->getObj()->position.x;
 	//player->getObj()->position.x += speed;
 
@@ -96,7 +96,7 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFL
 
 void Goal::update()
 {
-	gameObj->update(calcCameraAngleRad());
+	gameObj->update(calcCameraAngleRad(), center);
 	tireObj->update(calcCameraAngleRad() + tireObj->getFrontData()->rotation);
 #ifdef _DEBUG
 	//aabbObj->update(calcCameraAngleRad());
@@ -124,7 +124,3 @@ void Goal::draw()
 #endif // _DEBUG
 }
 
-void Goal::hit(const CollisionShape::Sphere& playerSphere)
-{
-	//isGoal = true;
-}
