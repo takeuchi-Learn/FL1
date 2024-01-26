@@ -48,7 +48,7 @@ private:
 	inline void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
+	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFLOAT2& scale);
 	~Goal() {}
 
 	void update()override;

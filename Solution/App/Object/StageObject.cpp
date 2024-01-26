@@ -4,10 +4,9 @@
 #include<Player/Player.h>
 using namespace DirectX;
 
-float StageObject::calcCameraAngleRad()
 Player* StageObject::player;
 
-float StageObject::getCameraAngleDeg()
+float StageObject::calcCameraAngleRad()
 {
 	return XMConvertToRadians(-camera->getAngleDeg());
 }
