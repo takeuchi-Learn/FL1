@@ -197,7 +197,7 @@ void StageSelectScene::drawFrontSprite()
 				{
 					if (i == currentStage)
 					{
-						constexpr float sprSize = 200.f * 1.3f;
+						const float sprSize = size * 0.8f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 					else
@@ -218,6 +218,9 @@ void StageSelectScene::drawFrontSprite()
 
 		if (i <= stageMaxNum)
 		{
+			// 選択してるやつだけ一番上に描画するのでcontinue
+			if (i == currentStage)continue;
+
 			// stage3の画像が無いのでif書いてます
 			if (stageTexSprite[i])
 			{
@@ -227,4 +230,11 @@ void StageSelectScene::drawFrontSprite()
 	}
 
 	tutorialTexture->draw();
+
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	// 一番上に表示したいのでここで呼び出し
+	if (stageTexSprite[currentStage])
+	{
+		stageTexSprite[currentStage]->drawWithUpdate(DX12Base::ins(), spBase.get());
+	}
 }
