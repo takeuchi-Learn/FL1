@@ -126,7 +126,8 @@ void StageSelectScene::drawFrontSprite()
 	{
 		// todo GameMapのstatic定数にする
 		constexpr float mapSize = 100.f;
-		constexpr float sizeMax = mapSize * 2.f;
+		//constexpr float sizeMax = mapSize * 2.f;
+		constexpr float sizeMax = mapSize * 3.2f;
 
 		{
 			const float shiftVal = mapSize * 1.5f;
@@ -177,12 +178,12 @@ void StageSelectScene::drawFrontSprite()
 				{
 					if (i == currentStage)
 					{
-						constexpr float sprSize = 200.f * 0.985f;
+						constexpr float sprSize = 200.f * 1.3f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 					else
 					{
-						const float sprSize = size;
+						const float sprSize = size * 0.7f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 				}
