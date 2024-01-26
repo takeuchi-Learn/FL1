@@ -97,6 +97,8 @@ void PlayScene::checkCollision()
 			}
 			plyerPreGoalPos = goalPreGoalPos;
 
+			loadNextScene = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<ClearScene>(); });
+
 			hitGoalPtr = goal.get();
 			goal->hit(sphere);
 			updateProc = std::bind(&PlayScene::update_goal, this);
@@ -341,8 +343,15 @@ void PlayScene::update_clear()
 	// コーンのカウント記録
 	ConeRecorder::ins()->registration(stageNum, player->getConeCount());
 
+	if (!loadNextScene || !loadNextScene->joinable())
+	{
+		assert(0);
+		return;
+	}
+
 	// クリア演出後シーン切り替え
-	SceneManager::ins()->changeScene<ClearScene>();
+	loadNextScene->join();
+	SceneManager::ins()->changeSceneFromInstance(nextScene);
 }
 
 void PlayScene::drawObj3d()

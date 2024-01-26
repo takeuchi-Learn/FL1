@@ -7,6 +7,7 @@
 #include <memory>
 #include <functional>
 #include <array>
+#include <thread>
 
 class Camera;
 class Light;
@@ -27,8 +28,9 @@ class PlayScene :
 	public GameScene
 {
 private:
+	std::unique_ptr<GameScene> nextScene;
+	std::unique_ptr<std::jthread> loadNextScene;
 
-	//std::unique_ptr<Camera> camera;
 	std::unique_ptr<Light> light;
 	std::unique_ptr<GameCamera> camera;
 
