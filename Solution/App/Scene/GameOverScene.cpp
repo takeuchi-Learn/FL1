@@ -16,6 +16,7 @@ using namespace DirectX;
 namespace
 {
 	constexpr Timer::timeType transitionTime = Timer::timeType(Timer::oneSecF * 1.5f);
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
 }
 
 GameOverScene::GameOverScene() :
@@ -25,6 +26,9 @@ GameOverScene::GameOverScene() :
 	sprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/gameover.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/nowLoading.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
+
+	sprite->setSize(winSize);
+	nowLoading->setSize(winSize);
 
 	bgm = Sound::ins()->loadWave("Resources/BGM/BGM.wav");
 	transitionSe = Sound::ins()->loadWave("Resources/SE/Shortbridge29-1.wav");

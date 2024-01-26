@@ -22,7 +22,7 @@ namespace
 		goalStr,
 	};
 
-	template <std::integral Ty, int base = 10>
+	template <std::integral Ty, int base = 36>
 	std::from_chars_result fromStr(std::string_view str, Ty& ret)
 	{
 		return std::from_chars(std::to_address(str.begin()),
@@ -131,14 +131,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		{
 			const auto& cellStr = csvData[y][x];
 
-			constexpr int base = 10;
-			uint8_t n = 0ui8;
+			constexpr int base = 36;
+			uint8_t n = UINT8_MAX;
 			const auto ret = fromStr<uint8_t, base>(cellStr, n);
 
 			// 未定義の値なら
 			if (ret.ec == std::errc::invalid_argument ||
-				ret.ec == std::errc::result_out_of_range ||
-				n == 0ui8)
+				ret.ec == std::errc::result_out_of_range)
 			{
 				assert(0);
 				return true;

@@ -15,6 +15,7 @@ using namespace DirectX;
 namespace
 {
 	constexpr Timer::timeType transitionTime = Timer::timeType(Timer::oneSecF * 1.5f);
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
 }
 
 ClearScene::ClearScene() :
@@ -25,6 +26,9 @@ ClearScene::ClearScene() :
 	sprite = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/gameclear.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/nowLoading.png"), spriteBase.get(), XMFLOAT2(0.f, 0.f));
 	nowLoading->isInvisible = true;
+
+	sprite->setSize(winSize);
+	nowLoading->setSize(winSize);
 }
 
 ClearScene::~ClearScene()
