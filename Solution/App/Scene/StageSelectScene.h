@@ -13,6 +13,9 @@
 class Stopwatch;
 class Sprite;
 class SpriteBase;
+class TutorialTexture;
+// TutorialTexture用
+class GameCamera;
 
 /// @brief ステージ選択画面のクラス
 class StageSelectScene :
@@ -41,7 +44,10 @@ class StageSelectScene :
 	// ステージ画面
 	std::vector<std::unique_ptr<Sprite>>stageTexSprite;
 
+	// コントローラー回転してるやつ
+	std::unique_ptr<TutorialTexture>tutorialTexture;
 
+	std::unique_ptr<GameCamera>camera;
 public:
 	StageSelectScene();
 	~StageSelectScene() = default;

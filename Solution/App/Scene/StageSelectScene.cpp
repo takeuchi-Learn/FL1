@@ -9,8 +9,10 @@
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
 #include <Util/Util.h>
+#include<GameCamera.h>
 #include <filesystem>
 #include <format>
+#include<TutorialTexture.h>
 
 using namespace DirectX;
 
@@ -60,6 +62,13 @@ StageSelectScene::StageSelectScene() :
 		stageTexSprite[i]->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
 
 	}
+
+	// 操作方法表示で使う使うカメラ
+	camera = std::make_unique<GameCamera>();
+	// 操作方法
+	tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), 0);
+	tutorialTexture->setPosition(XMFLOAT2(0.0f, 8.0f));
+	tutorialTexture->setScale(6.f);
 }
 
 void StageSelectScene::update_main()
@@ -92,6 +101,9 @@ void StageSelectScene::update_main()
 		update_proc = std::bind(&StageSelectScene::update_transition, this);
 		timer->reset();
 	}
+
+	// 操作方法更新
+	tutorialTexture->update();
 }
 
 void StageSelectScene::update_transition()
@@ -118,7 +130,6 @@ void StageSelectScene::drawFrontSprite()
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 	
-
 	using namespace ImGui;
 
 	const auto stageCount = stageMaxNum + 1;
@@ -204,4 +215,6 @@ void StageSelectScene::drawFrontSprite()
 			}
 		}
 	}
+
+	tutorialTexture->draw();
 }

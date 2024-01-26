@@ -31,6 +31,18 @@ void TutorialTexture::draw()
 	gameObj->draw();
 }
 
+void TutorialTexture::setScale(const float scale)
+{
+	gameObj->getFrontData()->scale.x = scale;
+	gameObj->getFrontData()->scale.y = scale;
+}
+
+void TutorialTexture::setPosition(const XMFLOAT2& pos)
+{
+	gameObj->getFrontData()->position.x = pos.x;
+	gameObj->getFrontData()->position.y = pos.y;
+};
+
 void TutorialTexture::createState()
 {
 	constexpr decltype(STAGE_NUM) TUTORIAL_MOVE = 0ui16;
