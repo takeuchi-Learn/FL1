@@ -144,6 +144,8 @@ PlayScene::PlayScene() :
 	player->isDynamic = false;
 	// 追従させるためにポインタを渡す
 	camera->setParentObj(player->getObj().get());
+	StageObject::setPlayer(player.get());
+
 
 	const auto mapYamlPath = "Resources/Map/map_" + std::to_string(stageNum) + ".yml";
 	gameMap = std::make_unique<GameMap>(camera.get());

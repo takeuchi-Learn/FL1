@@ -25,15 +25,35 @@ class GameCamera;
 class Goal :public StageObject
 {
 private:
+	// タイヤ
+	std::unique_ptr<Billboard>tireObj;
+
+
+#ifdef _DEBUG
+	// 当たり判定確認用
+	std::unique_ptr<Billboard> aabbObj;
+#endif // _DEBUG
+
+
 	bool isGoal = false;
+	bool isDeparture = false;
+	float speed = 0.f;
 
 private:
+	/// @brief プレイヤーを黒い部分にはめる処理
+	void movePlayer();
+	/// @brief 車が発射する処理
+	void departure();
 	/// @brief ゴールフラグをtrueにする
 	inline void goal() { isGoal = true; }
 
 public:
-	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFLOAT2& scale);
-	virtual ~Goal() {}
+	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, float scale);
+	~Goal() {}
+
+	void update()override;
+	void draw()override;
+	void hit(const CollisionShape::Sphere& playerSphere)override;
 
 	// ゴールフラグがtrueかどうか
 	inline bool getIsGoal() const { return isGoal; }

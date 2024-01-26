@@ -1,10 +1,13 @@
 ﻿#include "StageObject.h"
 #include <GameCamera.h>
 #include <3D/Billboard/Billboard.h>
-
+#include<Player/Player.h>
 using namespace DirectX;
 
 float StageObject::calcCameraAngleRad()
+Player* StageObject::player;
+
+float StageObject::getCameraAngleDeg()
 {
 	return XMConvertToRadians(-camera->getAngleDeg());
 }

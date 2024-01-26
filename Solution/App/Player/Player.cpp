@@ -126,8 +126,6 @@ Player::Player(GameCamera* camera)
 
 void Player::update()
 {
-	preColliderPos = sphere.center;
-
 	// ベクトル計測用
 	preFramePos = currentFramePos;
 	currentFramePos = XMFLOAT2(mapPos.x, mapPos.y);

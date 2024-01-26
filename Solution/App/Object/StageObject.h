@@ -4,9 +4,12 @@
 #include <memory>
 #include <DirectXMath.h>
 #include <Collision/CollisionShape.h>
-\
+
+class Light;
 class GameCamera;
 class Billboard;
+
+class Player;
 
 // ステージ配置物の親クラス
 class StageObject
@@ -21,6 +24,7 @@ protected:
 	// 0~1で画像のどこを中心とするか
 	DirectX::XMFLOAT2 center{};
 
+	static Player* player;
 protected:
 	float calcCameraAngleRad();
 
@@ -37,6 +41,7 @@ public:
 
 	inline const auto& getAABB() const { return aabb; }
 
+	static void setPlayer(Player* p) { player = p; }
 	inline const auto& getCenter() const { return center; }
 	inline void setCenter(const auto& center) { this->center = center; }
 
