@@ -3,12 +3,16 @@
 #include <System/Dx12Base.h>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
+#include <2D/Sprite.h>
+#include <2D/SpriteBase.h>
 #include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
 #include <Util/Util.h>
 #include <filesystem>
 #include <format>
+
+using namespace DirectX;
 
 namespace
 {
@@ -36,6 +40,27 @@ StageSelectScene::StageSelectScene() :
 	currentStage = std::clamp(PlayScene::getStageNum(), 0ui16, stageMaxNum);
 
 	update_proc = std::bind(&StageSelectScene::update_main, this);
+
+
+	// テクスチャ準備
+	spBase = std::make_unique<SpriteBase>();
+	// 背景
+	backGroundSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/stageSelectBG.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
+	backGroundSprite->setSize(winSize);
+
+	// ステージ画像
+	stageTexSprite.resize(stageMaxNum);
+	for (uint16_t i = 0u; i < stageMaxNum; i++)
+	{
+		if (i == 3)continue;
+
+		const std::wstring path = L"Resources/stageSelect/stage" + std::to_wstring(i) + L".png";
+		stageTexSprite[i] = std::make_unique<Sprite>(spBase->loadTexture(path.c_str()), spBase.get(), XMFLOAT2(0.f, 0.f));
+		
+		constexpr float size = 0.f;
+		//spr->setSize(winSize);
+	}
 }
 
 void StageSelectScene::update_main()
@@ -91,6 +116,9 @@ void StageSelectScene::update()
 
 void StageSelectScene::drawFrontSprite()
 {
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
 	using namespace ImGui;
 
 	const auto stageCount = stageMaxNum + 1;
