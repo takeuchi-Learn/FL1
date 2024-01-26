@@ -26,7 +26,7 @@ int Sensor::updateSensor()
 	constexpr int packetSize = sizeof(header) + sizeof(int16_t) * Sensor::sensorCount;
 
 	int dataCount = 0;
-
+	recordPre = record;
 	for (; p < buf + contentSize - packetSize; )
 	{
 		if (memcmp(p, header, sizeof(header)) != 0)

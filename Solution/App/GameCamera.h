@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <Camera/Camera.h>
 #include <GameObject/AbstractGameObj.h>
-#include <Imu/Sensor.h>
 #include <3D/Billboard/Billboard.h>
 #include <DirectXMath.h>
 

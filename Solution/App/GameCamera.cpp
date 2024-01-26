@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
+#include <Imu/Sensor.h>
 #include <Util/YamlLoader.h>
 
 using namespace DirectX;
@@ -181,13 +182,13 @@ void GameCamera::imuInputRotation()
 	auto* sensor = Sensor::ins();
 
 	// 加速度取得
-	accel.right = -sensor->GetAccelX();
+	accel.right = sensor->GetAccelX();
 	accel.up = -sensor->GetAccelZ();
-	accel.forward = -sensor->GetAccelY();
+	accel.forward = sensor->GetAccelY();
 	// 角速度取得
-	gyro.pitch = -sensor->GetGyroX();
-	gyro.yaw = -sensor->GetGyroZ();
-	gyro.roll = -sensor->GetGyroY();
+	gyro.pitch = sensor->GetGyroX();
+	gyro.yaw = sensor->GetGyroZ();
+	gyro.roll = sensor->GetGyroY();
 
 	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
 
@@ -213,7 +214,7 @@ void GameCamera::imuInputRotation()
 	{
 		// 調整項目
 		const float invRaito = 1.f - angleFilterRaito;
-		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, -accel.up));
+		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, -accel.up + abs(accel.forward)));
 
 		angleDeg = angleFilterRaito * (angleDeg + gyro.roll) + invRaito * rollAccel;
 	}

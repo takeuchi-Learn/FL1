@@ -52,10 +52,10 @@ void StageSelectScene::update_main()
 		inputL |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::LEFT);
 	}
 
-	if (inputR)
+	if (inputR || Sensor::ins()->CheckRight())
 	{
 		if (currentStage < stageMaxNum) { ++currentStage; }
-	} else if (inputL)
+	} else if (inputL || Sensor::ins()->CheckLeft())
 	{
 		if (currentStage > 0u) { --currentStage; }
 	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
