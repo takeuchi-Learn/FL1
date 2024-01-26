@@ -322,14 +322,18 @@ void PlayScene::update_main()
 void PlayScene::update_goal()
 {
 	constexpr float max = Timer::oneSecF;
-	const float raito = static_cast<float>(timer->getNowTime()) / max;
+	float raito = static_cast<float>(timer->getNowTime()) / max;
 	if (raito >= 1.f)
 	{
 		updateProc = std::bind(&PlayScene::update_clear, this);
 		return;
 	}
 
-	constexpr float moveVal = 1000.f;
+	// ゴール演出で動く幅
+	constexpr float moveVal = 2000.f;
+
+	// だんだん速くなるようにする
+	raito *= raito * raito;
 
 	auto& goal = hitGoalPtr->getObj()->getFrontData();
 	goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + moveVal, raito);
