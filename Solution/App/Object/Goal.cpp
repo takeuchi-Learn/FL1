@@ -72,7 +72,7 @@ Goal::Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFL
 
 	// タイヤ追加&座標セット
 	XMFLOAT2 tirePos = pos;
-	tirePos.x += 175.f;
+	tirePos.x += 398.f;
 	tirePos.y += -10.f;
 	tireObj->add(XMFLOAT3(tirePos.x, tirePos.y, 0), player->getObj()->scale);
 

@@ -323,11 +323,7 @@ void PlayScene::update_goal()
 {
 	constexpr float max = Timer::oneSecF;
 	const float raito = static_cast<float>(timer->getNowTime()) / max;
-	if (raito >= 1.f)
-	{
-		updateProc = std::bind(&PlayScene::update_clear, this);
-		return;
-	}
+	
 
 	constexpr float moveVal = 1000.f;
 
@@ -347,6 +343,11 @@ void PlayScene::update_goal()
 		setGoalPos = true;
 	}
 
+	if (raito >= 1.f)
+	{
+		updateProc = std::bind(&PlayScene::update_clear, this);
+		return;
+	}
 }
 
 void PlayScene::update_clear()
