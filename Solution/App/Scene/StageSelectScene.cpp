@@ -194,7 +194,7 @@ void StageSelectScene::drawFrontSprite()
 					}
 					else
 					{
-						const float sprSize = size * 0.81f;
+						const float sprSize = size * 0.82f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 				}
