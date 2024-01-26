@@ -210,7 +210,7 @@ void StageSelectScene::drawFrontSprite()
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
-			  DX12Base::imGuiWinFlagsNoTitleBar | ImGuiWindowFlags_NoBackground);
+			  DX12Base::imGuiWinFlagsNoTitleBar );
 		//Text("\n");
 		//Text(std::format("{}", i).c_str());
 		//SetWindowFontScale(1.5f);
