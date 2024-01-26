@@ -48,12 +48,19 @@ private:
 	inline void goal() { isGoal = true; }
 
 public:
+
+public:
 	Goal(GameCamera* camera, const DirectX::XMFLOAT2& pos, const DirectX::XMFLOAT2& scale);
 	~Goal() {}
 
 	void update()override;
 	void draw()override;
+	void hit(const CollisionShape::Sphere& playerSphere)override;
 
 	// ゴールフラグがtrueかどうか
 	inline bool getIsGoal() const { return isGoal; }
+
+	/// @brief 速度取得。もしゴールの移動処理をこのクラスに移したら消してよい
+	/// @return 速度
+	inline float getSpeed()const { return speed; }
 };

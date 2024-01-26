@@ -62,6 +62,8 @@ private:
 	DirectX::XMFLOAT2 plyerPreGoalPos{};
 	DirectX::XMFLOAT2 goalPreGoalPos{};
 
+	bool setGoalPos = false;
+
 private:
 	/// @brief 衝突確認関数
 	void checkCollision();

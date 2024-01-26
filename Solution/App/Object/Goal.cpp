@@ -124,3 +124,7 @@ void Goal::draw()
 #endif // _DEBUG
 }
 
+void Goal::hit(const CollisionShape::Sphere& playerSphere)
+{
+	isGoal = true;
+}
