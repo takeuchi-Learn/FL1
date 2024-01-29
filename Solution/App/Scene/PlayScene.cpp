@@ -182,8 +182,6 @@ void PlayScene::start()
 
 void PlayScene::update()
 {
-	// 衝突確認
-	checkCollision();
 
 	updateProc();
 
@@ -303,6 +301,8 @@ void PlayScene::update_main()
 		}
 	}
 
+	// 衝突確認
+	checkCollision();
 	// シネスコ更新関数
 	updateCinemaScopeProc();
 
