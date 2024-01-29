@@ -62,7 +62,6 @@ StageSelectScene::StageSelectScene() :
 	stageTexSprite.resize(stageMaxNum + 1);
 	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
 	{
-		if (i == 3)continue;
 
 		const std::wstring path = L"Resources/stageSelect/stage" + std::to_wstring(i) + L".png";
 		stageTexSprite[i] = std::make_unique<Sprite>(spBase->loadTexture(path.c_str()), spBase.get(), XMFLOAT2(0.f, 0.f));
@@ -208,12 +207,6 @@ void StageSelectScene::drawFrontSprite()
 				}
 			}
 		}
-
-
-		// ImDrawList::ChannelsSplit()とかで描画が変えられる可能性
-		// Forward declarationsあたりを翻訳して読んでみる
-		
-		// それか、いったんここで描画コマンド発行して再度描画開始する
 
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
