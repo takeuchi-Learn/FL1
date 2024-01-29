@@ -134,6 +134,7 @@ void StageSelectScene::update()
 
 void StageSelectScene::drawFrontSprite()
 {
+
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 	arrowSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
@@ -155,7 +156,6 @@ void StageSelectScene::drawFrontSprite()
 
 			const auto windowPos = ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY);
 			SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
-
 
 			if (i <= stageMaxNum)
 			{
@@ -209,14 +209,28 @@ void StageSelectScene::drawFrontSprite()
 			}
 		}
 
+
+		// ImDrawList::ChannelsSplit()とかで描画が変えられる可能性
+		// Forward declarationsあたりを翻訳して読んでみる
+		
+		// それか、いったんここで描画コマンド発行して再度描画開始する
+
+
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
 			  DX12Base::imGuiWinFlagsNoTitleBar );
 		//Text("\n");
 		//Text(std::format("{}", i).c_str());
 		//SetWindowFontScale(1.5f);
 		End();
+	}
+
+	DX12Base::getInstance()->endImGui();
+	DX12Base::getInstance()->startImGui();
 
 
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	for (int i = 0; i < stageCount; ++i)
+	{
 		if (i <= stageMaxNum)
 		{
 			// 選択してるやつだけ一番上に描画するのでcontinue
@@ -229,8 +243,8 @@ void StageSelectScene::drawFrontSprite()
 			}
 		}
 	}
-
 	tutorialTexture->draw();
+
 
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	// 一番上に表示したいのでここで呼び出し
