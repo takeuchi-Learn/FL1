@@ -58,6 +58,8 @@ StageSelectScene::StageSelectScene() :
 	arrowSprite->position = XMFLOAT3(WinAPI::window_width / 2.f, 450.f, 0.f);
 	arrowSprite->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
 
+	checkbox = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/checkbox.png"), spBase.get(), XMFLOAT2(0.5f, 0.5f));
+
 	// ステージ画像
 	stageTexSprite.resize(stageMaxNum + 1);
 	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
@@ -241,6 +243,12 @@ void StageSelectScene::drawFrontSprite()
 			auto& pos = sprite->position;
 			pos.x *= raitoX;
 			pos.y *= raitoY;
+
+			if (i == currentStage)
+			{
+				checkbox->setSize(size);
+				checkbox->position = pos;
+			}
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
@@ -274,4 +282,5 @@ void StageSelectScene::drawFrontSprite()
 	{
 		stageTexSprite[currentStage]->drawWithUpdate(DX12Base::ins(), spBase.get());
 	}
+	checkbox->drawWithUpdate(DX12Base::ins(), spBase.get());
 }
