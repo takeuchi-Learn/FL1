@@ -96,14 +96,14 @@ void StageSelectScene::update_main()
 		inputL |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::LEFT);
 	}
 
-	if (inputR)
+	if (inputR || Sensor::ins()->CheckRight())
 	{
 		if (currentStage < stageMaxNum)
 		{
 			++currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
-	} else if (inputL)
+	} else if (inputL || Sensor::ins()->CheckLeft())
 	{
 		if (currentStage > 0u)
 		{
