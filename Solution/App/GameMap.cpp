@@ -213,8 +213,9 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 							 {
 								 constexpr auto texSize = XMFLOAT2(800.f, 300.f);
 								 auto& i = goals.emplace_front(std::make_unique<Goal>(camera, pos, texSize));
-
-								 constexpr auto centerPx = XMFLOAT2(249.f, 249.f);
+								 
+								 // centerPxデフォ249,f,259.f
+								 constexpr auto centerPx = XMFLOAT2(249.f, 245.f);
 								 constexpr auto centerUv = XMFLOAT2(1.f - centerPx.x / texSize.x, centerPx.y / texSize.y);
 								 constexpr auto center = XMFLOAT2(std::lerp(-1.f, 1.f, centerUv.x), std::lerp(-1.f, 1.f, centerUv.y));
 								 i->setCenter(center);
