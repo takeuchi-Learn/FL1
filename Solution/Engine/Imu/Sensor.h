@@ -52,6 +52,10 @@ public:
 		return record[5];
 	}
 
+	// ステージセレクト用
+	inline bool CheckRight() const { return !isRightPre && isRight; }
+	inline bool CheckLeft() const { return !isLeftPre && isLeft; }
+
 	inline bool GetButton() const { return buttonState; }
 	inline bool GetPreButton() const { return buttonStatePre; }
 	inline bool CheckButton() const { return !buttonStatePre && buttonState; }
@@ -65,6 +69,11 @@ private:
 
 	bool buttonState = false;
 	bool buttonStatePre = false;
+
+	bool isRight = false;
+	bool isRightPre = false;
+	bool isLeft = false;
+	bool isLeftPre = false;
 
 	std::unique_ptr<Serial> serial;
 	std::array<float, sensorCount> record{};
