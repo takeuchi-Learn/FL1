@@ -54,8 +54,10 @@ int Sensor::updateSensor()
 	isRightPre = isRight;
 	isLeftPre = isLeft;
 
-	if (record[4] >= 180.f) { isRight = true; } else { isRight = false; }
-	if (record[4] <= -180.f) { isLeft = true; } else { isLeft = false; }
+	if (record[0] >= 0.7f) { isRight = true; }
+	else if(record[0] <= 0.2f) { isRight = false; }
+	if (record[0] <= -0.7f) { isLeft = true; }
+	else if(record[0] >= -0.2f) { isLeft = false; }
 
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);
