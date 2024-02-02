@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
-#include <Imu/Sensor.h>
 #include <Util/YamlLoader.h>
 
 using namespace DirectX;
@@ -132,16 +131,7 @@ void GameCamera::rotation()
 	}
 
 	directionalInputRotation();
-
-	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
-	if (imuPadIsConnected)
-	{
-		padInputRotation();
-	}
-	else
-	{
-		imuInputRotation();
-	}
+	imuInputRotation();
 }
 
 void GameCamera::directionalInputRotation()
@@ -188,50 +178,31 @@ void GameCamera::directionalInputRotation()
 
 void GameCamera::imuInputRotation()
 {
-	auto* sensor = Sensor::ins();
-
-	// 加速度取得
-	accel.right		= sensor->GetAccelX();
-	accel.up		= sensor->GetAccelZ();
-	accel.forward	= sensor->GetAccelY();
-	// 角速度取得
-	gyro.pitch		= sensor->GetGyroX();
-	gyro.yaw		= sensor->GetGyroZ();
-	gyro.roll		= sensor->GetGyroY();
-	// 単位がDegree/Secなので、1フレームでの値に変換する
-	gyro.pitch		/= DX12Base::ins()->getFPS();
-	gyro.yaw		/= DX12Base::ins()->getFPS();
-	gyro.roll		/= DX12Base::ins()->getFPS();
-
-	// 相補フィルターで補正
-	if(!sensor->GetButton())
+	if (PadImu::ins()->getDevCount() > 0)
 	{
-		// 調整項目
-		float sensorAngleFilterRaito = 0.9f;
-		const float invRaito = 1.f - sensorAngleFilterRaito;
-		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, sqrtf(accel.forward * accel.forward + accel.up * accel.up)));
+		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
-		angleDeg = sensorAngleFilterRaito * (angleDeg + gyro.roll) + invRaito * rollAccel;
-	}
-
-	// 静止状態を大きめに取る
-	if (angleDeg <= angleStopRange && -angleStopRange <= angleDeg)
+		// 加速度取得
+		accel.right = -state.accelX;
+		accel.up = -state.accelY;
+		accel.forward = state.accelZ;
+		// 角速度取得
+		gyro.pitch = -state.gyroX;
+		gyro.yaw = -state.gyroY;
+		gyro.roll = -state.gyroZ;
+	} else
 	{
-		angleDeg = 0.0f;
-	}
-}
+		auto* sensor = Sensor::ins();
 
-void GameCamera::padInputRotation()
-{
-	const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
-	// 加速度取得
-	accel.right = -state.accelX;
-	accel.up = -state.accelY;
-	accel.forward = state.accelZ;
-	// 角速度取得
-	gyro.pitch = -state.gyroX;
-	gyro.yaw = -state.gyroY;
-	gyro.roll = -state.gyroZ;
+		// 加速度取得
+		accel.right = -sensor->GetAccelX();
+		accel.up = -sensor->GetAccelZ();
+		accel.forward = -sensor->GetAccelY();
+		// 角速度取得
+		gyro.pitch = -sensor->GetGyroX();
+		gyro.yaw = -sensor->GetGyroZ();
+		gyro.roll = -sensor->GetGyroY();
+	}
 	// 単位がDegree/Secなので、1フレームでの値に変換する
 	gyro.pitch /= DX12Base::ins()->getFPS();
 	gyro.yaw /= DX12Base::ins()->getFPS();
