@@ -143,7 +143,6 @@ void StageSelectScene::update_transition()
 
 	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 
-
 	// 操作方法更新
 	tutorialTexture->update();
 }
