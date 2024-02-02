@@ -6,14 +6,16 @@ using namespace DirectX;
 
 namespace
 {
-	constexpr const wchar_t texPath[] = L"Resources/Map/Tex/tutorial.png";
+	constexpr const wchar_t texPath[] = L"Resources/Map/Tex/tutorial_";
 };
 
 TutorialTexture::TutorialTexture(GameCamera* camera, const uint16_t stageNum)
-	: gameObj(std::make_unique<Billboard>(texPath, camera))
-	, camera(camera)
+	: camera(camera)
 	, STAGE_NUM(stageNum)
 {
+	const std::wstring texPath = L"Resources/Map/Tex/tutorial_" + std::to_wstring(stageNum) + L".png";
+	gameObj = std::make_unique<Billboard>(texPath.c_str(), camera);
+	
 	// 数値は仮設定
 	gameObj->add(XMFLOAT3(300, -700, 0), 300.f);
 
