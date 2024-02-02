@@ -1,0 +1,7 @@
+SE名 選択5  (StageChange)
+制作 Springin’
+URL https://www.springin.org/sound-stock/category/system/
+
+SE名 メニューを開く1(StageDecided)
+制作 効果音ラボ
+URL https://soundeffect-lab.info/
