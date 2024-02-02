@@ -91,4 +91,9 @@ public:
 
 	void update();
 	void draw();
+
+	/// @brief ステージ選択での調整用
+	void setPosition(const DirectX::XMFLOAT2& pos);
+	/// @brief ステージ選択での調整用
+	void setScale(float scale);
 };

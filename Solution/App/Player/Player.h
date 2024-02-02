@@ -57,7 +57,7 @@ class Player
 	bool reboundYFrame = false;
 
 	//落下フレーム
-	int fallFrame = 0;
+	uint32_t fallFrame = 0;
 	//落下初速
 	float fallStartSpeed = 0.0f;
 	//現在の落下速度
