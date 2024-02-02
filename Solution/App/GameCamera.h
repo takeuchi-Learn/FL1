@@ -92,6 +92,7 @@ private:
 	void rotation();
 	void directionalInputRotation();
 	void imuInputRotation();
+	void padInputRotation();
 #pragma endregion
 
 	void preUpdate() override;

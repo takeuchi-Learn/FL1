@@ -23,10 +23,16 @@ int Sensor::updateSensor()
 
 	char* p = buf;
 	constexpr char header[] = { 'D', 'A', 'T', 'F' };
-	constexpr int packetSize = sizeof(header) + sizeof(int16_t) * Sensor::sensorCount;
+	constexpr int packetSize = sizeof(header) + sizeof(int16_t) * sensorCount;
 
 	int dataCount = 0;
-	recordPre = record;
+	buttonStatePre = buttonState;
+	if (receivedSize <= 0) 
+	{
+		buttonState = true;
+	}
+	else { buttonState = false; }
+
 	for (; p < buf + contentSize - packetSize; )
 	{
 		if (memcmp(p, header, sizeof(header)) != 0)
@@ -37,16 +43,19 @@ int Sensor::updateSensor()
 		++dataCount;
 		p += sizeof(header);
 
-		for (int i = 0; i < Sensor::sensorCount; i++, p += sizeof(int16_t))
+		for (int i = 0; i < sensorCount; i++, p += sizeof(int16_t))
 		{
 			const float accelSensitivity_16g = 2048.f;
 			const float gyroSensitivity_2kdps = 16.4f;
-			record[i] = *((const int16_t*)p) / (i < Sensor::accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
+			record[i] = *((const int16_t*)p) / (i < accelCount ? accelSensitivity_16g : gyroSensitivity_2kdps);
 		}
 	}
 
-	buttonStatePre = buttonState;
-	if (receivedSize <= 0) { buttonState = true; } else { buttonState = false; }
+	isRightPre = isRight;
+	isLeftPre = isLeft;
+
+	if (record[4] >= 180.f) { isRight = true; } else { isRight = false; }
+	if (record[4] <= -180.f) { isLeft = true; } else { isLeft = false; }
 
 	const int tailSize = (int)(buf + contentSize - p);
 	memmove(buf, p, tailSize);
