@@ -144,6 +144,8 @@ void StageSelectScene::drawFrontSprite()
 		//constexpr float sizeMax = mapSize * 2.f;
 		constexpr float sizeMax = mapSize * 3.2f;
 
+		auto& sprite = stageTexSprite[i];
+
 		{
 			const float shiftVal = mapSize * 1.5f;
 			constexpr auto posY = static_cast<float>(WinAPI::window_height) / 2.f;
@@ -154,10 +156,10 @@ void StageSelectScene::drawFrontSprite()
 
 			if (i <= stageMaxNum)
 			{
-				if (stageTexSprite[i])
+				if (sprite)
 				{
-					stageTexSprite[i]->position.x = windowPos.x;
-					stageTexSprite[i]->position.y = windowPos.y;
+					sprite->position.x = windowPos.x;
+					sprite->position.y = windowPos.y;
 				}
 			}
 		}
@@ -188,19 +190,34 @@ void StageSelectScene::drawFrontSprite()
 			if (i <= stageMaxNum)
 			{
 				// stage3の画像が無いのでif書いてます
-				if (stageTexSprite[i])
+				if (sprite)
 				{
 					if (i == currentStage)
 					{
 						const float sprSize = size * 0.8f;
-						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+						sprite->setSize(XMFLOAT2(sprSize, sprSize));
 					} else
 					{
 						const float sprSize = size * 0.82f;
-						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+						sprite->setSize(XMFLOAT2(sprSize, sprSize));
 					}
 				}
 			}
+		}
+
+		// OS設定の表示スケールに対応させる
+		{
+			const float raitoX = float(WinAPI::ins()->getSystemWindowSize().x) / float(WinAPI::window_width);
+			const float raitoY = float(WinAPI::ins()->getSystemWindowSize().y) / float(WinAPI::window_height);
+
+			XMFLOAT2 size = sprite->getSize();
+			size.x *= raitoX;
+			size.y *= raitoY;
+			sprite->setSize(size);
+
+			auto& pos = sprite->position;
+			pos.x *= raitoX;
+			pos.y *= raitoY;
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
