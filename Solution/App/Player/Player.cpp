@@ -232,7 +232,7 @@ void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionD
 
 	case LEFT:
 		// 下の処理あると壁密着時にカメラ回転させるとガクガクするので一旦コメントアウトしました
-		// おそらく判定無視でめり込み状態描画->移動後に押し戻された処理を行ってからの描画を繰り返す為 
+		// おそらく判定無視でめり込み状態描画->移動後に押し戻された処理を行ってからの描画を繰り返す為
 		//if (XMVectorGetX(myColliderVel) < 0.f) { return; }
 
 		// 横のバウンド開始

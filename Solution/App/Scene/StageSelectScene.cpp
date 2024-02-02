@@ -43,7 +43,6 @@ StageSelectScene::StageSelectScene() :
 
 	update_proc = std::bind(&StageSelectScene::update_main, this);
 
-
 	// テクスチャ準備
 	spBase = std::make_unique<SpriteBase>();
 	// 背景
@@ -62,11 +61,9 @@ StageSelectScene::StageSelectScene() :
 	stageTexSprite.resize(stageMaxNum + 1);
 	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
 	{
-
 		const std::wstring path = L"Resources/stageSelect/stage" + std::to_wstring(i) + L".png";
 		stageTexSprite[i] = std::make_unique<Sprite>(spBase->loadTexture(path.c_str()), spBase.get(), XMFLOAT2(0.f, 0.f));
 		stageTexSprite[i]->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
-
 	}
 
 	// 操作方法表示で使う使うカメラ
@@ -133,7 +130,6 @@ void StageSelectScene::update()
 
 void StageSelectScene::drawFrontSprite()
 {
-
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
 	arrowSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
@@ -198,8 +194,7 @@ void StageSelectScene::drawFrontSprite()
 					{
 						const float sprSize = size * 0.8f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
-					}
-					else
+					} else
 					{
 						const float sprSize = size * 0.82f;
 						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
@@ -208,9 +203,8 @@ void StageSelectScene::drawFrontSprite()
 			}
 		}
 
-
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
-			  DX12Base::imGuiWinFlagsNoTitleBar );
+			  DX12Base::imGuiWinFlagsNoTitleBar);
 		//Text("\n");
 		//Text(std::format("{}", i).c_str());
 		//SetWindowFontScale(1.5f);
@@ -219,7 +213,6 @@ void StageSelectScene::drawFrontSprite()
 
 	DX12Base::getInstance()->endImGui();
 	DX12Base::getInstance()->startImGui();
-
 
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	for (int i = 0; i < stageCount; ++i)
@@ -237,7 +230,6 @@ void StageSelectScene::drawFrontSprite()
 		}
 	}
 	tutorialTexture->draw();
-
 
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	// 一番上に表示したいのでここで呼び出し

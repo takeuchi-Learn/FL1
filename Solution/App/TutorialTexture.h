@@ -14,8 +14,6 @@ class Billboard;
 class GameCamera;
 class Stopwatch;
 
-using namespace DirectX;
-
 // 仕様
 // 個数少ないので、プレイヤーと同じ配置方法を想定して作成
 // プレイヤーと同じ方法で作成するが、それだと画像を正方形にしないといけない
@@ -95,7 +93,7 @@ public:
 	void draw();
 
 	/// @brief ステージ選択での調整用
-	void setPosition(const XMFLOAT2& pos);
+	void setPosition(const DirectX::XMFLOAT2& pos);
 	/// @brief ステージ選択での調整用
 	void setScale(float scale);
 };

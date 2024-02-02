@@ -33,9 +33,8 @@ class StageSelectScene :
 	void update_main();
 	void update_transition();
 
-	
 	// ステージ選択の画面はImGuiのウィンドウの上にかぶせるように配置すれば問題なさそう
-	
+
 	// スプライト準備するやつ
 	std::unique_ptr<SpriteBase> spBase;
 
