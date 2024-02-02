@@ -231,14 +231,16 @@ void Player::hitMap(const CollisionShape::AABB& hitAABB, uint8_t validCollisionD
 		break;
 
 	case LEFT:
-		if (XMVectorGetX(myColliderVel) < 0.f) { return; }
+		// 下の処理あると壁密着時にカメラ回転させるとガクガクするので一旦コメントアウトしました
+		// おそらく判定無視でめり込み状態描画->移動後に押し戻された処理を行ってからの描画を繰り返す為
+		//if (XMVectorGetX(myColliderVel) < 0.f) { return; }
 
 		// 横のバウンド開始
 		startSideRebound(XMVectorGetX(hitAABB.minPos), true);
 		break;
 
 	case RIGHT:
-		if (XMVectorGetX(myColliderVel) > 0.f) { return; }
+		//if (XMVectorGetX(myColliderVel) > 0.f) { return; }
 
 		// 横のバウンド開始
 		startSideRebound(XMVectorGetX(hitAABB.maxPos), false);
@@ -277,7 +279,7 @@ void Player::jump()
 
 	pushJumpKeyFrame = false;
 
-	if (!isJump && fallFrame < 1 || isReboundY)
+	if (!isJump || isReboundY)
 	{
 		bool triggerJump = Input::ins()->triggerKey(DIK_Z);
 		triggerJump |= Input::ins()->hitInputPadLT() || Input::ins()->hitInputPadRT();
@@ -343,10 +345,7 @@ void Player::jumpEnd(const CollisionShape::AABB& hitAABB)
 
 	isDrop = false;
 
-	if (fallFrame > 2)
-	{
-		startRebound();
-	}
+	startRebound();
 	fallFrame = 0;
 }
 

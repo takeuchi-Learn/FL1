@@ -6,11 +6,18 @@ using namespace DirectX;
 
 namespace
 {
-	constexpr const wchar_t texPath[] = L"Resources/Map/Tex/tutorial.png";
+	constexpr const wchar_t* texPath[] =
+	{
+		L"Resources/tutorial/tutorial.png",
+		L"Resources/tutorial/tutorial2.png"
+	};
+
+	constexpr uint16_t TUTORIAL_MOVE = 0ui16;
+	constexpr uint16_t TUTORIAL_JUMP = 1ui16;
 };
 
 TutorialTexture::TutorialTexture(GameCamera* camera, const uint16_t stageNum)
-	: gameObj(std::make_unique<Billboard>(texPath, camera))
+	: gameObj(std::make_unique<Billboard>(texPath[std::min(stageNum, 1ui16)], camera))
 	, camera(camera)
 	, STAGE_NUM(stageNum)
 {
@@ -31,11 +38,20 @@ void TutorialTexture::draw()
 	gameObj->draw();
 }
 
+void TutorialTexture::setScale(const float scale)
+{
+	gameObj->getFrontData()->scale.x = scale;
+	gameObj->getFrontData()->scale.y = scale;
+}
+
+void TutorialTexture::setPosition(const XMFLOAT2& pos)
+{
+	gameObj->getFrontData()->position.x = pos.x;
+	gameObj->getFrontData()->position.y = pos.y;
+};
+
 void TutorialTexture::createState()
 {
-	constexpr decltype(STAGE_NUM) TUTORIAL_MOVE = 0ui16;
-	constexpr decltype(STAGE_NUM) TUTORIAL_JUMP = 1ui16;
-
 	switch (STAGE_NUM)
 	{
 	case TUTORIAL_MOVE:
