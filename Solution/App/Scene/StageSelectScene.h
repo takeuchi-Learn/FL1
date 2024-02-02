@@ -9,6 +9,7 @@
 #include <thread>
 #include <functional>
 #include <string>
+#include <Input/PadImu.h>
 
 class Stopwatch;
 class Sprite;
@@ -51,7 +52,13 @@ class StageSelectScene :
 
 	std::unique_ptr<Sprite> checkbox;
 
-	std::unique_ptr<GameCamera>camera;
+	std::unique_ptr<GameCamera> camera;
+
+	IMU_STATE preState{}, state{};
+	bool imuInputRight = false;
+	bool imuInputLeft = false;
+	bool imuPreInputRight = false;
+	bool imuPreInputLeft = false;
 
 	std::weak_ptr<SoundData> bgm;
 	std::weak_ptr<SoundData> stageChange;

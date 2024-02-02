@@ -2,18 +2,17 @@
 #include "PlayScene.h"
 #include <System/Dx12Base.h>
 #include <Input/Input.h>
-#include <Input/PadImu.h>
 #include <2D/Sprite.h>
 #include <2D/SpriteBase.h>
 #include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
 #include <Util/Util.h>
-#include<GameCamera.h>
+#include <GameCamera.h>
 #include <filesystem>
 #include <format>
-#include<TutorialTexture.h>
-#include<Sound/Sound.h>
+#include <TutorialTexture.h>
+#include <Sound/Sound.h>
 
 using namespace DirectX;
 
@@ -94,16 +93,33 @@ void StageSelectScene::update_main()
 	{
 		inputR |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::RIGHT);
 		inputL |= PadImu::ins()->checkTriggerInputDPAD(0, PadImu::DIRECTION::LEFT);
+
+		preState = state;
+		state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
+
+		imuPreInputRight = imuInputRight;
+		imuPreInputLeft = imuInputLeft;
+
+		if (-state.accelX >= 0.7f) { imuInputRight = true; }
+		else if (-state.accelX <= 0.2f) { imuInputRight = false; }
+		if (-state.accelX <= -0.7f) { imuInputLeft = true; }
+		else if (-state.accelX >= -0.2f) { imuInputLeft = false; }
+
+		inputR |= imuInputRight && !imuPreInputRight;
+		inputL |= imuInputLeft && !imuPreInputLeft;
 	}
 
-	if (inputR || Sensor::ins()->CheckRight())
+	inputR |= Sensor::ins()->CheckRight();
+	inputL |= Sensor::ins()->CheckLeft();
+
+	if (inputR)
 	{
 		if (currentStage < stageMaxNum)
 		{
 			++currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
-	} else if (inputL || Sensor::ins()->CheckLeft())
+	} else if (inputL)
 	{
 		if (currentStage > 0u)
 		{

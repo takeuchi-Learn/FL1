@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <Camera/Camera.h>
 #include <GameObject/AbstractGameObj.h>
+#include <Imu/Sensor.h>
 #include <3D/Billboard/Billboard.h>
 #include <DirectXMath.h>
 
@@ -92,7 +93,6 @@ private:
 	void rotation();
 	void directionalInputRotation();
 	void imuInputRotation();
-	void padInputRotation();
 #pragma endregion
 
 	void preUpdate() override;
