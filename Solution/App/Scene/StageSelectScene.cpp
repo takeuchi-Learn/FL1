@@ -58,6 +58,8 @@ StageSelectScene::StageSelectScene() :
 	arrowSprite->position = XMFLOAT3(WinAPI::window_width / 2.f, 450.f, 0.f);
 	arrowSprite->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
 
+	checkbox = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/checkbox.png"), spBase.get(), XMFLOAT2(0.5f, 0.5f));
+
 	// ステージ画像
 	stageTexSprite.resize(stageMaxNum + 1);
 	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
@@ -96,16 +98,16 @@ void StageSelectScene::update_main()
 
 	if (inputR || Sensor::ins()->CheckRight())
 	{
-		if (currentStage < stageMaxNum) 
-		{ 
-			++currentStage; 
+		if (currentStage < stageMaxNum)
+		{
+			++currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
 	} else if (inputL || Sensor::ins()->CheckLeft())
 	{
-		if (currentStage > 0u) 
+		if (currentStage > 0u)
 		{
-			--currentStage; 
+			--currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
 	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
@@ -139,8 +141,10 @@ void StageSelectScene::update_transition()
 	}
 
 	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
-}
 
+	// 操作方法更新
+	tutorialTexture->update();
+}
 
 void StageSelectScene::start()
 {
@@ -242,6 +246,12 @@ void StageSelectScene::drawFrontSprite()
 			auto& pos = sprite->position;
 			pos.x *= raitoX;
 			pos.y *= raitoY;
+
+			if (i == currentStage)
+			{
+				checkbox->setSize(size);
+				checkbox->position = pos;
+			}
 		}
 
 		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
@@ -275,4 +285,5 @@ void StageSelectScene::drawFrontSprite()
 	{
 		stageTexSprite[currentStage]->drawWithUpdate(DX12Base::ins(), spBase.get());
 	}
+	checkbox->drawWithUpdate(DX12Base::ins(), spBase.get());
 }
