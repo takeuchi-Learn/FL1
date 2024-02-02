@@ -11,6 +11,11 @@
 #include <string>
 
 class Stopwatch;
+class Sprite;
+class SpriteBase;
+class TutorialTexture;
+// TutorialTexture用
+class GameCamera;
 
 /// @brief ステージ選択画面のクラス
 class StageSelectScene :
@@ -28,6 +33,23 @@ class StageSelectScene :
 	void update_main();
 	void update_transition();
 
+	
+	// ステージ選択の画面はImGuiのウィンドウの上にかぶせるように配置すれば問題なさそう
+	
+	// スプライト準備するやつ
+	std::unique_ptr<SpriteBase> spBase;
+
+	// 背景
+	std::unique_ptr<Sprite>backGroundSprite;
+	// ステージ画面
+	std::vector<std::unique_ptr<Sprite>>stageTexSprite;
+	// 矢印
+	std::unique_ptr<Sprite>arrowSprite;
+
+	// コントローラー回転してるやつ
+	std::unique_ptr<TutorialTexture>tutorialTexture;
+
+	std::unique_ptr<GameCamera>camera;
 public:
 	StageSelectScene();
 	~StageSelectScene() = default;

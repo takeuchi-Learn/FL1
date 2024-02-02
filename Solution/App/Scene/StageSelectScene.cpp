@@ -3,12 +3,18 @@
 #include <System/Dx12Base.h>
 #include <Input/Input.h>
 #include <Input/PadImu.h>
+#include <2D/Sprite.h>
+#include <2D/SpriteBase.h>
 #include <Imu/Sensor.h>
 #include <System/SceneManager.h>
 #include <Util/Stopwatch.h>
 #include <Util/Util.h>
+#include<GameCamera.h>
 #include <filesystem>
 #include <format>
+#include<TutorialTexture.h>
+
+using namespace DirectX;
 
 namespace
 {
@@ -36,6 +42,39 @@ StageSelectScene::StageSelectScene() :
 	currentStage = std::clamp(PlayScene::getStageNum(), 0ui16, stageMaxNum);
 
 	update_proc = std::bind(&StageSelectScene::update_main, this);
+
+
+	// テクスチャ準備
+	spBase = std::make_unique<SpriteBase>();
+	// 背景
+	backGroundSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/stageSelectBG.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	constexpr XMFLOAT2 winSize = XMFLOAT2(float(WinAPI::window_width), float(WinAPI::window_height));
+	backGroundSprite->setSize(winSize);
+
+	// 矢印
+	arrowSprite = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/stageSelect/arrow.png"), spBase.get(), XMFLOAT2(0.f, 0.f));
+	constexpr float arrowSize = 1200.f;
+	arrowSprite->setSize(XMFLOAT2(arrowSize, arrowSize));
+	arrowSprite->position = XMFLOAT3(WinAPI::window_width / 2.f, 450.f, 0.f);
+	arrowSprite->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
+
+	// ステージ画像
+	stageTexSprite.resize(stageMaxNum + 1);
+	for (uint16_t i = 0u; i < stageMaxNum + 1; i++)
+	{
+
+		const std::wstring path = L"Resources/stageSelect/stage" + std::to_wstring(i) + L".png";
+		stageTexSprite[i] = std::make_unique<Sprite>(spBase->loadTexture(path.c_str()), spBase.get(), XMFLOAT2(0.f, 0.f));
+		stageTexSprite[i]->setAnchorPoint(XMFLOAT2(0.5f, 0.5f));
+
+	}
+
+	// 操作方法表示で使う使うカメラ
+	camera = std::make_unique<GameCamera>();
+	// 操作方法
+	tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), 0);
+	tutorialTexture->setPosition(XMFLOAT2(0.0f, 8.0f));
+	tutorialTexture->setScale(6.f);
 }
 
 void StageSelectScene::update_main()
@@ -68,6 +107,9 @@ void StageSelectScene::update_main()
 		update_proc = std::bind(&StageSelectScene::update_transition, this);
 		timer->reset();
 	}
+
+	// 操作方法更新
+	tutorialTexture->update();
 }
 
 void StageSelectScene::update_transition()
@@ -91,6 +133,11 @@ void StageSelectScene::update()
 
 void StageSelectScene::drawFrontSprite()
 {
+
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	backGroundSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+	arrowSprite->drawWithUpdate(DX12Base::ins(), spBase.get());
+
 	using namespace ImGui;
 
 	const auto stageCount = stageMaxNum + 1;
@@ -98,13 +145,25 @@ void StageSelectScene::drawFrontSprite()
 	{
 		// todo GameMapのstatic定数にする
 		constexpr float mapSize = 100.f;
-		constexpr float sizeMax = mapSize * 2.f;
+		//constexpr float sizeMax = mapSize * 2.f;
+		constexpr float sizeMax = mapSize * 3.2f;
 
 		{
 			const float shiftVal = mapSize * 1.5f;
 			constexpr auto posY = static_cast<float>(WinAPI::window_height) / 2.f;
 			constexpr auto posX = static_cast<float>(WinAPI::window_width) / 2.f;
-			SetNextWindowPos(ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY), 0, ImVec2(0.5f, 0.5f));
+
+			const auto windowPos = ImVec2(posX + (int(i) - int(currentStage)) * sizeMax, posY);
+			SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
+
+			if (i <= stageMaxNum)
+			{
+				if (stageTexSprite[i])
+				{
+					stageTexSprite[i]->position.x = windowPos.x;
+					stageTexSprite[i]->position.y = windowPos.y;
+				}
+			}
 		}
 
 		{
@@ -129,10 +188,61 @@ void StageSelectScene::drawFrontSprite()
 			}
 
 			SetNextWindowSize(ImVec2(size, size));
+
+			if (i <= stageMaxNum)
+			{
+				// stage3の画像が無いのでif書いてます
+				if (stageTexSprite[i])
+				{
+					if (i == currentStage)
+					{
+						const float sprSize = size * 0.8f;
+						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+					}
+					else
+					{
+						const float sprSize = size * 0.82f;
+						stageTexSprite[i]->setSize(XMFLOAT2(sprSize, sprSize));
+					}
+				}
+			}
 		}
 
-		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr, DX12Base::imGuiWinFlagsNoTitleBar);
-		Text(std::format("{}", i).c_str());
+
+		Begin(std::format("StageSelectScene::drawFrontSprite{}", i).c_str(), nullptr,
+			  DX12Base::imGuiWinFlagsNoTitleBar );
+		//Text("\n");
+		//Text(std::format("{}", i).c_str());
+		//SetWindowFontScale(1.5f);
 		End();
+	}
+
+	DX12Base::getInstance()->endImGui();
+	DX12Base::getInstance()->startImGui();
+
+
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	for (int i = 0; i < stageCount; ++i)
+	{
+		if (i <= stageMaxNum)
+		{
+			// 選択してるやつだけ一番上に描画するのでcontinue
+			if (i == currentStage)continue;
+
+			// stage3の画像が無いのでif書いてます
+			if (stageTexSprite[i])
+			{
+				stageTexSprite[i]->drawWithUpdate(DX12Base::ins(), spBase.get());
+			}
+		}
+	}
+	tutorialTexture->draw();
+
+
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	// 一番上に表示したいのでここで呼び出し
+	if (stageTexSprite[currentStage])
+	{
+		stageTexSprite[currentStage]->drawWithUpdate(DX12Base::ins(), spBase.get());
 	}
 }
