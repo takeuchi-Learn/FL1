@@ -212,7 +212,7 @@ void GameCamera::imuInputRotation()
 	{
 		// 調整項目
 		const float invRaito = 1.f - angleFilterRaito;
-		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, -accel.up));
+		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, std::sqrt(accel.forward * accel.forward + accel.up * accel.up)));
 
 		angleDeg = angleFilterRaito * (angleDeg + gyro.roll) + invRaito * rollAccel;
 	}
