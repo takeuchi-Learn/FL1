@@ -306,10 +306,10 @@ void PlayScene::update_main()
 		// 左シフト + R
 		bool hit = Input::ins()->triggerKey(DIK_R) && Input::ins()->hitKey(DIK_LSHIFT);
 
-		// ABXYの上と左
+		// LR
 		if (PadImu::ins()->getDevCount() > 0)
 		{
-			constexpr auto useJSLMask = JSMASK_N | JSMASK_W;
+			constexpr auto useJSLMask = JSMASK_L | JSMASK_R;
 
 			const int preState = PadImu::ins()->getPreStates()[0].buttons;
 			const int state = PadImu::ins()->getStates()[0].buttons;

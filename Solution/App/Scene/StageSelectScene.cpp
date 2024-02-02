@@ -96,16 +96,16 @@ void StageSelectScene::update_main()
 
 	if (inputR)
 	{
-		if (currentStage < stageMaxNum) 
-		{ 
-			++currentStage; 
+		if (currentStage < stageMaxNum)
+		{
+			++currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
 	} else if (inputL)
 	{
-		if (currentStage > 0u) 
+		if (currentStage > 0u)
 		{
-			--currentStage; 
+			--currentStage;
 			Sound::playWave(stageChange, 0u, 0.2f);
 		}
 	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
@@ -140,7 +140,6 @@ void StageSelectScene::update_transition()
 
 	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 }
-
 
 void StageSelectScene::start()
 {
