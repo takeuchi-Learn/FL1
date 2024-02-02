@@ -40,14 +40,16 @@ class StageSelectScene :
 	std::unique_ptr<SpriteBase> spBase;
 
 	// 背景
-	std::unique_ptr<Sprite>backGroundSprite;
+	std::unique_ptr<Sprite> backGroundSprite;
 	// ステージ画面
-	std::vector<std::unique_ptr<Sprite>>stageTexSprite;
+	std::vector<std::unique_ptr<Sprite>> stageTexSprite;
 	// 矢印
-	std::unique_ptr<Sprite>arrowSprite;
+	std::unique_ptr<Sprite> arrowSprite;
 
 	// コントローラー回転してるやつ
-	std::unique_ptr<TutorialTexture>tutorialTexture;
+	std::unique_ptr<TutorialTexture> tutorialTexture;
+
+	std::unique_ptr<Sprite> checkbox;
 
 	std::unique_ptr<GameCamera>camera;
 
