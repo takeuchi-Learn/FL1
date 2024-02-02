@@ -13,6 +13,7 @@
 class Stopwatch;
 class Sprite;
 class SpriteBase;
+class SoundData;
 class TutorialTexture;
 // TutorialTexture用
 class GameCamera;
@@ -50,10 +51,13 @@ class StageSelectScene :
 	std::unique_ptr<TutorialTexture>tutorialTexture;
 
 	std::unique_ptr<GameCamera>camera;
+
+	std::weak_ptr<SoundData> bgm;
 public:
 	StageSelectScene();
 	~StageSelectScene() = default;
 
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };

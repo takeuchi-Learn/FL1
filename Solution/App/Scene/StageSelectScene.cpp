@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <format>
 #include<TutorialTexture.h>
+#include<Sound/Sound.h>
 
 using namespace DirectX;
 
@@ -75,6 +76,9 @@ StageSelectScene::StageSelectScene() :
 	tutorialTexture = std::make_unique<TutorialTexture>(camera.get(), 0);
 	tutorialTexture->setPosition(XMFLOAT2(0.0f, 8.0f));
 	tutorialTexture->setScale(6.f);
+
+	// 音読み込み
+	bgm = Sound::ins()->loadWave("Resources/BGM/select13.wav");
 }
 
 void StageSelectScene::update_main()
@@ -120,10 +124,17 @@ void StageSelectScene::update_transition()
 		transitionRaito = 1.f;
 		thread->join();
 		SceneManager::ins()->changeSceneFromInstance(nextScene);
+
+		Sound::stopWave(bgm);
 		return;
 	}
 
 	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
+}
+
+void StageSelectScene::start()
+{
+	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
 }
 
 void StageSelectScene::update()
