@@ -79,6 +79,8 @@ StageSelectScene::StageSelectScene() :
 
 	// 音読み込み
 	bgm = Sound::ins()->loadWave("Resources/BGM/select13.wav");
+	stageChange = Sound::ins()->loadWave("Resources/SE/StageSelect/StageChange.wav");
+	stageDecided = Sound::ins()->loadWave("Resources/SE/StageSelect/StageDecided.wav");
 }
 
 void StageSelectScene::update_main()
@@ -97,10 +99,18 @@ void StageSelectScene::update_main()
 
 	if (inputR)
 	{
-		if (currentStage < stageMaxNum) { ++currentStage; }
+		if (currentStage < stageMaxNum) 
+		{ 
+			++currentStage; 
+			Sound::playWave(stageChange, 0u, 0.2f);
+		}
 	} else if (inputL)
 	{
-		if (currentStage > 0u) { --currentStage; }
+		if (currentStage > 0u) 
+		{
+			--currentStage; 
+			Sound::playWave(stageChange, 0u, 0.2f);
+		}
 	} else if (PadImu::ins()->checkInputAccept() || Sensor::ins()->CheckButton())
 	{
 		PlayScene::setStageNum(currentStage);
@@ -110,6 +120,8 @@ void StageSelectScene::update_main()
 												});
 		update_proc = std::bind(&StageSelectScene::update_transition, this);
 		timer->reset();
+
+		Sound::playWave(stageDecided, 0u, 0.2f);
 	}
 
 	// 操作方法更新
@@ -131,6 +143,7 @@ void StageSelectScene::update_transition()
 
 	transitionRaito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 }
+
 
 void StageSelectScene::start()
 {

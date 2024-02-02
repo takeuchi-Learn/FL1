@@ -53,6 +53,8 @@ class StageSelectScene :
 	std::unique_ptr<GameCamera>camera;
 
 	std::weak_ptr<SoundData> bgm;
+	std::weak_ptr<SoundData> stageChange;
+	std::weak_ptr<SoundData> stageDecided;
 public:
 	StageSelectScene();
 	~StageSelectScene() = default;
