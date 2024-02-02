@@ -178,7 +178,8 @@ void GameCamera::directionalInputRotation()
 
 void GameCamera::imuInputRotation()
 {
-	if (PadImu::ins()->getDevCount() > 0)
+	const bool imuPadIsConnected = PadImu::ins()->getDevCount() > 0;
+	if (imuPadIsConnected)
 	{
 		const auto state = JslGetIMUState(PadImu::ins()->getHandles()[0]);
 
@@ -195,13 +196,13 @@ void GameCamera::imuInputRotation()
 		auto* sensor = Sensor::ins();
 
 		// 加速度取得
-		accel.right = -sensor->GetAccelX();
-		accel.up = -sensor->GetAccelZ();
-		accel.forward = -sensor->GetAccelY();
+		accel.right = sensor->GetAccelX();
+		accel.up = sensor->GetAccelZ();
+		accel.forward = sensor->GetAccelY();
 		// 角速度取得
-		gyro.pitch = -sensor->GetGyroX();
-		gyro.yaw = -sensor->GetGyroZ();
-		gyro.roll = -sensor->GetGyroY();
+		gyro.pitch = sensor->GetGyroX();
+		gyro.yaw = sensor->GetGyroZ();
+		gyro.roll = sensor->GetGyroY();
 	}
 	// 単位がDegree/Secなので、1フレームでの値に変換する
 	gyro.pitch /= DX12Base::ins()->getFPS();
@@ -210,11 +211,13 @@ void GameCamera::imuInputRotation()
 
 	// 相補フィルターで補正
 	{
+		const float raito = imuPadIsConnected ? angleFilterRaito : 0.9f;
+
 		// 調整項目
-		const float invRaito = 1.f - angleFilterRaito;
+		const float invRaito = 1.f - raito;
 		const float rollAccel = XMConvertToDegrees(std::atan2(accel.right, std::sqrt(accel.forward * accel.forward + accel.up * accel.up)));
 
-		angleDeg = angleFilterRaito * (angleDeg + gyro.roll) + invRaito * rollAccel;
+		angleDeg = raito * (angleDeg + gyro.roll) + invRaito * rollAccel;
 	}
 
 	// 静止状態を大きめに取る
