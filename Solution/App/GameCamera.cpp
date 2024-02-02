@@ -211,7 +211,7 @@ void GameCamera::imuInputRotation()
 
 	// 相補フィルターで補正
 	{
-		const float raito = imuPadIsConnected ? angleFilterRaito : 0.9f;
+		const float raito = imuPadIsConnected ? angleFilterRaito : 0.8f;
 
 		// 調整項目
 		const float invRaito = 1.f - raito;
