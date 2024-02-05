@@ -125,7 +125,7 @@ void GameCamera::rotation()
 			padInput ||
 			Sensor::ins()->CheckButton())
 		{
-			dInputAngleDeg = 0.f;
+			dInputAngleDeg -= angleDeg * 2.f;
 			angleDeg = 0.f;
 		}
 	}
