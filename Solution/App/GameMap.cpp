@@ -22,7 +22,7 @@ namespace
 		goalStr,
 	};
 
-	template <std::integral Ty, int base = 10>
+	template <std::integral Ty, int base = 36>
 	std::from_chars_result fromStr(std::string_view str, Ty& ret)
 	{
 		return std::from_chars(std::to_address(str.begin()),
@@ -113,7 +113,7 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		}
 	}
 
-	const auto& texFolderPath = root["texFolderPath"].As<std::string>("DEF_VALUE");
+	const auto texFolderPath = root["texFolderPath"].As<std::string>("");
 	auto& texFileNameNode = root["texFileName"];
 
 	auto& csv = root["csv"].As<std::string>("NONE");
@@ -131,14 +131,13 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 		{
 			const auto& cellStr = csvData[y][x];
 
-			constexpr int base = 10;
-			uint8_t n = 0ui8;
+			constexpr int base = 36;
+			uint8_t n = UINT8_MAX;
 			const auto ret = fromStr<uint8_t, base>(cellStr, n);
 
 			// 未定義の値なら
 			if (ret.ec == std::errc::invalid_argument ||
-				ret.ec == std::errc::result_out_of_range ||
-				n == 0ui8)
+				ret.ec == std::errc::result_out_of_range)
 			{
 				assert(0);
 				return true;
@@ -215,7 +214,8 @@ bool GameMap::loadDataFile(const std::string& filePath, DirectX::XMFLOAT2* start
 								 constexpr auto texSize = XMFLOAT2(800.f, 300.f);
 								 auto& i = goals.emplace_front(std::make_unique<Goal>(camera, pos, texSize));
 
-								 constexpr auto centerPx = XMFLOAT2(249.f, 249.f);
+								 // centerPxデフォ249,f,259.f
+								 constexpr auto centerPx = XMFLOAT2(249.f, 245.f);
 								 constexpr auto centerUv = XMFLOAT2(1.f - centerPx.x / texSize.x, centerPx.y / texSize.y);
 								 constexpr auto center = XMFLOAT2(std::lerp(-1.f, 1.f, centerUv.x), std::lerp(-1.f, 1.f, centerUv.y));
 								 i->setCenter(center);

@@ -97,6 +97,30 @@ void PlayScene::checkCollision()
 			}
 			plyerPreGoalPos = goalPreGoalPos;
 
+			loadNextScene = std::make_unique<std::jthread>([&] { nextScene = std::make_unique<ClearScene>(); });
+
+			for (auto& i : cinemaScope)
+			{
+				i->isInvisible = false;
+			}
+			updateCinemaScopeProc = [&]
+				{
+					constexpr auto maxTime = Timer::oneSec / 4;
+					constexpr float maxTimeF = static_cast<float>(maxTime);
+					const auto now = timer->getNowTime();
+					if (now > maxTime)
+					{
+						updateCinemaScopeProc = [] {};
+						return;
+					}
+					const auto raito = static_cast<float>(now) / maxTimeF;
+					const float height = std::lerp(0.f, csHeight, raito);
+					for (auto& i : cinemaScope)
+					{
+						i->setSize(XMFLOAT2(winSize.x, height));
+					}
+				};
+
 			hitGoalPtr = goal.get();
 			goal->hit(sphere);
 			updateProc = std::bind(&PlayScene::update_goal, this);
@@ -183,6 +207,9 @@ void PlayScene::update()
 	// 衝突確認
 	checkCollision();
 
+	// シネスコ更新関数
+	updateCinemaScopeProc();
+
 	updateProc();
 
 	camera->update();
@@ -195,27 +222,26 @@ void PlayScene::update()
 
 void PlayScene::update_start()
 {
-	if (timer->getNowTime() > transitionTime)
+	if (const auto nowTime = timer->getNowTime();
+		nowTime <= transitionTime)
 	{
-		// 自機は物理挙動する
-		// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
-		player->isDynamic = true;
-		// 演出中の衝突フラグは無視する
-		player->resetReboundFlag();
-
-		PostEffect::ins()->setMosaicNum(winSize);
-		PostEffect::ins()->setAlpha(1.f);
-		Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
-		updateProc = std::bind(&PlayScene::update_appearance, this);
-		timer->reset();
-	} else
-	{
-		float raito = static_cast<float>(timer->getNowTime()) / static_cast<float>(transitionTime);
-		//PostEffect::ins()->setAlpha(raito);
-		//raito *= raito * raito * raito * raito;
+		const float raito = static_cast<float>(nowTime) / static_cast<float>(transitionTime);
 		PostEffect::ins()->setMosaicNum(XMFLOAT2(raito * winSize.x,
 												 raito * winSize.y));
+		return;
 	}
+
+	// 自機は物理挙動する
+	// 演出中に動くのが嫌なら`update_appearance`関数の`allowInput=true`があるところに移動する
+	player->isDynamic = true;
+	// 演出中の衝突フラグは無視する
+	player->resetReboundFlag();
+
+	PostEffect::ins()->setMosaicNum(winSize);
+	PostEffect::ins()->setAlpha(1.f);
+	Sound::playWave(bgm, XAUDIO2_LOOP_INFINITE, 0.2f);
+	updateProc = std::bind(&PlayScene::update_appearance, this);
+	timer->reset();
 }
 
 void PlayScene::update_appearance()
@@ -280,10 +306,10 @@ void PlayScene::update_main()
 		// 左シフト + R
 		bool hit = Input::ins()->triggerKey(DIK_R) && Input::ins()->hitKey(DIK_LSHIFT);
 
-		// ABXYの上と左
+		// LR
 		if (PadImu::ins()->getDevCount() > 0)
 		{
-			constexpr auto useJSLMask = JSMASK_N | JSMASK_W;
+			constexpr auto useJSLMask = JSMASK_L | JSMASK_R;
 
 			const int preState = PadImu::ins()->getPreStates()[0].buttons;
 			const int state = PadImu::ins()->getStates()[0].buttons;
@@ -301,9 +327,6 @@ void PlayScene::update_main()
 		}
 	}
 
-	// シネスコ更新関数
-	updateCinemaScopeProc();
-
 	// ゲームオーバー確認
 	if (player->getIsDead())
 	{
@@ -320,14 +343,18 @@ void PlayScene::update_main()
 void PlayScene::update_goal()
 {
 	constexpr float max = Timer::oneSecF;
-	const float raito = static_cast<float>(timer->getNowTime()) / max;
+	float raito = static_cast<float>(timer->getNowTime()) / max;
 	if (raito >= 1.f)
 	{
 		updateProc = std::bind(&PlayScene::update_clear, this);
 		return;
 	}
 
-	constexpr float moveVal = 1000.f;
+	// ゴール演出で動く幅
+	constexpr float moveVal = 2000.f;
+
+	// だんだん速くなるようにする
+	raito *= raito * raito;
 
 	auto& goal = hitGoalPtr->getObj()->getFrontData();
 	goal->position.x = std::lerp(goalPreGoalPos.x, goalPreGoalPos.x + moveVal, raito);
@@ -341,8 +368,15 @@ void PlayScene::update_clear()
 	// コーンのカウント記録
 	ConeRecorder::ins()->registration(stageNum, player->getConeCount());
 
+	if (!loadNextScene || !loadNextScene->joinable())
+	{
+		assert(0);
+		return;
+	}
+
 	// クリア演出後シーン切り替え
-	SceneManager::ins()->changeScene<ClearScene>();
+	loadNextScene->join();
+	SceneManager::ins()->changeSceneFromInstance(nextScene);
 }
 
 void PlayScene::drawObj3d()
