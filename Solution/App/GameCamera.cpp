@@ -125,7 +125,7 @@ void GameCamera::rotation()
 			padInput ||
 			Sensor::ins()->CheckButton())
 		{
-			dInputAngleDeg = 0.f;
+			dInputAngleDeg -= angleDeg * 2.f;
 			angleDeg = 0.f;
 		}
 	}
@@ -136,7 +136,7 @@ void GameCamera::rotation()
 
 void GameCamera::directionalInputRotation()
 {
-	constexpr float speed = 30.f;
+	constexpr float speed = 360.f;
 	float val = 0.f;
 
 	if (PadImu::ins()->getDevCount() > 0)
