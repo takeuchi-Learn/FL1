@@ -136,7 +136,7 @@ void GameCamera::rotation()
 
 void GameCamera::directionalInputRotation()
 {
-	constexpr float speed = 360.f;
+	constexpr float speed = 30.f;
 	float val = 0.f;
 
 	if (PadImu::ins()->getDevCount() > 0)
